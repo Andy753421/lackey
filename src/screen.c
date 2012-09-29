@@ -1,3 +1,4 @@
+#include <string.h>
 #include <ncurses.h>
 #include "main.h"
 #include "screen.h"
@@ -7,7 +8,7 @@ typedef struct {
 	char  *name;
 	void (*init)(void);
 	void (*draw)(void);
-	int  (*run)(int);
+	int  (*run)(int,mmask_t,int,int);
 	int    keys[8];
 } view_t;
 
@@ -25,52 +26,81 @@ view_t views[] = {
 	{ "Help",     help_init,     help_draw,     help_run,     {KEY_F(8), '8', 'h', '?'} },
 };
 
-view_t *active = &views[0];
+int active = 0;
 
 /* Local functions */
 void draw_header(void)
 {
 	move(0, 0);
-	attron(COLOR_PAIR(1));
+	attron(COLOR_PAIR(COLOR_TITLE));
 	for (int i = 0; i < N_ELEMENTS(views); i++) {
-		if (active == &views[i])
+		if (i == active)
 			attron(A_BOLD);
 		printw(" %s", views[i].name);
-		if (active == &views[i])
+		if (i == active)
 			attroff(A_BOLD);
 	}
-	attroff(COLOR_PAIR(1));
-	mvhline(1, 0, ACS_HLINE, win_cols);
+	attroff(COLOR_PAIR(COLOR_TITLE));
+	mvhline(1, 0, ACS_HLINE, COLS);
 }
 
 /* Screen init */
 void screen_init(void)
 {
-	init_pair(1, COLOR_GREEN, COLOR_BLACK);
 }
 
-/* Scren draw */
+/* Screen draw */
 void screen_draw(void)
 {
 	draw_header();
-	active->draw();
+	views[active].draw();
+}
+
+/* Screen set */
+int screen_set(int num)
+{
+	if (active != num) {
+		active = num;
+		screen_draw();
+	}
+	return 1;
 }
 
 /* Screen run */
-int screen_run(int chr)
+int screen_run(int key, mmask_t btn, int row, int col)
 {
+	/* Check for mouse events */
+	if (key == KEY_MOUSE && row == 0) {
+		int start = 1;
+		for (int i = 0; i < N_ELEMENTS(views); i++) {
+			int end = start + strlen(views[i].name) - 1;
+			if (start <= col && col <= end)
+				return screen_set(i);
+			start = end + 2;
+		}
+	}
+
 	/* Check for view change */
 	for (int i = 0; i < N_ELEMENTS(views); i++) {
-		view_t *view = &views[i];
-		if (view == active)
+		if (i == active)
 			continue;
-		for (int j = 0; j < N_ELEMENTS(view->keys); j++)
-			if (view->keys[j] == chr) {
-				active = view;
-				screen_draw();
-			}
+		for (int j = 0; j < N_ELEMENTS(views[i].keys); j++)
+			if (views[i].keys[j] == key)
+				return screen_set(i);
+	}
+
+	/* Shift windows */
+	int num   = active;
+	int shift = key == KEY_RIGHT ? +1 :
+		    key == KEY_LEFT  ? -1 : 0;
+	while (shift) {
+		num += shift;
+		num += N_ELEMENTS(views);
+		num %= N_ELEMENTS(views);
+		if (views[num].run)
+			return screen_set(num);
 	}
 
 	/* Pass key to active view */
-	return active->run(chr);
+	return views[active].run(key, btn, row, col);
 }

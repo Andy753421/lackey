@@ -1,3 +1,5 @@
+#include <ncurses.h>
+
 /* settings init */
 void settings_init(void)
 {
@@ -9,7 +11,7 @@ void settings_draw(void)
 }
 
 /* settings run */
-int settings_run(int chr)
+int settings_run(int key, mmask_t btn, int row, int col)
 {
 	return 0;
 }

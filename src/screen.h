@@ -1,7 +1,7 @@
 /* Screen functions */
 void screen_init(void);
 void screen_draw(void);
-int  screen_run(int);
+int  screen_run(int key, mmask_t btn, int row, int col);
 
 /* View init functions */
 void day_init(void);
@@ -24,11 +24,11 @@ void settings_draw(void);
 void help_draw(void);
 
 /* View run functions */
-int day_run(int);
-int week_run(int);
-int month_run(int);
-int year_run(int);
-int todo_run(int);
-int notes_run(int);
-int settings_run(int);
-int help_run(int);
+int day_run(int,mmask_t,int,int);
+int week_run(int,mmask_t,int,int);
+int month_run(int,mmask_t,int,int);
+int year_run(int,mmask_t,int,int);
+int todo_run(int,mmask_t,int,int);
+int notes_run(int,mmask_t,int,int);
+int settings_run(int,mmask_t,int,int);
+int help_run(int,mmask_t,int,int);
