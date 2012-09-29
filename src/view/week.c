@@ -1,16 +1,22 @@
 #include <ncurses.h>
 
-/* week init */
-void week_init(void)
+/* Static data */
+static WINDOW *win;
+
+/* Week init */
+void week_init(WINDOW *_win)
 {
+	win = _win;
 }
 
-/* week draw */
+/* Week draw */
 void week_draw(void)
 {
+	mvwprintw(win, 0, 1, "%s\n", "week");
+	wrefresh(win);
 }
 
-/* week run */
+/* Week run */
 int week_run(int key, mmask_t btn, int row, int col)
 {
 	return 0;

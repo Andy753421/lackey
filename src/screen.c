@@ -5,11 +5,12 @@
 
 /* Types */
 typedef struct {
-	char  *name;
-	void (*init)(void);
-	void (*draw)(void);
-	int  (*run)(int,mmask_t,int,int);
-	int    keys[8];
+	char   *name;
+	void  (*init)(WINDOW*);
+	void  (*draw)(void);
+	int   (*run)(int,mmask_t,int,int);
+	int     keys[8];
+	WINDOW *win;
 } view_t;
 
 /* Data */
@@ -42,11 +43,18 @@ void draw_header(void)
 	}
 	attroff(COLOR_PAIR(COLOR_TITLE));
 	mvhline(1, 0, ACS_HLINE, COLS);
+	refresh();
 }
 
 /* Screen init */
 void screen_init(void)
 {
+	for (int i = 0; i < N_ELEMENTS(views); i++) {
+		if (views[i].init) {
+			views[i].win = newwin(LINES-2, COLS, 2, 0);
+			views[i].init(views[i].win);
+		}
+	}
 }
 
 /* Screen draw */

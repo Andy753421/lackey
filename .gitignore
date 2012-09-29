@@ -1,5 +1,6 @@
 *.log
 *.o
+*.swp
 *~
 .vimrc
 acal

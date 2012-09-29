@@ -1,16 +1,22 @@
 #include <ncurses.h>
 
-/* help init */
-void help_init(void)
+/* Static data */
+static WINDOW *win;
+
+/* Help init */
+void help_init(WINDOW *_win)
 {
+	win = _win;
 }
 
-/* help draw */
+/* Help draw */
 void help_draw(void)
 {
+	mvwprintw(win, 0, 1, "%s\n", "help");
+	wrefresh(win);
 }
 
-/* help run */
+/* Help run */
 int help_run(int key, mmask_t btn, int row, int col)
 {
 	return 0;

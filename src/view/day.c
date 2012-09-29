@@ -1,16 +1,22 @@
 #include <ncurses.h>
 
-/* day init */
-void day_init(void)
+/* Static data */
+static WINDOW *win;
+
+/* Day init */
+void day_init(WINDOW *_win)
 {
+	win = _win;
 }
 
-/* day draw */
+/* Day draw */
 void day_draw(void)
 {
+	mvwprintw(win, 0, 1, "%s\n", "day");
+	wrefresh(win);
 }
 
-/* day run */
+/* Day run */
 int day_run(int key, mmask_t btn, int row, int col)
 {
 	return 0;

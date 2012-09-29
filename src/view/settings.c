@@ -1,16 +1,22 @@
 #include <ncurses.h>
 
-/* settings init */
-void settings_init(void)
+/* Static data */
+static WINDOW *win;
+
+/* Settings init */
+void settings_init(WINDOW *_win)
 {
+	win = _win;
 }
 
-/* settings draw */
+/* Settings draw */
 void settings_draw(void)
 {
+	mvwprintw(win, 0, 1, "%s\n", "settings");
+	wrefresh(win);
 }
 
-/* settings run */
+/* Settings run */
 int settings_run(int key, mmask_t btn, int row, int col)
 {
 	return 0;

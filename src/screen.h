@@ -4,14 +4,14 @@ void screen_draw(void);
 int  screen_run(int key, mmask_t btn, int row, int col);
 
 /* View init functions */
-void day_init(void);
-void week_init(void);
-void month_init(void);
-void year_init(void);
-void todo_init(void);
-void notes_init(void);
-void settings_init(void);
-void help_init(void);
+void day_init(WINDOW *win);
+void week_init(WINDOW *win);
+void month_init(WINDOW *win);
+void year_init(WINDOW *win);
+void todo_init(WINDOW *win);
+void notes_init(WINDOW *win);
+void settings_init(WINDOW *win);
+void help_init(WINDOW *win);
 
 /* View draw functions */
 void day_draw(void);

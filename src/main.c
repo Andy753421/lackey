@@ -14,7 +14,6 @@ static FILE *debug_fd = NULL;
 static void on_sigint(int signum)
 {
 	endwin();
-	debug("got sigint\n");
 	exit(0);
 }
 
@@ -59,11 +58,9 @@ int main(int argc, char **argv)
 	sigemptyset(&act.sa_mask);
 	act.sa_flags   = 0;
 	act.sa_handler = on_sigint;
-	if (sigaction(SIGINT, &act, NULL) < 0)
-		debug("sigint error\n");
+	sigaction(SIGINT, &act, NULL);
 	act.sa_handler = on_sigwinch;
-	if (sigaction(SIGWINCH, &act, NULL) < 0)
-		debug("sigwinch error\n");
+	sigaction(SIGWINCH, &act, NULL);
 
 	/* Curses setup */
 	initscr();
@@ -76,6 +73,7 @@ int main(int argc, char **argv)
 	init_pair(COLOR_TITLE, COLOR_GREEN, COLOR_BLACK);
 	init_pair(COLOR_ERROR, COLOR_RED,   COLOR_BLACK);
 	screen_init();
+	screen_draw();
 
 	/* Run */
 	while (1) {
@@ -103,6 +101,5 @@ int main(int argc, char **argv)
 
 	/* Cleanup, see also on_sigint */
 	endwin();
-	debug("cleanup");
 	return 0;
 }

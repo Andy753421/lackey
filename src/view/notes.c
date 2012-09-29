@@ -1,16 +1,22 @@
 #include <ncurses.h>
 
-/* notes init */
-void notes_init(void)
+/* Static data */
+static WINDOW *win;
+
+/* Notes init */
+void notes_init(WINDOW *_win)
 {
+	win = _win;
 }
 
-/* notes draw */
+/* Notes draw */
 void notes_draw(void)
 {
+	mvwprintw(win, 0, 1, "%s\n", "notes");
+	wrefresh(win);
 }
 
-/* notes run */
+/* Notes run */
 int notes_run(int key, mmask_t btn, int row, int col)
 {
 	return 0;

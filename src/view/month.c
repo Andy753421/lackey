@@ -1,16 +1,22 @@
 #include <ncurses.h>
 
-/* month init */
-void month_init(void)
+/* Static data */
+static WINDOW *win;
+
+/* Month init */
+void month_init(WINDOW *_win)
 {
+	win = _win;
 }
 
-/* month draw */
+/* Month draw */
 void month_draw(void)
 {
+	mvwprintw(win, 0, 1, "%s\n", "month");
+	wrefresh(win);
 }
 
-/* month run */
+/* Month run */
 int month_run(int key, mmask_t btn, int row, int col)
 {
 	return 0;

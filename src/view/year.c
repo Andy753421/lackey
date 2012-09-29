@@ -1,16 +1,22 @@
 #include <ncurses.h>
 
-/* year init */
-void year_init(void)
+/* Static data */
+static WINDOW *win;
+
+/* Year init */
+void year_init(WINDOW *_win)
 {
+	win = _win;
 }
 
-/* year draw */
+/* Year draw */
 void year_draw(void)
 {
+	mvwprintw(win, 0, 1, "%s\n", "year");
+	wrefresh(win);
 }
 
-/* year run */
+/* Year run */
 int year_run(int key, mmask_t btn, int row, int col)
 {
 	return 0;
