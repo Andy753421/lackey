@@ -15,7 +15,8 @@ default: test
 all: $(PROG)
 
 test: $(PROG)
-	./$<
+	@urxvt -e ./$<
+	@cat acal.log
 
 clean:
 	rm -f *.o view/*.o $(PROG)
