@@ -27,7 +27,7 @@ view_t views[] = {
 	{ "Help",     help_init,     help_draw,     help_run,     {KEY_F(8), '8', 'h', '?'} },
 };
 
-int active = 0;
+int active = 2;
 
 /* Local functions */
 void draw_header(void)
@@ -37,7 +37,7 @@ void draw_header(void)
 	for (int i = 0; i < N_ELEMENTS(views); i++) {
 		if (i == active)
 			attron(A_BOLD);
-		printw(" %s", views[i].name);
+		printw("%s ", views[i].name);
 		if (i == active)
 			attroff(A_BOLD);
 	}
@@ -58,10 +58,20 @@ void screen_init(void)
 }
 
 /* Screen draw */
+void screen_resize(void)
+{
+	for (int i = 0; i < N_ELEMENTS(views); i++)
+		if (views[i].init)
+			wresize(views[i].win, LINES-2, COLS);
+}
+
+/* Screen draw */
 void screen_draw(void)
 {
 	draw_header();
+	werase(views[active].win);
 	views[active].draw();
+	wrefresh(views[active].win);
 }
 
 /* Screen set */

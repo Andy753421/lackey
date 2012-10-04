@@ -1,5 +1,6 @@
 /* Screen functions */
 void screen_init(void);
+void screen_resize(void);
 void screen_draw(void);
 int  screen_run(int key, mmask_t btn, int row, int col);
 

@@ -22,6 +22,7 @@ static void on_sigwinch(int signum)
 {
 	endwin();
 	refresh();
+	screen_resize();
 	screen_draw();
 }
 
