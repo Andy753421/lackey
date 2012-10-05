@@ -3,7 +3,7 @@
 *.swp
 *~
 .vimrc
-acal
 config.mk
+lackey
 test
 tags

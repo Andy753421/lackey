@@ -51,7 +51,7 @@ int debug(char *fmt, ...)
 
 	/* Open log file */
 	if (!debug_fd)
-		debug_fd = fopen("acal.log", "w+");
+		debug_fd = fopen("lackey.log", "w+");
 
 	/* Log to debug file */
 	va_start(ap, fmt);

@@ -7,7 +7,7 @@ CPPFLAGS ?= -Isrc
 LDFLAGS  ?= -lncursesw
 
 # Sources
-PROG      = acal
+PROG      = lackey
 TEST      = test
 SOURCES   = main screen util
 TESTS     = test util
@@ -18,7 +18,7 @@ all: $(PROG) $(TEST)
 
 run-$(PROG): $(PROG)
 	@urxvt -e ./$<
-	@cat acal.log
+	@cat lackey.log
 
 run-$(TEST): $(TEST)
 	./$<
