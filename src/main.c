@@ -32,6 +32,10 @@ int debug(char *fmt, ...)
 	int rval;
 	va_list ap;
 
+	/* Open log file */
+	if (!debug_fd)
+		debug_fd = fopen("acal.log", "w+");
+
 	/* Log to debug file */
 	va_start(ap, fmt);
 	vfprintf(debug_fd, "debug: ", ap);
@@ -54,7 +58,6 @@ int debug(char *fmt, ...)
 int main(int argc, char **argv)
 {
 	/* Misc setup */
-	debug_fd = fopen("acal.log", "w+");
 	struct sigaction act;
 	sigemptyset(&act.sa_mask);
 	act.sa_flags   = 0;

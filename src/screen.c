@@ -2,6 +2,7 @@
 #include <ncurses.h>
 #include "main.h"
 #include "screen.h"
+#include "util.h"
 
 /* Types */
 typedef struct {
@@ -27,7 +28,7 @@ view_t views[] = {
 	{ "Help",     help_init,     help_draw,     help_run,     {KEY_F(8), '8', 'h', '?'} },
 };
 
-int active = 3;
+int active = 0;
 
 /* Local functions */
 void draw_header(void)

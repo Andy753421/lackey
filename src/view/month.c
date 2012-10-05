@@ -1,18 +1,11 @@
 #include <string.h>
 #include <ncurses.h>
 
+#include "main.h"
 #include "util.h"
-
-/* Macros */
-#define ROUND(x) ((int)((x)+0.5))
 
 /* Static data */
 static WINDOW *win;
-
-/* Test data */
-const static int YEAR  = 2012;
-const static int MONTH = SEP;
-const static int DAY   = 29;
 
 /* Month init */
 void month_init(WINDOW *_win)
@@ -33,8 +26,10 @@ void month_draw(void)
 
 	/* Print Header */
 	mvwprintw(win, 0, midpt, "%s %d", name, YEAR);
-	for (int d = 0; d < 7; d++)
-		mvwprintw(win, 1, ROUND(d*hstep), "%s", day_to_str(d+SUN));
+	for (int d = 0; d < 7; d++) {
+		const char *str = hstep >= 10 ? day_to_string(d+SUN) : day_to_str(d+SUN);
+		mvwprintw(win, 1, ROUND(d*hstep), "%s", str);
+	}
 	mvwhline(win, 2, 0, ACS_HLINE, COLS);
 
 	/* Print days */

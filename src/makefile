@@ -1,17 +1,17 @@
+-include config.mk
+
 # Settings
-CC       = gcc
-CFLAGS   = -Wall --std=c99
-CPPFLAGS = -I.
-LDFLAGS  = -lncursesw
-PROG     = acal
-TEST     = test
+CC       ?= gcc
+CFLAGS   ?= -Wall --std=c99
+CPPFLAGS ?= -Isrc
+LDFLAGS  ?= -lncursesw
 
-# Views
-SOURCES  = main screen util
-TESTS    = test util
-VIEWS    = day week month year todo notes settings help
-
-default: run-$(PROG)
+# Sources
+PROG      = acal
+TEST      = test
+SOURCES   = main screen util
+TESTS     = test util
+VIEWS     = day week month year todo notes settings help
 
 # Targets
 all: $(PROG) $(TEST)
@@ -24,13 +24,13 @@ run-$(TEST): $(TEST)
 	./$<
 
 clean:
-	rm -f *.o view/*.o $(PROG) $(TEST)
+	rm -f src/*.o view/*.o $(PROG) $(TEST) 
 
 # Rules
-$(PROG): $(SOURCES:%=%.o) $(VIEWS:%=view/%.o)
+$(PROG): $(SOURCES:%=src/%.o) $(VIEWS:%=view/%.o)
 	$(CC) $(CLFAGS) -o $@ $+ $(LDFLAGS)
 
-$(TEST): $(TESTS:%=%.o) $(VIEWS:%=view/%.o)
+$(TEST): $(TESTS:%=src/%.o) $(VIEWS:%=view/%.o)
 	$(CC) $(CLFAGS) -o $@ $+ $(LDFLAGS)
 
 %.o: %.c $(SOURCES:%=%.h) makefile

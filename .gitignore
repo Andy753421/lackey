@@ -4,5 +4,6 @@
 *~
 .vimrc
 acal
+config.mk
 test
 tags

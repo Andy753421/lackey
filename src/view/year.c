@@ -1,19 +1,14 @@
 #include <string.h>
 #include <ncurses.h>
 
+#include "main.h"
 #include "util.h"
 
-/* Macros */
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
+/* Constants */
 #define MW (2*7+6)
 
 /* Static data */
 static WINDOW *win;
-
-/* Test data */
-const static int YEAR  = 2012;
-const static int MONTH = SEP;
-const static int DAY   = 29;
 
 /* Helper functions */
 static void print_month(month_t month, int y, int x)
