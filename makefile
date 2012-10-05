@@ -18,7 +18,7 @@ all: $(PROG) $(TEST)
 
 run-$(PROG): $(PROG)
 	@urxvt -e ./$<
-	@cat lackey.log
+	@cat /tmp/lackey.log
 
 run-$(TEST): $(TEST)
 	./$<

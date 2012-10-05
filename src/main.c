@@ -15,7 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define _POSIX_C_SOURCE 1
 #include <stdarg.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -40,24 +39,11 @@ static void on_sigint(int signum)
 	exit(0);
 }
 
-/* Window change */
-static void on_sigwinch(int signum)
-{
-	endwin();
-	refresh();
-	screen_resize();
-	screen_draw();
-}
-
 /* Debugging functions */
 int debug(char *fmt, ...)
 {
 	int rval;
 	va_list ap;
-
-	/* Open log file */
-	if (!debug_fd)
-		debug_fd = fopen("lackey.log", "w+");
 
 	/* Log to debug file */
 	va_start(ap, fmt);
@@ -81,13 +67,8 @@ int debug(char *fmt, ...)
 int main(int argc, char **argv)
 {
 	/* Misc setup */
-	struct sigaction act;
-	sigemptyset(&act.sa_mask);
-	act.sa_flags   = 0;
-	act.sa_handler = on_sigint;
-	sigaction(SIGINT, &act, NULL);
-	act.sa_handler = on_sigwinch;
-	sigaction(SIGWINCH, &act, NULL);
+	signal(SIGINT, on_sigint);
+	debug_fd = fopen("/tmp/lackey.log", "w+");
 
 	/* Time setup */
 	time_t sec = time(NULL);
@@ -113,24 +94,31 @@ int main(int argc, char **argv)
 	while (1) {
 		MEVENT btn;
 		int chr = getch();
+		if (chr == 'q')
+			break;
 		if (chr == KEY_MOUSE)
 			if (getmouse(&btn) != OK)
 				continue;
-		if (chr == 'q')
-			break;
-		if (KEY_MOUSE)
-			//debug("mouse xyz=%d,%d,%d id=%hd state=%lx\n",
-			//	btn.x, btn.y, btn.z, btn.id, btn.bstate);
 		switch (chr) {
+			case ERR:
+				continue;
+			case KEY_RESIZE:
+				endwin();
+				refresh();
+				screen_resize();
+				screen_draw();
+				continue;
 			case 'L':
 				clear();
 			case 'l':
+			case '\7':
 				screen_draw();
-				break;
-			default:
-				screen_run(chr, btn.bstate, btn.y, btn.x);
-				break;
+				continue;
 		}
+		if (screen_run(chr, btn.bstate, btn.y, btn.x))
+			continue;
+		//debug("Unhandled key: Dec %3d,  Hex %02x,  Oct %03o,  Chr <%c>\n",
+		//		chr, chr, chr, chr);
 	}
 
 	/* Cleanup, see also on_sigint */
