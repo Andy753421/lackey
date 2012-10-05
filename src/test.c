@@ -17,6 +17,10 @@
 
 #include "util.h"
 
+int YEAR  = 2012;
+int MONTH = 8;
+int DAY   = 29;
+
 int main(int argc, char **argv)
 {
 	test_time();

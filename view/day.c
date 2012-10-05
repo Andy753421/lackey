@@ -37,8 +37,8 @@ void day_draw(void)
 	const char *dstr = day_to_string(day_of_week(YEAR, MONTH, DAY));
 
 	/* Print Header */
-	mvwprintw(win, 0, 0, "%s, %s %d", dstr, mstr, DAY);
-	mvwprintw(win, 0, COLS-10, "%d-%02d-%02d", YEAR, MONTH, DAY);
+	mvwprintw(win, 0, 0, "%s, %s %d", dstr, mstr, DAY+1);
+	mvwprintw(win, 0, COLS-10, "%d-%02d-%02d", YEAR, MONTH, DAY+1);
 	mvwhline(win, 1, 0, ACS_HLINE, COLS);
 
 	/* Print times */

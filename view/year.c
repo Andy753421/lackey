@@ -40,7 +40,7 @@ static void print_month(month_t month, int y, int x)
 	for (int d = 0; d < days; d++) {
 		int row = (start + d) / 7;
 		int col = (start + d) % 7;
-		mvwprintw(win, y+2+row, x+col*3, "%d", d+1);
+		mvwprintw(win, y+2+row, x+col*3, "%2d", d+1);
 	}
 }
 

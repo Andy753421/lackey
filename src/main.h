@@ -19,9 +19,9 @@
 #define COLOR_ERROR 2
 
 /* Debugging */
-const static int YEAR  = 2012;
-const static int MONTH = 8;
-const static int DAY   = 29;
+extern int YEAR;
+extern int MONTH;
+extern int DAY;
 
 /* Debug functions */
 int debug(char *fmt, ...);

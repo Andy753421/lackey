@@ -55,18 +55,18 @@ wday_t day_of_week(year_t year, month_t month, day_t day)
 {
 	static int tmp[] = {0, 3, 2, 5, 0, 3,
 		            5, 1, 4, 6, 2, 4};
-	if (month < 3)
+	if (month < MAR)
 		year--;
 	int start = year + year / 4
 		         - year / 100
 		         + year / 400
 		         + tmp[month];
-	return (start + day) % 7;
+	return (start + day + 1) % 7;
 }
 
 wday_t start_of_month(year_t year, month_t month)
 {
-	return day_of_week(year, month, 1);
+	return day_of_week(year, month, 0);
 }
 
 void add_days(year_t *year, month_t *month, day_t *day, int days)

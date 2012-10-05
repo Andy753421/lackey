@@ -49,7 +49,7 @@ void week_draw(void)
 	for (int d = 0; d < 5; d++) {
 		// FIXME..
 		const char *str = hstep >= 10 ? day_to_string(d+MON) : day_to_str(d+MON);
-		mvwprintw(win, 0, x+ROUND(d*hstep), "%02d/%02d", month, day);
+		mvwprintw(win, 0, x+ROUND(d*hstep), "%02d/%02d", month+1, day+1);
 		mvwprintw(win, 1, x+ROUND(d*hstep), "%s", str);
 		add_days(&year, &month, &day, 1);
 	}

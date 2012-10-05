@@ -19,10 +19,16 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <time.h>
 #include <ncurses.h>
 
 #include "main.h"
 #include "screen.h"
+
+/* Debugging */
+int YEAR  = 2012;
+int MONTH = 8;
+int DAY   = 29;
 
 /* Static data */
 static FILE *debug_fd = NULL;
@@ -82,6 +88,13 @@ int main(int argc, char **argv)
 	sigaction(SIGINT, &act, NULL);
 	act.sa_handler = on_sigwinch;
 	sigaction(SIGWINCH, &act, NULL);
+
+	/* Time setup */
+	time_t sec = time(NULL);
+	struct tm *tm = localtime(&sec);
+	YEAR  = tm->tm_year+1900;
+	MONTH = tm->tm_mon;
+	DAY   = tm->tm_mday-1;
 
 	/* Curses setup */
 	initscr();
