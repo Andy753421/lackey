@@ -110,7 +110,7 @@ int screen_run(int key, mmask_t btn, int row, int col)
 		int start = 1;
 		for (int i = 0; i < N_ELEMENTS(views); i++) {
 			int end = start + strlen(views[i].name) - 1;
-			if (start <= col && col <= end)
+			if (start <= col && col <= end && views[i].draw)
 				return screen_set(i);
 			start = end + 2;
 		}
