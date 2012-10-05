@@ -28,10 +28,10 @@ clean:
 
 # Rules
 $(PROG): $(SOURCES:%=src/%.o) $(VIEWS:%=view/%.o)
-	$(CC) $(CLFAGS) -o $@ $+ $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $+ $(LDFLAGS)
 
 $(TEST): $(TESTS:%=src/%.o) $(VIEWS:%=view/%.o)
-	$(CC) $(CLFAGS) -o $@ $+ $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $+ $(LDFLAGS)
 
-%.o: %.c $(SOURCES:%=%.h) makefile
+%.o: %.c $(SOURCES:%=src/%.h) makefile
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
