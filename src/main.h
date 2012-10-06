@@ -15,13 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef MAIN_H
+#define MAIN_H
+
 #define COLOR_TITLE 1
 #define COLOR_ERROR 2
 
+#include "util.h"
+
 /* Debugging */
-extern int YEAR;
-extern int MONTH;
-extern int DAY;
+extern year_t  YEAR;
+extern month_t MONTH;
+extern day_t   DAY;
 
 /* Debug functions */
 int debug(char *fmt, ...);
+
+#endif

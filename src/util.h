@@ -15,6 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef UTIL_H
+#define UTIL_H
+
 /* Macros */
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
@@ -59,6 +62,7 @@ wday_t day_of_week(year_t year, month_t month, day_t day);
 wday_t start_of_month(year_t year, month_t month);
 day_t start_of_week(year_t year, month_t month, day_t day);
 void add_days(year_t *year, month_t *month, day_t *day, int days);
+void add_months(year_t *year, month_t *month, int months);
 
 /* Time to string functions */
 const char *month_to_str(month_t month);
@@ -69,3 +73,5 @@ const char *day_to_string(wday_t day);
 
 /* Tests */
 void test_time(void);
+
+#endif

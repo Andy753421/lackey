@@ -19,15 +19,16 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <time.h>
+#include <locale.h>
 #include <ncurses.h>
 
 #include "main.h"
 #include "screen.h"
 
 /* Debugging */
-int YEAR  = 2012;
-int MONTH = 8;
-int DAY   = 29;
+year_t  YEAR  = 2012;
+month_t MONTH = 8;
+day_t   DAY   = 29;
 
 /* Static data */
 static FILE *debug_fd = NULL;
@@ -78,6 +79,7 @@ int main(int argc, char **argv)
 	DAY   = tm->tm_mday-1;
 
 	/* Curses setup */
+	setlocale(LC_ALL, "");
 	initscr();
 	cbreak();
 	noecho();
@@ -108,9 +110,8 @@ int main(int argc, char **argv)
 				screen_resize();
 				screen_draw();
 				continue;
-			case 'L':
+			case '\14':
 				clear();
-			case 'l':
 			case '\7':
 				screen_draw();
 				continue;

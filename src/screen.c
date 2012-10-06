@@ -33,16 +33,16 @@ typedef struct {
 
 /* Data */
 view_t views[] = {
-	{ "Day",      day_init,      day_draw,      day_run,      {KEY_F(1), '1', 'd',    } },
-	{ "Week",     week_init,     week_draw,     week_run,     {KEY_F(2), '2', 'w',    } },
-	{ "Month",    month_init,    month_draw,    month_run,    {KEY_F(3), '3', 'm',    } },
-	{ "Year",     year_init,     year_draw,     year_run,     {KEY_F(4), '4', 'y',    } },
-	{ "|",        NULL,          NULL,          NULL,         {                       } },
-	{ "Todo",     todo_init,     todo_draw,     todo_run,     {KEY_F(5), '5', 't',    } },
-	{ "Notes",    notes_init,    notes_draw,    notes_run,    {KEY_F(6), '6', 'n',    } },
-	{ "|",        NULL,          NULL,          NULL,         {                       } },
-	{ "Settings", settings_init, settings_draw, settings_run, {KEY_F(7), '7', 's',    } },
-	{ "Help",     help_init,     help_draw,     help_run,     {KEY_F(8), '8', 'h', '?'} },
+	{ "Day",      day_init,      day_draw,      day_run,      {KEY_F(1), '1',    } },
+	{ "Week",     week_init,     week_draw,     week_run,     {KEY_F(2), '2',    } },
+	{ "Month",    month_init,    month_draw,    month_run,    {KEY_F(3), '3',    } },
+	{ "Year",     year_init,     year_draw,     year_run,     {KEY_F(4), '4',    } },
+	{ "|",        NULL,          NULL,          NULL,         {                  } },
+	{ "Todo",     todo_init,     todo_draw,     todo_run,     {KEY_F(5), '5',    } },
+	{ "Notes",    notes_init,    notes_draw,    notes_run,    {KEY_F(6), '6',    } },
+	{ "|",        NULL,          NULL,          NULL,         {                  } },
+	{ "Settings", settings_init, settings_draw, settings_run, {KEY_F(7), '7',    } },
+	{ "Help",     help_init,     help_draw,     help_run,     {KEY_F(8), '8', '?'} },
 };
 
 int active = 0;

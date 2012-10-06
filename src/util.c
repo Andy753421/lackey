@@ -83,6 +83,13 @@ void add_days(year_t *year, month_t *month, day_t *day, int days)
 	*day   = tm->tm_mday-1;
 }
 
+void add_months(year_t *year, month_t *month, int months)
+{
+	int total = *year*12 + *month + months;
+	*year  = total / 12;
+	*month = total % 12;
+}
+
 /* Debug functions */
 const char *month_to_str(month_t month)
 {
@@ -123,14 +130,15 @@ const char *day_to_string(wday_t day)
 /* Test functions */
 void test_time(void)
 {
-	printf("Year Month     Start Weeks Days\n");
+	printf("Info\n");
+	printf("  Year Month     Start Weeks Days\n");
 	for (int y = 2012; y <= 2012; y++)
 	for (int m = JAN;  m <= DEC;  m++) {
-		printf("%-5d",  y);
-		printf("%-10s", month_to_string(m));
-		printf("%-6s",  day_to_str(start_of_month(y,m)));
-		printf("%-6d",  weeks_in_month(y,m));
-		printf("%-2d",  days_in_month(y,m));
+		printf("  %-5d",  y);
+		printf("  %-10s", month_to_string(m));
+		printf("  %-6s",  day_to_str(start_of_month(y,m)));
+		printf("  %-6d",  weeks_in_month(y,m));
+		printf("  %-2d",  days_in_month(y,m));
 		printf("\n");
 	}
 }
