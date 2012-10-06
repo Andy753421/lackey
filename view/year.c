@@ -40,7 +40,9 @@ static void print_month(month_t month, int y, int x)
 	for (int d = 0; d < days; d++) {
 		int row = (start + d) / 7;
 		int col = (start + d) % 7;
+		if (month == MONTH && d == DAY) wattron(win, A_REVERSE);
 		mvwprintw(win, y+2+row, x+col*3, "%2d", d+1);
+		if (month == MONTH && d == DAY) wattroff(win, A_REVERSE);
 	}
 }
 
@@ -57,6 +59,9 @@ void year_draw(void)
 	int x = COLS/2 - w/2;
 	int y = 0;
 	int h[4] = {};
+
+	/* Clear */
+	werase(win);
 
 	/* Determine heights */
 	for (int m = 0; m < 12; m++) {
@@ -95,5 +100,25 @@ void year_draw(void)
 /* Year run */
 int year_run(int key, mmask_t btn, int row, int col)
 {
+	wday_t day = day_of_week(YEAR, MONTH, DAY);
+	int days = 0, months = 0, years = 0;
+	switch (key)
+	{
+		case 'k': days   = -7; break;
+		case 'j': days   =  7; break;
+		case 'h': days   = -1; break;
+		case 'l': days   =  1; break;
+		case 'i': years  = -1; break;
+		case 'o': years  =  1; break;
+	}
+	if (day == SUN && days == -1) days = -22;
+	if (day == SAT && days ==  1) days =  22;
+	if (days || months || years) {
+		add_days(&YEAR, &MONTH, &DAY, days);
+		add_months(&YEAR, &MONTH, months);
+		YEAR += years;
+		year_draw();
+		wrefresh(win);
+	}
 	return 0;
 }

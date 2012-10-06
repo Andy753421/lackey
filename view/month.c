@@ -40,8 +40,8 @@ void month_draw(void)
 	const int   days  = days_in_month(YEAR, MONTH);
 	const int   weeks = weeks_in_month(YEAR, MONTH);
 	const float midpt = (float)COLS/2.0 - (strlen(name) + 1 + 4)/2.0;
-	const float hstep = (float)COLS/7.0;
-	const float vstep = (float)(LINES-4)/weeks;
+	const float hstep = (float)(COLS-1)/7.0;
+	const float vstep = (float)(LINES-6)/weeks;
 
 	/* Clear */
 	werase(win);
@@ -50,7 +50,7 @@ void month_draw(void)
 	mvwprintw(win, 0, midpt, "%s %d", name, YEAR);
 	for (int d = 0; d < 7; d++) {
 		const char *str = hstep >= 10 ? day_to_string(d+SUN) : day_to_str(d+SUN);
-		mvwprintw(win, 1, ROUND(d*hstep), "%s", str);
+		mvwprintw(win, 1, ROUND(1+d*hstep), "%s", str);
 	}
 	mvwhline(win, 2, 0, ACS_HLINE, COLS);
 
@@ -58,31 +58,33 @@ void month_draw(void)
 	for (int d = 0; d < days; d++) {
 		int row = (start + d) / 7;
 		int col = (start + d) % 7;
-		mvwprintw(win, ROUND(3+row*vstep), ROUND(col*hstep), "%d", d+1);
+		if (d == DAY) wattron(win, A_BOLD);
+		mvwprintw(win, ROUND(4+row*vstep), ROUND(1+col*hstep), "%d", d+1);
+		if (d == DAY) wattroff(win, A_BOLD);
 	}
 
 	/* Print lines */
 	for (int w = 1; w < weeks; w++)
-		mvwhline(win, ROUND(2+w*vstep), 0, ACS_HLINE, COLS);
+		mvwhline(win, ROUND(3+w*vstep), 1, ACS_HLINE, COLS-2);
 	for (int d = 1; d < 7; d++) {
-		int top = d >=  start         ? 0     : 1;
-		int bot = d <= (start+days)%7 ? weeks : weeks-1;
-		mvwvline(win, ROUND(3+top*vstep), ROUND(d*hstep-1),
-				ACS_VLINE, (bot-top)*vstep);
+		int top = d >=  start             ? 0     : 1;
+		int bot = d <= (start+days-1)%7+1 ? weeks : weeks-1;
+		mvwvline(win, ROUND(4+top*vstep), ROUND(d*hstep),
+				ACS_VLINE, (bot-top)*vstep-1);
 		for (int w = 1; w < weeks; w++) {
 			int chr = w == top ? ACS_TTEE :
 				  w == bot ? ACS_BTEE : ACS_PLUS;
-			mvwaddch(win, ROUND(2+w*vstep), ROUND(d*hstep-1), chr);
+			mvwaddch(win, ROUND(3+w*vstep), ROUND(d*hstep), chr);
 		}
 	}
 
 	/* Draw today */
 	int col = day_of_week(YEAR, MONTH, DAY);
 	int row = (start+DAY) / 7;
-	int l = ROUND((col+0)*hstep-1);
-	int r = ROUND((col+1)*hstep-1);
-	int t = ROUND((row+0)*vstep+2);
-	int b = ROUND((row+1)*vstep+2);
+	int l = ROUND((col+0)*hstep);
+	int r = ROUND((col+1)*hstep);
+	int t = ROUND((row+0)*vstep+3);
+	int b = ROUND((row+1)*vstep+3);
 	mvwvline_set(win, t, l, WACS_T_VLINE, b-t);
 	mvwvline_set(win, t, r, WACS_T_VLINE, b-t);
 	mvwhline_set(win, t, l, WACS_T_HLINE, r-l);
