@@ -36,6 +36,9 @@ void day_draw(void)
 	const char *mstr = month_to_string(MONTH);
 	const char *dstr = day_to_string(day_of_week(YEAR, MONTH, DAY));
 
+	/* Clear */
+	werase(win);
+
 	/* Print Header */
 	mvwprintw(win, 0, 0, "%s, %s %d", dstr, mstr, DAY+1);
 	mvwprintw(win, 0, COLS-10, "%d-%02d-%02d", YEAR, MONTH, DAY+1);
@@ -51,5 +54,18 @@ void day_draw(void)
 /* Day run */
 int day_run(int key, mmask_t btn, int row, int col)
 {
+	int days = 0;
+	switch (key)
+	{
+		case 'h': days = -1; break;
+		case 'l': days =  1; break;
+		case 'i': days = -7; break;
+		case 'o': days =  7; break;
+	}
+	if (days) {
+		add_days(&YEAR, &MONTH, &DAY, days);
+		day_draw();
+		wrefresh(win);
+	}
 	return 0;
 }

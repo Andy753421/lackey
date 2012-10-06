@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define _XOPEN_SOURCE_EXTENDED
+
 #include <string.h>
 #include <ncurses.h>
 
@@ -35,22 +37,26 @@ void week_draw(void)
 {
 	int x = 6;
 	int y = 3;
-	const float hstep = (float)(COLS-x)/5.0;
+	const float hstep = (float)(COLS-x)/7.0;
+
+	/* Clear */
+	werase(win);
 
 	/* Get start of week */
 	year_t  year  = YEAR;
 	month_t month = MONTH;
 	day_t   day   = DAY;
 	int shift = day_of_week(year, month, day);
-	add_days(&year, &month, &day, -shift+MON);
+	add_days(&year, &month, &day, -shift);
 
 	/* Print Header */
 	mvwprintw(win, 1, 0, "%s", month_to_str(MONTH));
-	for (int d = 0; d < 5; d++) {
-		// FIXME..
-		const char *str = hstep >= 10 ? day_to_string(d+MON) : day_to_str(d+MON);
+	for (int d = 0; d < 7; d++) {
+		const char *str = hstep >= 10 ? day_to_string(d) : day_to_str(d);
+		if (d == shift) wattron(win, A_BOLD);
 		mvwprintw(win, 0, x+ROUND(d*hstep), "%02d/%02d", month+1, day+1);
 		mvwprintw(win, 1, x+ROUND(d*hstep), "%s", str);
+		if (d == shift) wattroff(win, A_BOLD);
 		add_days(&year, &month, &day, 1);
 	}
 
@@ -61,12 +67,32 @@ void week_draw(void)
 
 	/* Print lines */
 	mvwhline(win, y-1, 0, ACS_HLINE, COLS);
-	for (int d = 0; d < 5; d++)
+	for (int d = 0; d < 7; d++)
 		mvwvline(win, y, x+ROUND(d*hstep)-1, ACS_VLINE, LINES-y-2);
+
+	/* Draw today */
+	int l = x+ROUND((shift+0)*hstep)-1;
+	int r = x+ROUND((shift+1)*hstep)-1;
+	mvwhline    (win, y-1, l, ACS_BLOCK, r-l+1);
+	mvwvline_set(win, y,   l, WACS_T_VLINE, LINES-y-2);
+	mvwvline_set(win, y,   r, WACS_T_VLINE, LINES-y-2);
 }
 
 /* Week run */
 int week_run(int key, mmask_t btn, int row, int col)
 {
+	int days = 0;
+	switch (key)
+	{
+		case 'h': days = -1; break;
+		case 'l': days =  1; break;
+		case 'i': days = -7; break;
+		case 'o': days =  7; break;
+	}
+	if (days) {
+		add_days(&YEAR, &MONTH, &DAY, days);
+		week_draw();
+		wrefresh(win);
+	}
 	return 0;
 }

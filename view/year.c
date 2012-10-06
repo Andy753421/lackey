@@ -100,25 +100,51 @@ void year_draw(void)
 /* Year run */
 int year_run(int key, mmask_t btn, int row, int col)
 {
+	int d = DAY, m = MONTH, y = YEAR;
 	wday_t day = day_of_week(YEAR, MONTH, DAY);
-	int days = 0, months = 0, years = 0;
-	switch (key)
-	{
-		case 'k': days   = -7; break;
-		case 'j': days   =  7; break;
-		case 'h': days   = -1; break;
-		case 'l': days   =  1; break;
-		case 'i': years  = -1; break;
-		case 'o': years  =  1; break;
+	int week = (start_of_month(y, m) + d) / 7;
+	int dir = 0;
+
+	/* Step years */
+	if (key == 'i')
+		YEAR--;
+	if (key == 'o')
+		YEAR++;
+
+	/* Get direction */
+	if (key == 'h' || key == 'k')
+		dir = -1;
+	if (key == 'j' || key == 'l')
+		dir =  1;
+
+	/* Step up/down */
+	if (key == 'j' || key == 'k') {
+		for (int i = 0; i < 90/7; i++) {
+			add_days(&y, &m, &d, dir*7);
+			if (day_of_week(y, m, d) == day &&
+			    y == YEAR && m%3 == MONTH%3) {
+				MONTH = m;
+				DAY = d;
+				break;
+			}
+		}
 	}
-	if (day == SUN && days == -1) days = -22;
-	if (day == SAT && days ==  1) days =  22;
-	if (days || months || years) {
-		add_days(&YEAR, &MONTH, &DAY, days);
-		add_months(&YEAR, &MONTH, months);
-		YEAR += years;
-		year_draw();
-		wrefresh(win);
+
+	/* Step left/right */
+	if (key == 'h' || key == 'l') {
+		for (int i = 0; i < 90; i++) {
+			add_days(&y, &m, &d, dir);
+			if ((start_of_month(y, m) + d) / 7 == week &&
+			    y == YEAR && m/3 == MONTH/3) {
+				MONTH = m;
+				DAY = d;
+				break;
+			}
+		}
 	}
+
+	/* Refresh */
+	year_draw();
+	wrefresh(win);
 	return 0;
 }
