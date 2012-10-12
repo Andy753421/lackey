@@ -49,3 +49,7 @@ event_t *event_get(year_t year, month_t month, day_t day, int days);
 
 /* Calendar implementation functions */
 event_t *dummy_get(cal_t *cal, year_t year, month_t month, day_t day, int days);
+event_t *ical_get(cal_t *cal, year_t year, month_t month, day_t day, int days);
+
+/* Test fuctions */
+void ical_test(void);

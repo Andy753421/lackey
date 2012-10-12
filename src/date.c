@@ -144,7 +144,7 @@ const char *day_to_string(wday_t day)
 }
 
 /* Test functions */
-void test_time(void)
+void date_test(void)
 {
 	printf("Info\n");
 	printf("  Year Month     Start Weeks Days\n");

@@ -4,7 +4,7 @@
 CC       ?= gcc
 CFLAGS   ?= -Wall --std=c99
 CPPFLAGS ?= -Isrc
-LDFLAGS  ?= -lncursesw
+LDFLAGS  ?= -lncursesw -lical
 
 # Sources
 PROG      = lackey
@@ -12,7 +12,7 @@ PROG_SRC  = main screen date event util
 TEST      = test
 TEST_SRC  = test date
 VIEWS     = day week month year todo notes settings help
-CALS      = dummy
+CALS      = dummy ical
 
 # Targets
 all: $(PROG) $(TEST)

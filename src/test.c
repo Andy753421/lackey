@@ -16,9 +16,11 @@
  */
 
 #include "date.h"
+#include "event.h"
 
 int main(int argc, char **argv)
 {
-	test_time();
+	//date_test();
+	ical_test();
 	return 0;
 }

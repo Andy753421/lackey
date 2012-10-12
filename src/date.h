@@ -73,4 +73,4 @@ const char *day_to_str(wday_t day);
 const char *day_to_string(wday_t day);
 
 /* Tests */
-void test_time(void);
+void date_test(void);
