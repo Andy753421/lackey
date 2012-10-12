@@ -15,8 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SCREEN_H
-#define SCREEN_H
+/* Configuration */
+#define COLOR_TITLE 1
+#define COLOR_ERROR 2
 
 /* Screen functions */
 void screen_init(void);
@@ -53,5 +54,3 @@ int todo_run(int,mmask_t,int,int);
 int notes_run(int,mmask_t,int,int);
 int settings_run(int,mmask_t,int,int);
 int help_run(int,mmask_t,int,int);
-
-#endif

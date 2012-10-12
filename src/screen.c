@@ -17,9 +17,10 @@
 
 #include <string.h>
 #include <ncurses.h>
-#include "main.h"
-#include "screen.h"
+
 #include "util.h"
+#include "date.h"
+#include "screen.h"
 
 /* Types */
 typedef struct {

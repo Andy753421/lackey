@@ -16,7 +16,23 @@
  */
 
 #include "util.h"
+#include "date.h"
 #include "event.h"
+
+/* Global data */
+event_t *EVENTS;
+
+/* Initialize */
+void event_init(void)
+{
+	EVENTS = event_get(2012, JAN, 0, 366);
+
+	/* Debug */
+	for (event_t *e = EVENTS; e; e = e->next)
+		debug("event: %04d-%02d-%02d %02d:%02d: %s - %s\n",
+				e->start.year, e->start.month, e->start.day,
+				e->start.hour, e->start.min, e->name, e->desc);
+}
 
 /* Event get */
 event_t *event_get(year_t year, month_t month, day_t day, int days)

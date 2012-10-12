@@ -15,11 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "util.h"
-
-int YEAR  = 2012;
-int MONTH = 8;
-int DAY   = 29;
+#include "date.h"
 
 int main(int argc, char **argv)
 {

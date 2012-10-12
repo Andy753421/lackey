@@ -18,8 +18,8 @@
 #include <string.h>
 #include <ncurses.h>
 
-#include "main.h"
 #include "util.h"
+#include "date.h"
 
 /* Constants */
 #define MW (2*7+6)

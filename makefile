@@ -8,9 +8,9 @@ LDFLAGS  ?= -lncursesw
 
 # Sources
 PROG      = lackey
+PROG_SRC  = main screen date event util 
 TEST      = test
-SOURCES   = main screen event util
-TESTS     = test util
+TEST_SRC  = test date
 VIEWS     = day week month year todo notes settings help
 CALS      = dummy
 
@@ -25,14 +25,14 @@ run-$(TEST): $(TEST)
 	./$<
 
 clean:
-	rm -f src/*.o view/*.o $(PROG) $(TEST) 
+	rm -f src/*.o view/*.o cal/*.o $(PROG) $(TEST) 
 
 # Rules
-$(PROG): $(SOURCES:%=src/%.o) $(VIEWS:%=view/%.o) $(CALS:%=cal/%.o)
+$(PROG): $(PROG_SRC:%=src/%.o) $(VIEWS:%=view/%.o) $(CALS:%=cal/%.o)
 	$(CC) $(CFLAGS) -o $@ $+ $(LDFLAGS)
 
-$(TEST): $(TESTS:%=src/%.o) $(VIEWS:%=view/%.o) $(CALS:%=cal/%.o)
+$(TEST): $(TEST_SRC:%=src/%.o) $(CALS:%=cal/%.o)
 	$(CC) $(CFLAGS) -o $@ $+ $(LDFLAGS)
 
-%.o: %.c $(SOURCES:%=src/%.h) makefile
+%.o: %.c $(wildcard src/*.h) makefile
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<

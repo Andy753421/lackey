@@ -15,25 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdarg.h>
 #include <stdlib.h>
 #include <signal.h>
-#include <time.h>
 #include <locale.h>
 #include <ncurses.h>
 
-#include "main.h"
+#include "util.h"
+#include "date.h"
+#include "event.h"
 #include "screen.h"
-
-/* Debugging */
-year_t   YEAR   = 2012;
-month_t  MONTH  = 8;
-day_t    DAY    = 29;
-
-event_t *EVENTS = NULL;
-
-/* Static data */
-static FILE *debug_fd = NULL;
 
 /* Control-C handler, so we don't hose the therminal */
 static void on_sigint(int signum)
@@ -42,47 +32,13 @@ static void on_sigint(int signum)
 	exit(0);
 }
 
-/* Debugging functions */
-int debug(char *fmt, ...)
-{
-	int rval;
-	va_list ap;
-
-	/* Log to debug file */
-	va_start(ap, fmt);
-	vfprintf(debug_fd, "debug: ", ap);
-	rval = vfprintf(debug_fd, fmt, ap);
-
-	/* Log to status bar */
-	va_start(ap, fmt);
-	mvhline(LINES-2, 0, ACS_HLINE, COLS);
-	move(LINES-1, 0);
-	attron(COLOR_PAIR(COLOR_ERROR));
-	vwprintw(stdscr, fmt, ap);
-	attroff(COLOR_PAIR(COLOR_ERROR));
-	clrtoeol();
-
-	va_end(ap);
-	return rval;
-}
-
 /* Main */
 int main(int argc, char **argv)
 {
 	/* Misc setup */
 	signal(SIGINT, on_sigint);
-	debug_fd = fopen("/tmp/lackey.log", "w+");
 
-	/* Time setup */
-	time_t sec = time(NULL);
-	struct tm *tm = localtime(&sec);
-	YEAR   = tm->tm_year+1900;
-	MONTH  = tm->tm_mon;
-	DAY    = tm->tm_mday-1;
-
-	EVENTS = event_get(2012, JAN, 0, 366);
-
-	/* Curses setup */
+	/* Setup Curses */
 	setlocale(LC_ALL, "");
 	initscr();
 	cbreak();
@@ -93,14 +49,15 @@ int main(int argc, char **argv)
 	mousemask(ALL_MOUSE_EVENTS, NULL);
 	init_pair(COLOR_TITLE, COLOR_GREEN, COLOR_BLACK);
 	init_pair(COLOR_ERROR, COLOR_RED,   COLOR_BLACK);
-	screen_init();
-	screen_draw();
 
-	/* Debug */
-	for (event_t *e = EVENTS; e; e = e->next)
-		debug("event: %04d-%02d-%02d %02d:%02d: %s - %s\n",
-				e->start.year, e->start.month, e->start.day,
-				e->start.hour, e->start.min, e->name, e->desc);
+	/* Initialize */
+	util_init();
+	date_init();
+	event_init();
+	screen_init();
+
+	/* Draw initial screen */
+	screen_draw();
 
 	/* Run */
 	while (1) {
@@ -128,8 +85,8 @@ int main(int argc, char **argv)
 		}
 		if (screen_run(chr, btn.bstate, btn.y, btn.x))
 			continue;
-		//debug("Unhandled key: Dec %3d,  Hex %02x,  Oct %03o,  Chr <%c>\n",
-		//		chr, chr, chr, chr);
+		debug("main: Unhandled key - Dec %3d,  Hex %02x,  Oct %03o,  Chr <%c>\n",
+				chr, chr, chr, chr);
 	}
 
 	/* Cleanup, see also on_sigint */

@@ -15,11 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef EVENT_H
-#define EVENT_H
-
-#include "util.h"
-
 /* Calendar types */
 typedef struct {
 	char *name;
@@ -45,10 +40,12 @@ typedef struct event_t {
 	struct event_t *next;
 } event_t;
 
+/* Global data */
+extern event_t *EVENTS;
+
 /* Event functions */
+void event_init(void);
 event_t *event_get(year_t year, month_t month, day_t day, int days);
 
 /* Calendar implementation functions */
 event_t *dummy_get(cal_t *cal, year_t year, month_t month, day_t day, int days);
-
-#endif

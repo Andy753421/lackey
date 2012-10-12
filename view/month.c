@@ -20,8 +20,8 @@
 #include <string.h>
 #include <ncurses.h>
 
-#include "main.h"
 #include "util.h"
+#include "date.h"
 
 /* Static data */
 static WINDOW *win;

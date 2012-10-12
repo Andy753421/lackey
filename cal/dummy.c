@@ -17,7 +17,8 @@
 
 #include <stdlib.h>
 
-#include "main.h"
+#include "util.h"
+#include "date.h"
 #include "event.h"
 
 /* Test data */

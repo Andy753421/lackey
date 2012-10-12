@@ -17,11 +17,11 @@
 
 #define _XOPEN_SOURCE_EXTENDED
 
-#include <string.h>
 #include <ncurses.h>
 
-#include "main.h"
 #include "util.h"
+#include "date.h"
+#include "event.h"
 
 /* Static data */
 static WINDOW *win;
@@ -33,7 +33,8 @@ static void print_event(event_t *event, wday_t day, hour_t hour, min_t min, floa
 	int y = 3+hour*4;
 	int l = (event->end.min - event->start.min)/15;
 	mvwprintw(win, y, x, "%s", event->name);
-	debug("event: %s\n", event->name);
+	debug("week: event = %s\n", event->name);
+	(void)l;
 }
 
 static int before(datetime_t *start, int year, int month, int day, int hour, int min)
@@ -43,7 +44,7 @@ static int before(datetime_t *start, int year, int month, int day, int hour, int
 	           start->day   < day   ? 1 : start->day   > day  ? 0 :
 	           start->hour  < hour  ? 1 : start->hour  > hour ? 0 :
 	           start->min   < min   ? 1 : start->min   > min  ? 0 : 0;
-	debug("%04d-%02d-%02d %02d:%02d < %04d-%02d-%02d %02d:%02d == %d\n",
+	debug("week: %04d-%02d-%02d %02d:%02d < %04d-%02d-%02d %02d:%02d == %d\n",
 			start->year, start->month, start->day, start->hour, start->min,
 			year, month, day, hour, min, rval);
 	return rval;
