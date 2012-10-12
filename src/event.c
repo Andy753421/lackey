@@ -15,23 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MAIN_H
-#define MAIN_H
-
-#define COLOR_TITLE 1
-#define COLOR_ERROR 2
-
 #include "util.h"
 #include "event.h"
 
-/* Debugging */
-extern year_t   YEAR;
-extern month_t  MONTH;
-extern day_t    DAY;
-
-extern event_t *EVENTS;
-
-/* Debug functions */
-int debug(char *fmt, ...);
-
-#endif
+/* Event get */
+event_t *event_get(year_t year, month_t month, day_t day, int days)
+{
+	return dummy_get(0, year, month, day, days);
+}

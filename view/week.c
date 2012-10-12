@@ -26,6 +26,29 @@
 /* Static data */
 static WINDOW *win;
 
+/* Local functions */
+static void print_event(event_t *event, wday_t day, hour_t hour, min_t min, float hstep)
+{
+	int x = 6+ROUND(day*hstep);
+	int y = 3+hour*4;
+	int l = (event->end.min - event->start.min)/15;
+	mvwprintw(win, y, x, "%s", event->name);
+	debug("event: %s\n", event->name);
+}
+
+static int before(datetime_t *start, int year, int month, int day, int hour, int min)
+{
+	int rval = start->year  < year  ? 1 : start->year  > year ? 0 :
+	           start->month < month ? 1 : start->month > month? 0 :
+	           start->day   < day   ? 1 : start->day   > day  ? 0 :
+	           start->hour  < hour  ? 1 : start->hour  > hour ? 0 :
+	           start->min   < min   ? 1 : start->min   > min  ? 0 : 0;
+	debug("%04d-%02d-%02d %02d:%02d < %04d-%02d-%02d %02d:%02d == %d\n",
+			start->year, start->month, start->day, start->hour, start->min,
+			year, month, day, hour, min, rval);
+	return rval;
+}
+
 /* Week init */
 void week_init(WINDOW *_win)
 {
@@ -61,7 +84,7 @@ void week_draw(void)
 	}
 
 	/* Print times */
-	int start = 8;
+	hour_t start = 8;
 	for (int h = 0; h < (LINES-6)/4+1; h++)
 		mvwprintw(win, 3+h*4, 0,"%02d:%02d", (start+h)%12, 0);
 
@@ -69,6 +92,22 @@ void week_draw(void)
 	mvwhline(win, y-1, 0, ACS_HLINE, COLS);
 	for (int d = 0; d < 7; d++)
 		mvwvline(win, y, x+ROUND(d*hstep)-1, ACS_VLINE, LINES-y-2);
+
+	/* Print events */
+	event_t *event = EVENTS;
+	add_days(&year, &month, &day, -7);
+	for (int d = 0; d <  7; d++) {
+		for (int h = 0; h < (LINES-6)/4+1; h++) {
+			for (int m = 0; m < 60; m+=15) {
+				while (event && before(&event->start, year, month, day, start+h+(m+15)/60, (m+15)%60)) {
+					if (!before(&event->start, year, month, day, start+h, m))
+						print_event(event, d, h, m, hstep);
+					event = event->next;
+				}
+			}
+		}
+		add_days(&year, &month, &day, 1);
+	}
 
 	/* Draw today */
 	int l = x+ROUND((shift+0)*hstep)-1;

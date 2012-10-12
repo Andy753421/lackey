@@ -15,23 +15,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MAIN_H
-#define MAIN_H
-
-#define COLOR_TITLE 1
-#define COLOR_ERROR 2
+#ifndef EVENT_H
+#define EVENT_H
 
 #include "util.h"
-#include "event.h"
 
-/* Debugging */
-extern year_t   YEAR;
-extern month_t  MONTH;
-extern day_t    DAY;
+/* Calendar types */
+typedef struct {
+	char *name;
+	char *desc;
+	void *data;
+} cal_t;
 
-extern event_t *EVENTS;
+/* Event types */
+typedef struct {
+	year_t  year;
+	month_t month;
+	day_t   day;
+	hour_t  hour;
+	min_t   min;
+} datetime_t;
 
-/* Debug functions */
-int debug(char *fmt, ...);
+typedef struct event_t {
+	const cal_t    *cal;
+	datetime_t      start;
+	datetime_t      end;
+	const char     *name;
+	const char     *desc;
+	struct event_t *next;
+} event_t;
+
+/* Event functions */
+event_t *event_get(year_t year, month_t month, day_t day, int days);
+
+/* Calendar implementation functions */
+event_t *dummy_get(cal_t *cal, year_t year, month_t month, day_t day, int days);
 
 #endif

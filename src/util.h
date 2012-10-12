@@ -27,6 +27,8 @@
 /* Time types */
 typedef int year_t;
 typedef int day_t;
+typedef int hour_t;
+typedef int min_t;
 
 typedef enum {
 	JAN =  0,

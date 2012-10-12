@@ -26,9 +26,11 @@
 #include "screen.h"
 
 /* Debugging */
-year_t  YEAR  = 2012;
-month_t MONTH = 8;
-day_t   DAY   = 29;
+year_t   YEAR   = 2012;
+month_t  MONTH  = 8;
+day_t    DAY    = 29;
+
+event_t *EVENTS = NULL;
 
 /* Static data */
 static FILE *debug_fd = NULL;
@@ -74,9 +76,11 @@ int main(int argc, char **argv)
 	/* Time setup */
 	time_t sec = time(NULL);
 	struct tm *tm = localtime(&sec);
-	YEAR  = tm->tm_year+1900;
-	MONTH = tm->tm_mon;
-	DAY   = tm->tm_mday-1;
+	YEAR   = tm->tm_year+1900;
+	MONTH  = tm->tm_mon;
+	DAY    = tm->tm_mday-1;
+
+	EVENTS = event_get(2012, JAN, 0, 366);
 
 	/* Curses setup */
 	setlocale(LC_ALL, "");
@@ -91,6 +95,12 @@ int main(int argc, char **argv)
 	init_pair(COLOR_ERROR, COLOR_RED,   COLOR_BLACK);
 	screen_init();
 	screen_draw();
+
+	/* Debug */
+	for (event_t *e = EVENTS; e; e = e->next)
+		debug("event: %04d-%02d-%02d %02d:%02d: %s - %s\n",
+				e->start.year, e->start.month, e->start.day,
+				e->start.hour, e->start.min, e->name, e->desc);
 
 	/* Run */
 	while (1) {

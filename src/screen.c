@@ -45,7 +45,7 @@ view_t views[] = {
 	{ "Help",     help_init,     help_draw,     help_run,     {KEY_F(8), '8', '?'} },
 };
 
-int active = 0;
+int active = 1;
 
 /* Local functions */
 void draw_header(void)

@@ -100,7 +100,9 @@ void year_draw(void)
 /* Year run */
 int year_run(int key, mmask_t btn, int row, int col)
 {
-	int d = DAY, m = MONTH, y = YEAR;
+	day_t d = DAY;
+	month_t m = MONTH;
+	year_t y = YEAR;
 	wday_t day = day_of_week(YEAR, MONTH, DAY);
 	int week = (start_of_month(y, m) + d) / 7;
 	int dir = 0;
