@@ -43,8 +43,8 @@ static event_t events[8];
 event_t *dummy_get(cal_t *cal, year_t year, month_t month, day_t day, int days)
 {
 	for (int i = 0; i < N_ELEMENTS(events); i++) {
-		datetime_t *s = &events[i].start;
-		datetime_t *e = &events[i].end;
+		date_t *s = &events[i].start;
+		date_t *e = &events[i].end;
 		events[i] = event;
 		add_days(&s->year, &s->month, &s->day, 7*i);
 		add_days(&e->year, &e->month, &e->day, 7*i);

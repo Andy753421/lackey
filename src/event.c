@@ -37,5 +37,6 @@ void event_init(void)
 /* Event get */
 event_t *event_get(year_t year, month_t month, day_t day, int days)
 {
-	return dummy_get(0, year, month, day, days);
+	//return dummy_get(0, year, month, day, days);
+	return ical_get(0, year, month, day, days);
 }

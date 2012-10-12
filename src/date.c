@@ -36,6 +36,11 @@ void date_init(void)
 	YEAR  = tm->tm_year+1900;
 	MONTH = tm->tm_mon;
 	DAY   = tm->tm_mday-1;
+
+	// Testing */
+	YEAR  = 2009;
+	MONTH = MAY;
+	DAY   = 1;
 }
 
 /* Time functions */

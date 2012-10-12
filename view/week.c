@@ -37,7 +37,7 @@ static void print_event(event_t *event, wday_t day, hour_t hour, min_t min, floa
 	(void)l;
 }
 
-static int before(datetime_t *start, int year, int month, int day, int hour, int min)
+static int before(date_t *start, int year, int month, int day, int hour, int min)
 {
 	int rval = start->year  < year  ? 1 : start->year  > year ? 0 :
 	           start->month < month ? 1 : start->month > month? 0 :

@@ -29,14 +29,14 @@ typedef struct {
 	day_t   day;
 	hour_t  hour;
 	min_t   min;
-} datetime_t;
+} date_t;
 
 typedef struct event_t {
 	const cal_t    *cal;
-	datetime_t      start;
-	datetime_t      end;
 	const char     *name;
 	const char     *desc;
+	date_t          start;
+	date_t          end;
 	struct event_t *next;
 } event_t;
 
