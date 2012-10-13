@@ -49,16 +49,21 @@ static void print_event(event_t *event, wday_t day, hour_t hour, min_t min, floa
 
 	if (color) wattron(body, COLOR_PAIR(color));
 
-        if (h <= 1) mvwadd_wch(body,   y,     x, WACS_BULLET);
-	if (h >= 2) mvwadd_wch(body,   y,     x, WACS_T_ULCORNER);
-	if (h >= 3) mvwvline_set(body, y+1+s, x, WACS_T_VLINE, h-2-s);
-	if (h >= 2) mvwadd_wch(body,   y+h-1, x, WACS_T_LLCORNER);
+	if (h >= 2) mvwhline_set(body, y,     x+1,   WACS_T_HLINE, w-2);
+	if (h <= 1) mvwadd_wch(body,   y,     x,     WACS_BULLET);
+	if (h >= 2) mvwadd_wch(body,   y,     x,     WACS_T_ULCORNER);
+	if (h >= 2) mvwadd_wch(body,   y,     x+w-1, WACS_T_URCORNER);
+	if (h >= 3) mvwvline_set(body, y+1+s, x,     WACS_T_VLINE, h-2-s);
+	if (h >= 3) mvwvline_set(body, y+1+s, x+w-1, WACS_T_VLINE, h-2-s);
+	if (h >= 2) mvwadd_wch(body,   y+h-1, x,     WACS_T_LLCORNER);
+	if (h >= 2) mvwadd_wch(body,   y+h-1, x+w-1, WACS_T_LRCORNER);
+	if (h >= 2) mvwhline_set(body, y+h-1, x+1,   WACS_T_HLINE, w-2);
 
 	if (color) wattroff(body, COLOR_PAIR(color));
 
-	if (l<h && event->name) mvwprintw(body, y+l++, x+1, "%-*.*s",   w-1, w-1, event->name);
-	if (l<h && event->loc)  mvwprintw(body, y+l++, x+1, "@ %-*.*s", w-3, w-3, event->loc);
-	if (l<h && event->desc) mvwprintw(body, y+l++, x+1, "%-*.*s",   w-1, w-1, event->desc);
+	if (l<h && event->name) mvwprintw(body, y+l++, x+1, "%.*s",     w-2,      event->name);
+	if (l<h && event->loc)  mvwprintw(body, y+l++, x+1, "@ %-*.*s", w-4, w-4, event->loc);
+	if (l<h && event->desc) mvwprintw(body, y+l++, x+1, "%-*.*s",   w-2, w-2, event->desc);
 
 	debug("week: event = %s\n", event->name);
 }
