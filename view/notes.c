@@ -26,6 +26,11 @@ void notes_init(WINDOW *_win)
 	win = _win;
 }
 
+/* Notes size */
+void notes_size(int rows, int cols)
+{
+}
+
 /* Notes draw */
 void notes_draw(void)
 {

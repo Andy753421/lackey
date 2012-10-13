@@ -46,9 +46,16 @@ int main(int argc, char **argv)
 	keypad(stdscr, TRUE);
 	start_color();
 	curs_set(false);
+	use_default_colors();
 	mousemask(ALL_MOUSE_EVENTS, NULL);
-	init_pair(COLOR_TITLE, COLOR_GREEN, COLOR_BLACK);
-	init_pair(COLOR_ERROR, COLOR_RED,   COLOR_BLACK);
+
+	init_pair(COLOR_TITLE, COLOR_GREEN,   -1);
+	init_pair(COLOR_ERROR, COLOR_RED,     -1);
+
+	init_pair(COLOR_CLASS, COLOR_BLUE,    -1);
+	init_pair(COLOR_EC,    COLOR_GREEN,   -1);
+	init_pair(COLOR_WORK,  COLOR_MAGENTA, -1);
+	init_pair(COLOR_OTHER, COLOR_RED,     -1);
 
 	/* Initialize */
 	util_init();

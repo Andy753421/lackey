@@ -52,6 +52,11 @@ void year_init(WINDOW *_win)
 	win = _win;
 }
 
+/* Year size */
+void year_size(int rows, int cols)
+{
+}
+
 /* Year draw */
 void year_draw(void)
 {

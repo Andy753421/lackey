@@ -1,4 +1,5 @@
 /*
+#include <string.h>
  * Copyright (C) 2012 Andy Spencer <andy753421@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +17,8 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <ncurses.h>
 
 #include "screen.h"
@@ -27,6 +30,17 @@ static FILE *debug_fd = NULL;
 void util_init(void)
 {
 	debug_fd = fopen("/tmp/lackey.log", "w+");
+}
+
+/* Misc functions */
+char *sdup(const char *str)
+{
+	if (str == NULL)
+		return NULL;
+	int len = strlen(str);
+	char *dup = malloc(len+1);
+	memcpy(dup, str, len+1);
+	return dup;
 }
 
 /* Debugging functions */

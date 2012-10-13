@@ -23,18 +23,12 @@ typedef struct {
 } cal_t;
 
 /* Event types */
-typedef struct {
-	year_t  year;
-	month_t month;
-	day_t   day;
-	hour_t  hour;
-	min_t   min;
-} date_t;
-
 typedef struct event_t {
 	const cal_t    *cal;
 	const char     *name;
 	const char     *desc;
+	const char     *loc;
+	const char     *cat;
 	date_t          start;
 	date_t          end;
 	struct event_t *next;

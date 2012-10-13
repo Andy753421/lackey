@@ -28,6 +28,11 @@ void day_init(WINDOW *_win)
 	win = _win;
 }
 
+/* Day size */
+void day_size(int rows, int cols)
+{
+}
+
 /* Day draw */
 void day_draw(void)
 {

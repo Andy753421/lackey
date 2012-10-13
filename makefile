@@ -10,7 +10,7 @@ LDFLAGS  ?= -lncursesw -lical
 PROG      = lackey
 PROG_SRC  = main screen date event util 
 TEST      = test
-TEST_SRC  = test date
+TEST_SRC  = test date util
 VIEWS     = day week month year todo notes settings help
 CALS      = dummy ical
 

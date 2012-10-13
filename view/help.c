@@ -26,6 +26,11 @@ void help_init(WINDOW *_win)
 	win = _win;
 }
 
+/* Help size */
+void help_size(int rows, int cols)
+{
+}
+
 /* Help draw */
 void help_draw(void)
 {

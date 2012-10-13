@@ -54,9 +54,13 @@ static date_t to_date(struct icaltimetype time)
 
 static event_t *to_event(ical_inst *inst)
 {
+	icalproperty *prop = icalcomponent_get_first_property(inst->comp, ICAL_CATEGORIES_PROPERTY);
+
 	event_t *event = calloc(1, sizeof(event_t));
 	event->name  = icalcomponent_get_summary(inst->comp);
 	event->desc  = icalcomponent_get_description(inst->comp);
+	event->loc   = icalcomponent_get_location(inst->comp);
+	event->cat   = icalproperty_get_value_as_string(prop);
 	event->start = to_date(inst->start);
 	event->end   = to_date(inst->end);
 	return event;
@@ -139,6 +143,8 @@ event_t *ical_get(cal_t *cal, year_t year, month_t month, day_t day, int days)
 {
 	/* Load ical */
 	FILE *file = fopen("data/all.ics", "r");
+	if (!file)
+		return NULL;
 	icalparser *parser = icalparser_new();
 	icalparser_set_gen_data(parser, file);
 	icalcomponent *ical = icalparser_parse(parser, (void*)fgets);

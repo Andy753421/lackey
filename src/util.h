@@ -18,11 +18,15 @@
 /* Macros */
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
+#define CLAMP(x,l,h) MIN(MAX(x,l),h)
 #define ROUND(x) ((int)((x)+0.5))
 #define N_ELEMENTS(x) (sizeof(x)/sizeof((x)[0]))
 
 /* Debug functions */
 void util_init(void);
+
+/* Misc functions */
+char *sdup(const char *str);
 
 /* Debug functions */
 #ifdef DEBUG

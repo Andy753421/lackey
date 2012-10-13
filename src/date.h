@@ -16,6 +16,8 @@
  */
 
 /* Time types */
+typedef long long stamp_t;
+
 typedef int year_t;
 typedef int day_t;
 typedef int hour_t;
@@ -46,6 +48,14 @@ typedef enum {
 	SAT = 6,
 } wday_t;
 
+typedef struct {
+	year_t  year;
+	month_t month;
+	day_t   day;
+	hour_t  hour;
+	min_t   min;
+} date_t;
+
 /* Global data */
 extern year_t  YEAR;
 extern month_t MONTH;
@@ -64,6 +74,9 @@ wday_t start_of_month(year_t year, month_t month);
 day_t start_of_week(year_t year, month_t month, day_t day);
 void add_days(year_t *year, month_t *month, day_t *day, int days);
 void add_months(year_t *year, month_t *month, int months);
+
+stamp_t get_stamp(date_t *date);
+int get_mins(date_t *start, date_t *end);
 
 /* Time to string functions */
 const char *month_to_str(month_t month);

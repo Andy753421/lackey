@@ -26,6 +26,11 @@ void settings_init(WINDOW *_win)
 	win = _win;
 }
 
+/* Settings init */
+void settings_size(int rows, int cols)
+{
+}
+
 /* Settings draw */
 void settings_draw(void)
 {

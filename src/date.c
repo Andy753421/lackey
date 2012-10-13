@@ -38,9 +38,9 @@ void date_init(void)
 	DAY   = tm->tm_mday-1;
 
 	// Testing */
-	YEAR  = 2009;
-	MONTH = MAY;
-	DAY   = 1;
+	//YEAR  = 2009;
+	//MONTH = MAY;
+	//DAY   = 1;
 }
 
 /* Time functions */
@@ -109,6 +109,21 @@ void add_months(year_t *year, month_t *month, int months)
 	int total = *year*12 + *month + months;
 	*year  = total / 12;
 	*month = total % 12;
+}
+
+stamp_t get_time(date_t *date)
+{
+	return mktime(&(struct tm){
+		.tm_year = date->year-1900,
+		.tm_mon  = date->month,
+		.tm_mday = date->day+1,
+		.tm_hour = date->hour,
+		.tm_min  = date->min});
+}
+
+int get_mins(date_t *start, date_t *end)
+{
+	return (get_time(end)-get_time(start))/60;
 }
 
 /* Debug functions */

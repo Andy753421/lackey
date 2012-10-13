@@ -26,6 +26,7 @@
 typedef struct {
 	char   *name;
 	void  (*init)(WINDOW*);
+	void  (*size)(int,int);
 	void  (*draw)(void);
 	int   (*run)(int,mmask_t,int,int);
 	int     keys[8];
@@ -34,16 +35,16 @@ typedef struct {
 
 /* Data */
 view_t views[] = {
-	{ "Day",      day_init,      day_draw,      day_run,      {KEY_F(1), '1',    } },
-	{ "Week",     week_init,     week_draw,     week_run,     {KEY_F(2), '2',    } },
-	{ "Month",    month_init,    month_draw,    month_run,    {KEY_F(3), '3',    } },
-	{ "Year",     year_init,     year_draw,     year_run,     {KEY_F(4), '4',    } },
-	{ "|",        NULL,          NULL,          NULL,         {                  } },
-	{ "Todo",     todo_init,     todo_draw,     todo_run,     {KEY_F(5), '5',    } },
-	{ "Notes",    notes_init,    notes_draw,    notes_run,    {KEY_F(6), '6',    } },
-	{ "|",        NULL,          NULL,          NULL,         {                  } },
-	{ "Settings", settings_init, settings_draw, settings_run, {KEY_F(7), '7',    } },
-	{ "Help",     help_init,     help_draw,     help_run,     {KEY_F(8), '8', '?'} },
+	{ "Day",      day_init,      day_size,      day_draw,      day_run,      {KEY_F(1), '1',    } },
+	{ "Week",     week_init,     week_size,     week_draw,     week_run,     {KEY_F(2), '2',    } },
+	{ "Month",    month_init,    month_size,    month_draw,    month_run,    {KEY_F(3), '3',    } },
+	{ "Year",     year_init,     year_size,     year_draw,     year_run,     {KEY_F(4), '4',    } },
+	{ "|",        NULL,          NULL,          NULL,          NULL,         {                  } },
+	{ "Todo",     todo_init,     todo_size,     todo_draw,     todo_run,     {KEY_F(5), '5',    } },
+	{ "Notes",    notes_init,    notes_size,    notes_draw,    notes_run,    {KEY_F(6), '6',    } },
+	{ "|",        NULL,          NULL,          NULL,          NULL,         {                  } },
+	{ "Settings", settings_init, settings_size, settings_draw, settings_run, {KEY_F(7), '7',    } },
+	{ "Help",     help_init,     help_size,     help_draw,     help_run,     {KEY_F(8), '8', '?'} },
 };
 
 int active = 1;
@@ -79,9 +80,12 @@ void screen_init(void)
 /* Screen draw */
 void screen_resize(void)
 {
-	for (int i = 0; i < N_ELEMENTS(views); i++)
-		if (views[i].init)
+	for (int i = 0; i < N_ELEMENTS(views); i++) {
+		if (views[i].win)
 			wresize(views[i].win, LINES-2, COLS);
+		if (views[i].size)
+			views[i].size(LINES-2, COLS);
+	}
 }
 
 /* Screen draw */

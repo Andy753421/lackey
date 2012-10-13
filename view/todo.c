@@ -26,6 +26,11 @@ void todo_init(WINDOW *_win)
 	win = _win;
 }
 
+/* Todo size */
+void todo_size(int rows, int cols)
+{
+}
+
 /* Todo draw */
 void todo_draw(void)
 {

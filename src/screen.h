@@ -19,6 +19,11 @@
 #define COLOR_TITLE 1
 #define COLOR_ERROR 2
 
+#define COLOR_CLASS 3
+#define COLOR_EC    4
+#define COLOR_WORK  5
+#define COLOR_OTHER 6
+
 /* Screen functions */
 void screen_init(void);
 void screen_resize(void);
@@ -34,6 +39,16 @@ void todo_init(WINDOW *win);
 void notes_init(WINDOW *win);
 void settings_init(WINDOW *win);
 void help_init(WINDOW *win);
+
+/* View size functions */
+void day_size(int,int);
+void week_size(int,int);
+void month_size(int,int);
+void year_size(int,int);
+void todo_size(int,int);
+void notes_size(int,int);
+void settings_size(int,int);
+void help_size(int,int);
 
 /* View draw functions */
 void day_draw(void);

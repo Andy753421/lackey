@@ -32,6 +32,11 @@ void month_init(WINDOW *_win)
 	win = _win;
 }
 
+/* Month size */
+void month_size(int rows, int cols)
+{
+}
+
 /* Month draw */
 void month_draw(void)
 {
