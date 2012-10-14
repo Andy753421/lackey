@@ -22,9 +22,26 @@
 
 #include "util.h"
 #include "date.h"
+#include "event.h"
+#include "screen.h"
 
 /* Static data */
 static WINDOW *win;
+
+/* Local functions */
+static void print_event(event_t *event, int y, int x, int w)
+{
+	int color = event->cat == NULL           ? 0           :
+	            !strcmp(event->cat, "class") ? COLOR_CLASS :
+	            !strcmp(event->cat, "ec")    ? COLOR_EC    :
+	            !strcmp(event->cat, "work")  ? COLOR_WORK  : COLOR_OTHER ;
+
+	if (color) wattron(win, COLOR_PAIR(color));
+	mvwaddch(win, y, x+0, ACS_BLOCK);
+	if (color) wattroff(win, COLOR_PAIR(color));
+
+	mvwprintw(win, y, x+1, "%-*.*s", w-1, w-1, event->name);
+}
 
 /* Month init */
 void month_init(WINDOW *_win)
@@ -66,6 +83,23 @@ void month_draw(void)
 		if (d == DAY) wattron(win, A_BOLD);
 		mvwprintw(win, ROUND(4+row*vstep), ROUND(1+col*hstep), "%d", d+1);
 		if (d == DAY) wattroff(win, A_BOLD);
+	}
+
+	/* Print events */
+	event_t *event = EVENTS;
+	for (int d = 0; d < days; d++) {
+		int y = ROUND(4+(((start + d) / 7)  )*vstep);
+		int e = ROUND(4+(((start + d) / 7)+1)*vstep)-2;
+		int x = ROUND(1+(((start + d) % 7)  )*hstep)+3;
+		int w = ROUND(1+(((start + d) % 7)+1)*hstep)-x-1;
+		while (event && before(&event->start, YEAR, MONTH, d, 24, 0)) {
+			if (!before(&event->start, YEAR, MONTH, d, 0, 0)){
+				if (y == e) mvwhline(win, y, x-3, ACS_DARROW, 2);
+				if (y <= e) print_event(event, y, x, w);
+				y++;
+			}
+			event = event->next;
+		}
 	}
 
 	/* Print lines */

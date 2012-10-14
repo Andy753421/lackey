@@ -37,7 +37,7 @@ void date_init(void)
 	MONTH = tm->tm_mon;
 	DAY   = tm->tm_mday-1;
 
-	// Testing */
+	/* Testing */
 	//YEAR  = 2009;
 	//MONTH = MAY;
 	//DAY   = 1;
@@ -124,6 +124,16 @@ stamp_t get_time(date_t *date)
 int get_mins(date_t *start, date_t *end)
 {
 	return (get_time(end)-get_time(start))/60;
+}
+
+int before(date_t *start, int year, int month, int day, int hour, int min)
+{
+	int rval = start->year  < year  ? 1 : start->year  > year ? 0 :
+	           start->month < month ? 1 : start->month > month? 0 :
+	           start->day   < day   ? 1 : start->day   > day  ? 0 :
+	           start->hour  < hour  ? 1 : start->hour  > hour ? 0 :
+	           start->min   < min   ? 1 : start->min   > min  ? 0 : 0;
+	return rval;
 }
 
 /* Debug functions */

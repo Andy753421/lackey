@@ -63,19 +63,6 @@ static void print_event(event_t *event, wday_t day, hour_t hour, min_t min, floa
 	debug("week: event = %s\n", event->name);
 }
 
-static int before(date_t *start, int year, int month, int day, int hour, int min)
-{
-	int rval = start->year  < year  ? 1 : start->year  > year ? 0 :
-	           start->month < month ? 1 : start->month > month? 0 :
-	           start->day   < day   ? 1 : start->day   > day  ? 0 :
-	           start->hour  < hour  ? 1 : start->hour  > hour ? 0 :
-	           start->min   < min   ? 1 : start->min   > min  ? 0 : 0;
-	debug("week: %04d-%02d-%02d %02d:%02d < %04d-%02d-%02d %02d:%02d == %d\n",
-			start->year, start->month, start->day, start->hour, start->min,
-			year, month, day, hour, min, rval);
-	return rval;
-}
-
 /* Week init */
 void week_init(WINDOW *_win)
 {

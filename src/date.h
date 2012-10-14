@@ -77,6 +77,7 @@ void add_months(year_t *year, month_t *month, int months);
 
 stamp_t get_stamp(date_t *date);
 int get_mins(date_t *start, date_t *end);
+int before(date_t *start, int year, int month, int day, int hour, int min);
 
 /* Time to string functions */
 const char *month_to_str(month_t month);
