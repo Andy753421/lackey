@@ -20,6 +20,8 @@
 
 #include "util.h"
 #include "date.h"
+#include "event.h"
+#include "screen.h"
 
 /* Constants */
 #define MW (2*7+6)
@@ -30,6 +32,7 @@ static WINDOW *win;
 /* Helper functions */
 static void print_month(month_t month, int y, int x)
 {
+	event_t    *event = EVENTS;
 	const char *name  = month_to_string(month);
 	const int   start = start_of_month(YEAR, month);
 	const char  days  = days_in_month(YEAR, month);
@@ -40,9 +43,22 @@ static void print_month(month_t month, int y, int x)
 	for (int d = 0; d < days; d++) {
 		int row = (start + d) / 7;
 		int col = (start + d) % 7;
-		if (month == MONTH && d == DAY) wattron(win, A_REVERSE);
+
+		int busy = 0;
+		while (event && before(&event->start, YEAR, month, d, 24, 0)) {
+			if (!before(&event->start, YEAR, month, d, 0, 0))
+				busy = 1;
+			event = event->next;
+		}
+
+		int today = month == MONTH && d == DAY;
+
+		int attr  = (busy  ? A_BOLD|A_UNDERLINE : A_DIM)
+		          | (today ? A_REVERSE          : 0    );
+
+		wattron(win, attr);
 		mvwprintw(win, y+2+row, x+col*3, "%2d", d+1);
-		if (month == MONTH && d == DAY) wattroff(win, A_REVERSE);
+		wattroff(win, attr);
 	}
 }
 
