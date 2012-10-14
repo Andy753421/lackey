@@ -32,42 +32,6 @@ static WINDOW *head;
 static WINDOW *times;
 static WINDOW *body;
 
-/* Local functions */
-static void print_event(event_t *event, wday_t day, hour_t hour, min_t min, float hstep)
-{
-	int x = ROUND(day*hstep);
-	int y = hour*4 + min/15 - line;
-	int w = ROUND((day+1)*hstep) - 1 - x;
-	int h = (get_mins(&event->start, &event->end)-1)/15+1;
-	int l = 0;
-	int s = y < 0 ? -y-1 : 0;
-
-	int color = event->cat == NULL           ? 0           :
-	            !strcmp(event->cat, "class") ? COLOR_CLASS :
-	            !strcmp(event->cat, "ec")    ? COLOR_EC    :
-	            !strcmp(event->cat, "work")  ? COLOR_WORK  : COLOR_OTHER ;
-
-	if (color) wattron(body, COLOR_PAIR(color));
-
-	if (h >= 2) mvwhline_set(body, y,     x+1,   WACS_T_HLINE, w-2);
-	if (h <= 1) mvwadd_wch(body,   y,     x,     WACS_BULLET);
-	if (h >= 2) mvwadd_wch(body,   y,     x,     WACS_T_ULCORNER);
-	if (h >= 2) mvwadd_wch(body,   y,     x+w-1, WACS_T_URCORNER);
-	if (h >= 3) mvwvline_set(body, y+1+s, x,     WACS_T_VLINE, h-2-s);
-	if (h >= 3) mvwvline_set(body, y+1+s, x+w-1, WACS_T_VLINE, h-2-s);
-	if (h >= 2) mvwadd_wch(body,   y+h-1, x,     WACS_T_LLCORNER);
-	if (h >= 2) mvwadd_wch(body,   y+h-1, x+w-1, WACS_T_LRCORNER);
-	if (h >= 2) mvwhline_set(body, y+h-1, x+1,   WACS_T_HLINE, w-2);
-
-	if (color) wattroff(body, COLOR_PAIR(color));
-
-	if (l<h && event->name) mvwprintw(body, y+l++, x+1, "%.*s",     w-2,      event->name);
-	if (l<h && event->loc)  mvwprintw(body, y+l++, x+1, "@ %-*.*s", w-4, w-4, event->loc);
-	if (l<h && event->desc) mvwprintw(body, y+l++, x+1, "%-*.*s",   w-2, w-2, event->desc);
-
-	debug("week: event = %s\n", event->name);
-}
-
 /* Week init */
 void week_init(WINDOW *_win)
 {
@@ -92,9 +56,6 @@ void week_draw(void)
 	int x = 6;
 	int y = 3;
 	const float hstep = (float)(COLS-x)/7.0;
-
-	/* Clear */
-	werase(win);
 
 	/* Get start of week */
 	year_t  year  = YEAR;
@@ -128,8 +89,13 @@ void week_draw(void)
 	for (int m = 0; m < 60; m+=15)
 	while (event && before(&event->start,
 			year, month, day, h+(m+15)/60, (m+15)%60)) {
-		if (!before(&event->start, year, month, day, h, m))
-			print_event(event, d, h, m, hstep);
+		if (!before(&event->start, year, month, day, h, m)) {
+			int y = h*4 + m/15 - line;
+			int x = ROUND(d*hstep);
+			int h = (get_mins(&event->start, &event->end)-1)/15+1;
+			int w = ROUND((d+1)*hstep) - 1 - x;
+			event_box(body, event, y, x, h, w);
+		}
 		event = event->next;
 	}
 
@@ -138,12 +104,17 @@ void week_draw(void)
 	for (int d = 0; d < 7; d++)
 		mvwvline(win, y, x+ROUND(d*hstep)-1, ACS_VLINE, LINES-y-2);
 
+
 	/* Draw today */
 	int l = x+ROUND((shift+0)*hstep)-1;
 	int r = x+ROUND((shift+1)*hstep)-1;
 	mvwhline    (win, y-1, l, ACS_BLOCK, r-l+1);
 	mvwvline_set(win, y,   l, WACS_T_VLINE, LINES-y-2);
 	mvwvline_set(win, y,   r, WACS_T_VLINE, LINES-y-2);
+	for (int h = (line+3)/4; h < 24; h++) {
+		mvwadd_wch(win, y+h*4-line, l, WACS_T_LTEE);
+		mvwadd_wch(win, y+h*4-line, r, WACS_T_RTEE);
+	}
 }
 
 /* Week run */
@@ -163,6 +134,7 @@ int week_run(int key, mmask_t btn, int row, int col)
 	if (days)
 		add_days(&YEAR, &MONTH, &DAY, days);
 	if (ref) {
+		werase(win);
 		week_draw();
 		wrefresh(win);
 	}

@@ -38,9 +38,9 @@ void date_init(void)
 	DAY   = tm->tm_mday-1;
 
 	/* Testing */
-	//YEAR  = 2009;
-	//MONTH = MAY;
-	//DAY   = 1;
+	//YEAR  = 2008;
+	//MONTH = OCT;
+	//DAY   = 21;
 }
 
 /* Time functions */

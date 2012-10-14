@@ -81,9 +81,6 @@ void year_draw(void)
 	int y = 0;
 	int h[4] = {};
 
-	/* Clear */
-	werase(win);
-
 	/* Determine heights */
 	for (int m = 0; m < 12; m++) {
 		int weeks = weeks_in_month(YEAR, m);
@@ -167,6 +164,7 @@ int year_run(int key, mmask_t btn, int row, int col)
 	}
 
 	/* Refresh */
+	werase(win);
 	year_draw();
 	wrefresh(win);
 	return 0;

@@ -24,6 +24,10 @@
 #define COLOR_WORK  5
 #define COLOR_OTHER 6
 
+/* Helper functions */
+void event_box(WINDOW *win, event_t *event, int y, int x, int h, int w);
+void event_line(WINDOW *win, event_t *event, int y, int x, int w);
+
 /* Screen functions */
 void screen_init(void);
 void screen_resize(void);

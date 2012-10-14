@@ -1,6 +1,6 @@
 Day view
    ┌─────────────────────────────────────────────────────────────────────┐
-   │ Day  Week  Month  Year │ Todo  Notes │ Settings  Help               │
+   │ Day  Week  Month  Year │ Events Todo │ Settings  Help               │
    │ ─────────────────────────────────────────────────────────────────── │
    │ 2012-09-27                                    Saturday September 27 │
    │ ─────────────────────────────────────────────────────────────────── │
@@ -34,7 +34,7 @@ Day view
 
 Week view
    ┌─────────────────────────────────────────────────────────────────────┐
-   │ Day  Week  Month  Year │ Todo  Notes │ Settings  Help               │
+   │ Day  Week  Month  Year │ Events Todo │ Settings  Help               │
    │ ─────────────────────────────────────────────────────────────────── │
    │         09/24       09/25       09/26       09/27       09/28       │
    │         Monday      Tuesday     Wednesday   Thursday    Friday      │
@@ -65,7 +65,7 @@ Week view
 
 Month view
    ┌─────────────────────────────────────────────────────────────────────┐
-   │ Day  Week  Month  Year │ Todo  Notes │ Settings  Help               │
+   │ Day  Week  Month  Year │ Events Todo │ Settings  Help               │
    │ ─────────────────────────────────────────────────────────────────── │
    │                          September  2012                            │
    │ Sun      Mon       Tue       Wed       Thu       Fri       Sat      │
@@ -98,7 +98,7 @@ Month view
 
 Year view
    ┌─────────────────────────────────────────────────────────────────────┐
-   │ Day  Week  Month  Year │ Todo  Notes │ Settings  Help               │
+   │ Day  Week  Month  Year │ Events Todo │ Settings  Help               │
    │ ─────────────────────────────────────────────────────────────────── │
    │                                2012                                 │
    │        January       │       February       │         March         │
@@ -137,9 +137,9 @@ Year view
    │                                                                     │
    └─────────────────────────────────────────────────────────────────────┘
 
-Notes view
+Events view
    ┌─────────────────────────────────────────────────────────────────────┐
-   │ Day  Week  Month  Year │ Todo  Notes │ Settings  Help               │
+   │ Day  Week  Month  Year │ Events Todo │ Settings  Help               │
    │ ─────────────────────────────────────────────────────────────────── │
    │                                                                     │
    │ 2012-09-24                                                          │
@@ -166,9 +166,9 @@ Notes view
    └─────────────────────────────────────────────────────────────────────┘
 
 
-Notes view
+Todo view
    ┌─────────────────────────────────────────────────────────────────────┐
-   │ Day  Week  Month  Year │ Todo  Notes │ Settings  Help               │
+   │ Day  Week  Month  Year │ Events Todo │ Settings  Help               │
    │ ─────────────────────────────────────────────────────────────────── │
    │                                                                     │
    │ ???                                                                 │
@@ -181,7 +181,7 @@ Notes view
 
 Settings view
    ┌─────────────────────────────────────────────────────────────────────┐
-   │ Day  Week  Month  Year │ Todo  Notes │ Settings  Help               │
+   │ Day  Week  Month  Year │ Events Todo │ Settings  Help               │
    │ ─────────────────────────────────────────────────────────────────── │
    │                                                                     │
    │ ???                                                                 │
@@ -195,7 +195,7 @@ Settings view
 
 Help view
    ┌─────────────────────────────────────────────────────────────────────┐
-   │ Day  Week  Month  Year │ Todo  Notes │ Settings  Help               │
+   │ Day  Week  Month  Year │ Events Todo │ Settings  Help               │
    │ ─────────────────────────────────────────────────────────────────── │
    │                                                                     │
    │ ???                                                                 │

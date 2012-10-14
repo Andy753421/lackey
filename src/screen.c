@@ -15,11 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define _XOPEN_SOURCE_EXTENDED
+
 #include <string.h>
 #include <ncurses.h>
 
 #include "util.h"
 #include "date.h"
+#include "event.h"
 #include "screen.h"
 
 /* Types */
@@ -47,7 +50,7 @@ view_t views[] = {
 	{ "Help",     help_init,     help_size,     help_draw,     help_run,     {KEY_F(8), '8', '?'} },
 };
 
-int active = 2;
+int active = 0;
 
 /* Local functions */
 void draw_header(void)
@@ -65,6 +68,51 @@ void draw_header(void)
 	mvhline(1, 0, ACS_HLINE, COLS);
 	refresh();
 }
+
+/* Helper functions */
+void event_box(WINDOW *win, event_t *event, int y, int x, int h, int w)
+{
+	int l = 0;
+	int s = y < 0 ? -y-1 : 0;
+
+	int color = event->cat == NULL           ? 0           :
+	            !strcmp(event->cat, "class") ? COLOR_CLASS :
+	            !strcmp(event->cat, "ec")    ? COLOR_EC    :
+	            !strcmp(event->cat, "work")  ? COLOR_WORK  : COLOR_OTHER ;
+
+	if (color) wattron(win, COLOR_PAIR(color));
+
+	if (h >= 2) mvwhline_set(win, y,     x+1,   WACS_T_HLINE, w-2);
+	if (h <= 1) mvwadd_wch(win,   y,     x,     WACS_BULLET);
+	if (h >= 2) mvwadd_wch(win,   y,     x,     WACS_T_ULCORNER);
+	if (h >= 2) mvwadd_wch(win,   y,     x+w-1, WACS_T_URCORNER);
+	if (h >= 3) mvwvline_set(win, y+1+s, x,     WACS_T_VLINE, h-2-s);
+	if (h >= 3) mvwvline_set(win, y+1+s, x+w-1, WACS_T_VLINE, h-2-s);
+	if (h >= 2) mvwadd_wch(win,   y+h-1, x,     WACS_T_LLCORNER);
+	if (h >= 2) mvwadd_wch(win,   y+h-1, x+w-1, WACS_T_LRCORNER);
+	if (h >= 2) mvwhline_set(win, y+h-1, x+1,   WACS_T_HLINE, w-2);
+
+	if (color) wattroff(win, COLOR_PAIR(color));
+
+	if (l<h && event->name) mvwprintw(win, y+l++, x+1, "%.*s",     w-2,      event->name);
+	if (l<h && event->loc)  mvwprintw(win, y+l++, x+1, "@ %-*.*s", w-4, w-4, event->loc);
+	if (l<h && event->desc) mvwprintw(win, y+l++, x+1, "%-*.*s",   w-2, w-2, event->desc);
+}
+
+void event_line(WINDOW *win, event_t *event, int y, int x, int w)
+{
+	int color = event->cat == NULL           ? 0           :
+	            !strcmp(event->cat, "class") ? COLOR_CLASS :
+	            !strcmp(event->cat, "ec")    ? COLOR_EC    :
+	            !strcmp(event->cat, "work")  ? COLOR_WORK  : COLOR_OTHER ;
+
+	if (color) wattron(win, COLOR_PAIR(color));
+	mvwaddch(win, y, x+0, ACS_BLOCK);
+	if (color) wattroff(win, COLOR_PAIR(color));
+
+	mvwprintw(win, y, x+1, "%-*.*s", w-1, w-1, event->name);
+}
+
 
 /* Screen init */
 void screen_init(void)

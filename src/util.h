@@ -25,9 +25,6 @@
 /* Debug functions */
 void util_init(void);
 
-/* Misc functions */
-char *sdup(const char *str);
-
 /* Debug functions */
 #ifdef DEBUG
 int debug(char *fmt, ...);

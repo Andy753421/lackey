@@ -21,6 +21,8 @@
 #include <string.h>
 #include <ncurses.h>
 
+#include "date.h"
+#include "event.h"
 #include "screen.h"
 
 /* Static data */
@@ -30,17 +32,6 @@ static FILE *debug_fd = NULL;
 void util_init(void)
 {
 	debug_fd = fopen("/tmp/lackey.log", "w+");
-}
-
-/* Misc functions */
-char *sdup(const char *str)
-{
-	if (str == NULL)
-		return NULL;
-	int len = strlen(str);
-	char *dup = malloc(len+1);
-	memcpy(dup, str, len+1);
-	return dup;
 }
 
 /* Debugging functions */

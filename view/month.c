@@ -28,21 +28,6 @@
 /* Static data */
 static WINDOW *win;
 
-/* Local functions */
-static void print_event(event_t *event, int y, int x, int w)
-{
-	int color = event->cat == NULL           ? 0           :
-	            !strcmp(event->cat, "class") ? COLOR_CLASS :
-	            !strcmp(event->cat, "ec")    ? COLOR_EC    :
-	            !strcmp(event->cat, "work")  ? COLOR_WORK  : COLOR_OTHER ;
-
-	if (color) wattron(win, COLOR_PAIR(color));
-	mvwaddch(win, y, x+0, ACS_BLOCK);
-	if (color) wattroff(win, COLOR_PAIR(color));
-
-	mvwprintw(win, y, x+1, "%-*.*s", w-1, w-1, event->name);
-}
-
 /* Month init */
 void month_init(WINDOW *_win)
 {
@@ -64,9 +49,6 @@ void month_draw(void)
 	const float midpt = (float)COLS/2.0 - (strlen(name) + 1 + 4)/2.0;
 	const float hstep = (float)(COLS-1)/7.0;
 	const float vstep = (float)(LINES-6)/weeks;
-
-	/* Clear */
-	werase(win);
 
 	/* Print Header */
 	mvwprintw(win, 0, midpt, "%s %d", name, YEAR);
@@ -95,7 +77,7 @@ void month_draw(void)
 		while (event && before(&event->start, YEAR, MONTH, d, 24, 0)) {
 			if (!before(&event->start, YEAR, MONTH, d, 0, 0)){
 				if (y == e) mvwhline(win, y, x-3, ACS_DARROW, 2);
-				if (y <= e) print_event(event, y, x, w);
+				if (y <= e) event_line(win, event, y, x, w);
 				y++;
 			}
 			event = event->next;
@@ -150,6 +132,7 @@ int month_run(int key, mmask_t btn, int row, int col)
 	if (days || months) {
 		add_days(&YEAR, &MONTH, &DAY, days);
 		add_months(&YEAR, &MONTH, months);
+		werase(win);
 		month_draw();
 		wrefresh(win);
 	}
