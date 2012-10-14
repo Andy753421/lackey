@@ -109,7 +109,7 @@ void month_draw(void)
 		int top = d >=  start             ? 0     : 1;
 		int bot = d <= (start+days-1)%7+1 ? weeks : weeks-1;
 		mvwvline(win, ROUND(4+top*vstep), ROUND(d*hstep),
-				ACS_VLINE, (bot-top)*vstep-1);
+				ACS_VLINE, (bot-top)*vstep);
 		for (int w = 1; w < weeks; w++) {
 			int chr = w == top ? ACS_TTEE :
 				  w == bot ? ACS_BTEE : ACS_PLUS;
