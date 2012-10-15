@@ -77,7 +77,7 @@ void month_draw(void)
 		while (event && before(&event->start, YEAR, MONTH, d, 24, 0)) {
 			if (!before(&event->start, YEAR, MONTH, d, 0, 0)){
 				if (y == e) mvwhline(win, y, x-3, ACS_DARROW, 2);
-				if (y <= e) event_line(win, event, y, x, w);
+				if (y <= e) event_line(win, event, y, x, w, 0);
 				y++;
 			}
 			event = event->next;

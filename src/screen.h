@@ -26,7 +26,7 @@
 
 /* Helper functions */
 void event_box(WINDOW *win, event_t *event, int y, int x, int h, int w);
-void event_line(WINDOW *win, event_t *event, int y, int x, int w);
+void event_line(WINDOW *win, event_t *event, int y, int x, int w, int full);
 
 /* Screen functions */
 void screen_init(void);
@@ -39,8 +39,8 @@ void day_init(WINDOW *win);
 void week_init(WINDOW *win);
 void month_init(WINDOW *win);
 void year_init(WINDOW *win);
+void events_init(WINDOW *win);
 void todo_init(WINDOW *win);
-void notes_init(WINDOW *win);
 void settings_init(WINDOW *win);
 void help_init(WINDOW *win);
 
@@ -49,8 +49,8 @@ void day_size(int,int);
 void week_size(int,int);
 void month_size(int,int);
 void year_size(int,int);
+void events_size(int,int);
 void todo_size(int,int);
-void notes_size(int,int);
 void settings_size(int,int);
 void help_size(int,int);
 
@@ -59,8 +59,8 @@ void day_draw(void);
 void week_draw(void);
 void month_draw(void);
 void year_draw(void);
+void events_draw(void);
 void todo_draw(void);
-void notes_draw(void);
 void settings_draw(void);
 void help_draw(void);
 
@@ -69,7 +69,7 @@ int day_run(int,mmask_t,int,int);
 int week_run(int,mmask_t,int,int);
 int month_run(int,mmask_t,int,int);
 int year_run(int,mmask_t,int,int);
+int events_run(int,mmask_t,int,int);
 int todo_run(int,mmask_t,int,int);
-int notes_run(int,mmask_t,int,int);
 int settings_run(int,mmask_t,int,int);
 int help_run(int,mmask_t,int,int);

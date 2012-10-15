@@ -43,14 +43,14 @@ view_t views[] = {
 	{ "Month",    month_init,    month_size,    month_draw,    month_run,    {KEY_F(3), '3',    } },
 	{ "Year",     year_init,     year_size,     year_draw,     year_run,     {KEY_F(4), '4',    } },
 	{ "|",        NULL,          NULL,          NULL,          NULL,         {                  } },
-	{ "Todo",     todo_init,     todo_size,     todo_draw,     todo_run,     {KEY_F(5), '5',    } },
-	{ "Notes",    notes_init,    notes_size,    notes_draw,    notes_run,    {KEY_F(6), '6',    } },
+	{ "Events",   events_init,   events_size,   events_draw,   events_run,   {KEY_F(5), '5',    } },
+	{ "Todo",     todo_init,     todo_size,     todo_draw,     todo_run,     {KEY_F(6), '6',    } },
 	{ "|",        NULL,          NULL,          NULL,          NULL,         {                  } },
 	{ "Settings", settings_init, settings_size, settings_draw, settings_run, {KEY_F(7), '7',    } },
 	{ "Help",     help_init,     help_size,     help_draw,     help_run,     {KEY_F(8), '8', '?'} },
 };
 
-int active = 0;
+int active = 5;
 
 /* Local functions */
 void draw_header(void)
@@ -99,7 +99,7 @@ void event_box(WINDOW *win, event_t *event, int y, int x, int h, int w)
 	if (l<h && event->desc) mvwprintw(win, y+l++, x+1, "%.*s",   w-2, event->desc);
 }
 
-void event_line(WINDOW *win, event_t *event, int y, int x, int w)
+void event_line(WINDOW *win, event_t *event, int y, int x, int w, int full)
 {
 	int color = event->cat == NULL           ? 0           :
 	            !strcmp(event->cat, "class") ? COLOR_CLASS :
@@ -107,10 +107,21 @@ void event_line(WINDOW *win, event_t *event, int y, int x, int w)
 	            !strcmp(event->cat, "work")  ? COLOR_WORK  : COLOR_OTHER ;
 
 	if (color) wattron(win, COLOR_PAIR(color));
-	mvwaddch(win, y, x+0, ACS_BLOCK);
+	mvwaddch(win, y, x++, ACS_BLOCK);
 	if (color) wattroff(win, COLOR_PAIR(color));
 
-	mvwprintw(win, y, x+1, "%-*.*s", w-1, w-1, event->name);
+	if (full) {
+		mvwprintw(win, y, x, " %02d:%02d - ", event->start.hour, event->start.min);
+		x += 9;
+	}
+	if (event->name) {
+		const char *label = event->name ?: event->desc;
+		mvwprintw(win, y, x, "%-*.*s", w-1, w-1, label);
+		x += MIN(strlen(label), w-1);
+	}
+	if (full && event->loc) {
+		mvwprintw(win, y, x, " @ %s", event->loc);
+	}
 }
 
 

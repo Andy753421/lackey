@@ -11,7 +11,7 @@ PROG      = lackey
 PROG_SRC  = main screen date event util 
 TEST      = test
 TEST_SRC  = test date util
-VIEWS     = day week month year todo notes settings help
+VIEWS     = day week month year events todo settings help
 CALS      = dummy ical
 
 # Targets

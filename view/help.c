@@ -35,7 +35,6 @@ void help_size(int rows, int cols)
 void help_draw(void)
 {
 	mvwprintw(win, 0, 1, "%s\n", "help");
-	wrefresh(win);
 }
 
 /* Help run */

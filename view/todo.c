@@ -35,7 +35,6 @@ void todo_size(int rows, int cols)
 void todo_draw(void)
 {
 	mvwprintw(win, 0, 1, "%s\n", "todo");
-	wrefresh(win);
 }
 
 /* Todo run */

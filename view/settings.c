@@ -35,7 +35,6 @@ void settings_size(int rows, int cols)
 void settings_draw(void)
 {
 	mvwprintw(win, 0, 1, "%s\n", "settings");
-	wrefresh(win);
 }
 
 /* Settings run */
