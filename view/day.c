@@ -32,6 +32,63 @@ static WINDOW *head;
 static WINDOW *times;
 static WINDOW *body;
 
+/* Box packing helpers */
+static void clear_old(event_t **list, int n, event_t *cur)
+{
+	for (int i = 0; i < n; i++)
+		if (list[i] && compare(&list[i]->end, &cur->start) < 0)
+			list[i] = NULL;
+}
+
+static int next_free(event_t **list, int n)
+{
+	for (int i = 0; i < n; i++)
+		if (!list[i])
+			return i;
+	return n-1;
+}
+
+static int count_busy(event_t **list, int n)
+{
+	int sum = 0;
+	for (int i = 0; i < n; i++)
+		if (list[i])
+			sum++;
+	return sum;
+}
+
+static int get_ncols(event_t *event, int n)
+{
+	int ncols = 0;
+	event_t *preview[n];
+	memset(preview, 0, sizeof(preview));
+	for (event_t *cur = event; cur; cur = cur->next) {
+		int col = next_free(preview, n);
+		preview[col] = cur;
+		ncols = MAX(ncols, col+1);
+		if (cur->next)
+			clear_old(preview, n, cur->next);
+		if (count_busy(preview, n) == 0)
+			break;
+	}
+	return ncols;
+}
+
+static int get_col(event_t **list, int n, event_t *event, int *ncols)
+{
+	clear_old(list, n, event);
+
+	/* If there are current events, then recalculate
+	 * ncols for the next series of events */
+	if (count_busy(list, n) == 0)
+		*ncols = get_ncols(event, n);
+
+	/* Find next open slot */
+	int col = next_free(list, n);
+	list[col] = event;
+	return col;
+}
+
 /* Day init */
 void day_init(WINDOW *_win)
 {
@@ -67,16 +124,19 @@ void day_draw(void)
 
 	/* Print events */
 	event_t *event = EVENTS;
+	event_t *active[10] = {};
+	int ncols = 0;
 	for (int h = 0; h < 24; h++)
 	for (int m = 0; m < 60; m+=15)
 	while (event && before(&event->start,
 			YEAR, MONTH, DAY, h+(m+15)/60, (m+15)%60)) {
 		if (!before(&event->start, YEAR, MONTH, DAY, h, m)) {
-			int y = h*4 + m/15 - line;
-			int x = 0;
-			int h = (get_mins(&event->start, &event->end)-1)/15+1;
-			int w = COLS-6;
-			event_box(body, event, y, x, h, w);
+			int col    = get_col(active, N_ELEMENTS(active), event, &ncols);
+			int left   = ROUND((col+0.0)*(COLS-6)/ncols);
+			int right  = ROUND((col+1.0)*(COLS-6)/ncols);
+			int row    = h*4 + m/15 - line;
+			int height = (get_mins(&event->start, &event->end)-1)/15+1;
+			event_box(body, event, row, left, height, right-left);
 		}
 		event = event->next;
 	}

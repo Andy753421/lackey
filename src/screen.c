@@ -94,9 +94,9 @@ void event_box(WINDOW *win, event_t *event, int y, int x, int h, int w)
 
 	if (color) wattroff(win, COLOR_PAIR(color));
 
-	if (l<h && event->name) mvwprintw(win, y+l++, x+1, "%.*s",     w-2,      event->name);
-	if (l<h && event->loc)  mvwprintw(win, y+l++, x+1, "@ %-*.*s", w-4, w-4, event->loc);
-	if (l<h && event->desc) mvwprintw(win, y+l++, x+1, "%-*.*s",   w-2, w-2, event->desc);
+	if (l<h && event->name) mvwprintw(win, y+l++, x+1, "%.*s",   w-2, event->name);
+	if (l<h && event->loc)  mvwprintw(win, y+l++, x+1, "@ %.*s", w-4, event->loc);
+	if (l<h && event->desc) mvwprintw(win, y+l++, x+1, "%.*s",   w-2, event->desc);
 }
 
 void event_line(WINDOW *win, event_t *event, int y, int x, int w)
