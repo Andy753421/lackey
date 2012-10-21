@@ -34,10 +34,18 @@ static event_t event = {
 	.end   = {2012, OCT, 0, 13, 0},
 	.name  = "dummy event",
 	.desc  = "this event is random and does not exist",
-	.next  = NULL,
+};
+
+static todo_t todo = {
+	.cal     = &cal,
+	.name    = "dummy todo",
+	.desc    = "this todo is random and does not exist",
+	.due     = {2012, OCT, 0, 13, 0},
+	.status  = 50,
 };
 
 static event_t events[8];
+static todo_t  todos[6];
 
 /* Event functions */
 event_t *dummy_events(cal_t *cal, year_t year, month_t month, day_t day, int days)
@@ -52,4 +60,16 @@ event_t *dummy_events(cal_t *cal, year_t year, month_t month, day_t day, int day
 			events[i].next = &events[i+1];
 	}
 	return &events[0];
+}
+
+/* Todo functions */
+todo_t *dummy_todos(cal_t *cal, year_t year, month_t month, day_t day, int days)
+{
+	for (int i = 0; i < N_ELEMENTS(todos); i++) {
+		todos[i] = todo;
+		todos[i].status = i*20;
+		if (i+1 < N_ELEMENTS(todos))
+			todos[i].next = &todos[i+1];
+	}
+	return &todos[0];
 }

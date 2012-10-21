@@ -27,6 +27,7 @@
 /* Helper functions */
 void event_box(WINDOW *win, event_t *event, int y, int x, int h, int w);
 void event_line(WINDOW *win, event_t *event, int y, int x, int w, int full);
+void todo_line(WINDOW *win, todo_t *todo, int y, int x, int w, int full);
 
 /* View functions */
 void view_init(void);

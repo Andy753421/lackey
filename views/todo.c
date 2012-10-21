@@ -17,8 +17,48 @@
 
 #include <ncurses.h>
 
+#include "util.h"
+#include "date.h"
+#include "cal.h"
+#include "view.h"
+
 /* Static data */
 static WINDOW *win;
+
+static int show_new      = 1;
+static int show_started  = 1;
+static int show_finished = 1;
+
+/* Helper functions */
+static int print_todos(WINDOW *win, int y, todo_t *todos, status_t low, status_t high)
+{
+	int n = 0;
+	for (todo_t *cur = todos; cur; cur = cur->next)
+		if (low <= cur->status && cur->status <= high)
+			todo_line(win, cur, y+n++, 2, COLS-2, 1);
+	return n;
+}
+
+static int print_group(WINDOW *win, int y, todo_t *todos,
+		int show, const char *label, status_t low, status_t high)
+{
+	int n = 1;
+
+	/* Label */
+	mvwprintw(win, y, 0, "%s", label);
+
+	/* Todos */
+	if (show)
+		n = print_todos(win, y+1, todos, low, high);
+
+	/* Status */
+	if (!show)
+		mvwprintw(win, y+1, 4, "[hidden]");
+	if (n == 0)
+		mvwprintw(win, y+1, 4, "[no tasks]");
+
+	return y+1+MAX(n,1)+1;
+}
 
 /* Todo init */
 void todo_init(WINDOW *_win)
@@ -34,11 +74,32 @@ void todo_size(int rows, int cols)
 /* Todo draw */
 void todo_draw(void)
 {
-	mvwprintw(win, 0, 1, "%s\n", "todo");
+	int y = 0;
+
+	y = print_group(win, y, TODOS,
+		show_new, "New Tasks", NEW, NEW);
+
+	y = print_group(win, y, TODOS,
+		show_started, "Started Tasks", NEW+1, DONE-1);
+
+	y = print_group(win, y, TODOS,
+		show_finished, "Finished Tasks", DONE, DONE);
 }
 
 /* Todo run */
 int todo_run(int key, mmask_t btn, int row, int col)
 {
+	int ref = 0;
+	switch (key)
+	{
+		case 'n': ref = 1; show_new      ^= 1; break;
+		case 's': ref = 1; show_started  ^= 1; break;
+		case 'f': ref = 1; show_finished ^= 1; break;
+	}
+	if (ref) {
+		werase(win);
+		todo_draw();
+		wrefresh(win);
+	}
 	return 0;
 }

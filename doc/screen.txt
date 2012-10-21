@@ -170,8 +170,22 @@ Todo view
    ┌─────────────────────────────────────────────────────────────────────┐
    │ Day  Week  Month  Year │ Events Todo │ Settings  Help               │
    │ ─────────────────────────────────────────────────────────────────── │
+   │   Due Date          Status  Desription                        [nsf] │
+   │ ─────────────────────────────────────────────────────────────────── │
    │                                                                     │
-   │ ???                                                                 │
+   │ New tasks                                                           │
+   │   2012-10-01 12:00  new     Some task                               │
+   │   2012-10-01 12:00  new     Some task                               │
+   │   2012-10-01 12:00  new     Some task                               │
+   │                                                                     │
+   │ Started Tasks                                                       │
+   │   2012-10-01 13:00  10%     Other Tasks                             │
+   │   2012-10-01 13:00  10%     Other Tasks                             │
+   │   2012-10-01 13:00  10%     Other Tasks                             │
+   │                                                                     │
+   │ Finished tasks:                                                     │
+   │   2012-10-01 14:00  done    Some finished task                      │
+   │   2012-10-01 14:00  done    Other finsihed task                     │
    │                                                                     │
    │                                                                     │
    │                                                                     │

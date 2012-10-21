@@ -160,6 +160,12 @@ event_t *ical_events(cal_t *cal, year_t year, month_t month, day_t day, int days
 	/* Todo, memory management */
 }
 
+/* Todo functions */
+todo_t *ical_todos(cal_t *cal, year_t year, month_t month, day_t day, int days)
+{
+	return NULL;
+}
+
 /* Test functions */
 void ical_printr(icalcomponent *comp, int depth)
 {

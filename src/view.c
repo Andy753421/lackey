@@ -50,10 +50,10 @@ view_t views[] = {
 	{ "Help",     help_init,     help_size,     help_draw,     help_run,     {KEY_F(8), '8', '?'} },
 };
 
-int active = 5;
+int active = 6;
 
 /* Local functions */
-void draw_header(void)
+static void draw_header(void)
 {
 	move(0, 0);
 	attron(COLOR_PAIR(COLOR_TITLE));
@@ -69,16 +69,21 @@ void draw_header(void)
 	refresh();
 }
 
+static int get_color(const char *cat)
+{
+	return cat == NULL           ? 0           :
+	       !strcmp(cat, "class") ? COLOR_CLASS :
+	       !strcmp(cat, "ec")    ? COLOR_EC    :
+	       !strcmp(cat, "work")  ? COLOR_WORK  : COLOR_OTHER ;
+}
+
 /* Helper functions */
 void event_box(WINDOW *win, event_t *event, int y, int x, int h, int w)
 {
 	int l = 0;
 	int s = y < 0 ? -y-1 : 0;
 
-	int color = event->cat == NULL           ? 0           :
-	            !strcmp(event->cat, "class") ? COLOR_CLASS :
-	            !strcmp(event->cat, "ec")    ? COLOR_EC    :
-	            !strcmp(event->cat, "work")  ? COLOR_WORK  : COLOR_OTHER ;
+	int color = get_color(event->cat);
 
 	if (color) wattron(win, COLOR_PAIR(color));
 
@@ -101,10 +106,7 @@ void event_box(WINDOW *win, event_t *event, int y, int x, int h, int w)
 
 void event_line(WINDOW *win, event_t *event, int y, int x, int w, int full)
 {
-	int color = event->cat == NULL           ? 0           :
-	            !strcmp(event->cat, "class") ? COLOR_CLASS :
-	            !strcmp(event->cat, "ec")    ? COLOR_EC    :
-	            !strcmp(event->cat, "work")  ? COLOR_WORK  : COLOR_OTHER ;
+	int color = get_color(event->cat);
 
 	if (color) wattron(win, COLOR_PAIR(color));
 	mvwaddch(win, y, x++, ACS_BLOCK);
@@ -124,6 +126,24 @@ void event_line(WINDOW *win, event_t *event, int y, int x, int w, int full)
 	}
 }
 
+void todo_line(WINDOW *win, todo_t *todo, int y, int x, int w, int full)
+{
+	char perc[16];
+	sprintf(perc, "%2d%%", todo->status);
+
+	int color = get_color(todo->cat);
+	if (color) wattron(win, COLOR_PAIR(color));
+	mvwaddch(win, y, 2, ACS_BLOCK);
+	if (color) wattroff(win, COLOR_PAIR(color));
+
+	mvwprintw(win, y, 4, "%04d-%02d-%02d %2d:%02d",
+			todo->due.year, todo->due.month+1, todo->due.day+1,
+			todo->due.hour, todo->due.min);
+	mvwprintw(win, y, 22, "%s",
+			todo->status == NEW  ? "new"  :
+			todo->status == DONE ? "done" : perc);
+	mvwprintw(win, y, 30, "%s: %s", todo->name, todo->desc);
+}
 
 /* View init */
 void view_init(void)
