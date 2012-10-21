@@ -21,8 +21,8 @@
 
 #include <util.h>
 #include <date.h>
-#include <event.h>
-#include <screen.h>
+#include <cal.h>
+#include <view.h>
 
 /* Static data */
 static WINDOW *win;

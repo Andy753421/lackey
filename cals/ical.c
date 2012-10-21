@@ -21,7 +21,7 @@
 
 #include "util.h"
 #include "date.h"
-#include "event.h"
+#include "cal.h"
 
 /* Local types */
 typedef struct {
@@ -139,7 +139,7 @@ static void add_events(icalarray *array, icalcomponent *comp,
 }
 
 /* Event functions */
-event_t *ical_get(cal_t *cal, year_t year, month_t month, day_t day, int days)
+event_t *ical_events(cal_t *cal, year_t year, month_t month, day_t day, int days)
 {
 	/* Load ical */
 	FILE *file = fopen("data/all.ics", "r");

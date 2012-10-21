@@ -19,7 +19,7 @@
 
 #include "util.h"
 #include "date.h"
-#include "event.h"
+#include "cal.h"
 
 /* Test data */
 static cal_t cal = {
@@ -40,7 +40,7 @@ static event_t event = {
 static event_t events[8];
 
 /* Event functions */
-event_t *dummy_get(cal_t *cal, year_t year, month_t month, day_t day, int days)
+event_t *dummy_events(cal_t *cal, year_t year, month_t month, day_t day, int days)
 {
 	for (int i = 0; i < N_ELEMENTS(events); i++) {
 		date_t *s = &events[i].start;

@@ -28,11 +28,11 @@
 void event_box(WINDOW *win, event_t *event, int y, int x, int h, int w);
 void event_line(WINDOW *win, event_t *event, int y, int x, int w, int full);
 
-/* Screen functions */
-void screen_init(void);
-void screen_resize(void);
-void screen_draw(void);
-int  screen_run(int key, mmask_t btn, int row, int col);
+/* View functions */
+void view_init(void);
+void view_resize(void);
+void view_draw(void);
+int  view_run(int key, mmask_t btn, int row, int col);
 
 /* View init functions */
 void day_init(WINDOW *win);

@@ -22,7 +22,7 @@ typedef struct {
 	void *data;
 } cal_t;
 
-/* Event types */
+/* Calendar items */
 typedef struct event_t {
 	const cal_t    *cal;
 	const char     *name;
@@ -37,13 +37,13 @@ typedef struct event_t {
 /* Global data */
 extern event_t *EVENTS;
 
-/* Event functions */
-void event_init(void);
-event_t *event_get(year_t year, month_t month, day_t day, int days);
+/* Calendar functions */
+void cal_init(void);
+event_t *cal_events(year_t year, month_t month, day_t day, int days);
 
-/* Calendar implementation functions */
-event_t *dummy_get(cal_t *cal, year_t year, month_t month, day_t day, int days);
-event_t *ical_get(cal_t *cal, year_t year, month_t month, day_t day, int days);
+/* Calendar event functions */
+event_t *dummy_events(cal_t *cal, year_t year, month_t month, day_t day, int days);
+event_t *ical_events(cal_t *cal, year_t year, month_t month, day_t day, int days);
 
 /* Test fuctions */
 void ical_test(void);

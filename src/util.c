@@ -22,8 +22,8 @@
 #include <ncurses.h>
 
 #include "date.h"
-#include "event.h"
-#include "screen.h"
+#include "cal.h"
+#include "view.h"
 
 /* Static data */
 static FILE *debug_fd = NULL;

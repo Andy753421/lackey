@@ -17,15 +17,15 @@
 
 #include "util.h"
 #include "date.h"
-#include "event.h"
+#include "cal.h"
 
 /* Global data */
 event_t *EVENTS;
 
 /* Initialize */
-void event_init(void)
+void cal_init(void)
 {
-	EVENTS = event_get(2012, JAN, 0, 366);
+	EVENTS = cal_events(2012, JAN, 0, 366);
 
 	/* Debug */
 	for (event_t *e = EVENTS; e; e = e->next)
@@ -34,9 +34,9 @@ void event_init(void)
 				e->start.hour, e->start.min, e->name, e->desc);
 }
 
-/* Event get */
-event_t *event_get(year_t year, month_t month, day_t day, int days)
+/* Get events */
+event_t *cal_events(year_t year, month_t month, day_t day, int days)
 {
-	return ical_get(0, year, month, day, days)
-	    ?: dummy_get(0, year, month, day, days);
+	return ical_events(0, year, month, day, days)
+	    ?: dummy_events(0, year, month, day, days);
 }

@@ -16,7 +16,7 @@
  */
 
 #include "date.h"
-#include "event.h"
+#include "cal.h"
 
 int main(int argc, char **argv)
 {

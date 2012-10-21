@@ -22,8 +22,8 @@
 
 #include "util.h"
 #include "date.h"
-#include "event.h"
-#include "screen.h"
+#include "cal.h"
+#include "view.h"
 
 /* Types */
 typedef struct {
@@ -125,8 +125,8 @@ void event_line(WINDOW *win, event_t *event, int y, int x, int w, int full)
 }
 
 
-/* Screen init */
-void screen_init(void)
+/* View init */
+void view_init(void)
 {
 	for (int i = 0; i < N_ELEMENTS(views); i++) {
 		if (views[i].init) {
@@ -136,8 +136,8 @@ void screen_init(void)
 	}
 }
 
-/* Screen draw */
-void screen_resize(void)
+/* View draw */
+void view_resize(void)
 {
 	for (int i = 0; i < N_ELEMENTS(views); i++) {
 		if (views[i].win)
@@ -147,8 +147,8 @@ void screen_resize(void)
 	}
 }
 
-/* Screen draw */
-void screen_draw(void)
+/* View draw */
+void view_draw(void)
 {
 	draw_header();
 	werase(views[active].win);
@@ -156,18 +156,18 @@ void screen_draw(void)
 	wrefresh(views[active].win);
 }
 
-/* Screen set */
-int screen_set(int num)
+/* View set */
+int view_set(int num)
 {
 	if (active != num) {
 		active = num;
-		screen_draw();
+		view_draw();
 	}
 	return 1;
 }
 
-/* Screen run */
-int screen_run(int key, mmask_t btn, int row, int col)
+/* View run */
+int view_run(int key, mmask_t btn, int row, int col)
 {
 	/* Check for mouse events */
 	if (key == KEY_MOUSE && row == 0) {
@@ -175,7 +175,7 @@ int screen_run(int key, mmask_t btn, int row, int col)
 		for (int i = 0; i < N_ELEMENTS(views); i++) {
 			int end = start + strlen(views[i].name) - 1;
 			if (start <= col && col <= end && views[i].draw)
-				return screen_set(i);
+				return view_set(i);
 			start = end + 2;
 		}
 	}
@@ -186,7 +186,7 @@ int screen_run(int key, mmask_t btn, int row, int col)
 			continue;
 		for (int j = 0; j < N_ELEMENTS(views[i].keys); j++)
 			if (views[i].keys[j] == key)
-				return screen_set(i);
+				return view_set(i);
 	}
 
 	/* Shift windows */
@@ -198,7 +198,7 @@ int screen_run(int key, mmask_t btn, int row, int col)
 		num += N_ELEMENTS(views);
 		num %= N_ELEMENTS(views);
 		if (views[num].run)
-			return screen_set(num);
+			return view_set(num);
 	}
 
 	/* Pass key to active view */

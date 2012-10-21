@@ -22,8 +22,8 @@
 
 #include "util.h"
 #include "date.h"
-#include "event.h"
-#include "screen.h"
+#include "cal.h"
+#include "view.h"
 
 /* Control-C handler, so we don't hose the therminal */
 static void on_sigint(int signum)
@@ -60,11 +60,11 @@ int main(int argc, char **argv)
 	/* Initialize */
 	util_init();
 	date_init();
-	event_init();
-	screen_init();
+	cal_init();
+	view_init();
 
-	/* Draw initial screen */
-	screen_draw();
+	/* Draw initial view */
+	view_draw();
 
 	/* Run */
 	while (1) {
@@ -81,16 +81,16 @@ int main(int argc, char **argv)
 			case KEY_RESIZE:
 				endwin();
 				refresh();
-				screen_resize();
-				screen_draw();
+				view_resize();
+				view_draw();
 				continue;
 			case '\14':
 				clear();
 			case '\7':
-				screen_draw();
+				view_draw();
 				continue;
 		}
-		if (screen_run(chr, btn.bstate, btn.y, btn.x))
+		if (view_run(chr, btn.bstate, btn.y, btn.x))
 			continue;
 		debug("main: Unhandled key - Dec %3d,  Hex %02x,  Oct %03o,  Chr <%c>\n",
 				chr, chr, chr, chr);
