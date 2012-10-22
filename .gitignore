@@ -2,9 +2,10 @@
 *.log
 *.o
 *.swp
+*.tar.gz
 *~
 .vimrc
 config.mk
 lackey
-test
 tags
+test

@@ -1,0 +1,28 @@
+lackey - curses calendar program
+================================
+lackey is a lightweight terminal based calendar program
+
+
+Installation
+------------
+Create and edit config.mk as desired (see config.mk.example)
+
+Build and install lackey:
+
+    make
+    make install
+
+
+Running lackey
+--------------
+Start lackey from from a termainl:
+
+    lackey
+
+
+Hacking
+-------
+Common source files are in the src directory. Each Curses screen has it's own
+source file in the view directory and each calendar backend has a source file
+in the cal directory. The views and calendar backends are access though the
+view.c and cal.c files, respectively.
