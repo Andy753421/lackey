@@ -113,9 +113,12 @@ void event_line(WINDOW *win, event_t *event, int y, int x, int w, int full)
 	if (color) wattroff(win, COLOR_PAIR(color));
 
 	if (full) {
-		mvwprintw(win, y, x, " %2d:%02d-%2d:%02d -",
-				event->start.hour, event->start.min,
-				event->end.hour,   event->end.min);
+		if (all_day(&event->start, &event->end))
+			mvwprintw(win, y, x, " [all day]   -");
+		else
+			mvwprintw(win, y, x, " %2d:%02d-%2d:%02d -",
+					event->start.hour, event->start.min,
+					event->end.hour,   event->end.min);
 		x += 15;
 	}
 	if (event->name) {
@@ -148,9 +151,12 @@ void todo_line(WINDOW *win, todo_t *todo, int y, int x, int w, int full)
 	x += 2;
 
 	/* Print time */
-	mvwprintw(win, y, x, "%04d-%02d-%02d %2d:%02d",
-			todo->due.year, todo->due.month+1, todo->due.day+1,
-			todo->due.hour, todo->due.min);
+	if (no_date(&todo->due))
+		mvwprintw(win, y, x, "[no due date]");
+	else
+		mvwprintw(win, y, x, "%04d-%02d-%02d %2d:%02d",
+				todo->due.year, todo->due.month+1, todo->due.day+1,
+				todo->due.hour, todo->due.min);
 	x += 18;
 
 	/* Print status */

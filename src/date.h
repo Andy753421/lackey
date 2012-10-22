@@ -80,6 +80,9 @@ int get_mins(date_t *start, date_t *end);
 int compare(date_t *a, date_t *b);
 int before(date_t *start, int year, int month, int day, int hour, int min);
 
+int all_day(date_t *start, date_t *end);
+int no_date(date_t *date);
+
 /* Time to string functions */
 const char *month_to_str(month_t month);
 const char *month_to_string(month_t month);

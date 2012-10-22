@@ -141,6 +141,18 @@ int before(date_t *start, int year, int month, int day, int hour, int min)
 	return compare(start, &(date_t){year, month, day, hour, min}) < 0;
 }
 
+int all_day(date_t *start, date_t *end)
+{
+	date_t test = *start;
+	add_days(&test.year, &test.month, &test.day, 1);
+	return compare(&test, end) <= 0;
+}
+
+int no_date(date_t *date)
+{
+	return date->year == 0;
+}
+
 /* Debug functions */
 const char *month_to_str(month_t month)
 {
