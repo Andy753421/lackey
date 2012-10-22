@@ -25,6 +25,9 @@
 /* Debug functions */
 void util_init(void);
 
+/* Stirng functions */
+void strsub(char *str, char find, char repl);
+
 /* Debug functions */
 #ifdef DEBUG
 int debug(char *fmt, ...);

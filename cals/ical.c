@@ -45,55 +45,20 @@ static date_t to_date(struct icaltimetype time)
 {
 	return (date_t){
 		.year  = time.year,
-		.month = time.month-1,
-		.day   = time.day-1,
+		.month = time.month ? time.month-1 : 0,
+		.day   = time.day   ? time.day  -1 : 0,
 		.hour  = time.hour,
 		.min   = time.minute,
 	};
 }
 
-static event_t *to_event(ical_inst *inst)
-{
-	icalproperty *prop = icalcomponent_get_first_property(inst->comp, ICAL_CATEGORIES_PROPERTY);
-
-	event_t *event = calloc(1, sizeof(event_t));
-	event->name  = icalcomponent_get_summary(inst->comp);
-	event->desc  = icalcomponent_get_description(inst->comp);
-	event->loc   = icalcomponent_get_location(inst->comp);
-	event->cat   = icalproperty_get_value_as_string(prop);
-	event->start = to_date(inst->start);
-	event->end   = to_date(inst->end);
-	return event;
-}
-
-static event_t *to_list(icalarray *array)
-{
-	event_t  list = {};
-	event_t *tail = &list;
-	for (int i = 0; i < array->num_elements; i++) {
-		 ical_inst *inst = icalarray_element_at(array, i);
-		 tail->next = to_event(inst);
-		 tail = tail->next;
-	}
-	return list.next;
-}
-
-static void print_list(event_t *start)
-{
-	for (event_t *cur = start; cur; cur = cur->next)
-		printf("%04d-%02d-%02d %02d:%02d - %s\n",
-			cur->start.year, cur->start.month, cur->start.day,
-			cur->start.hour, cur->start.min,
-			cur->name ?: cur->desc ?: "[no summary]");
-}
-
-static void add_events(icalarray *array, icalcomponent *comp,
-		icaltimetype start, icaltimetype end)
+static void add_recur(icalarray *array, icalcomponent *comp,
+		icaltimetype start, icaltimetype end,
+		icalcomponent_kind which)
 {
 	icalcomponent_kind kind = icalcomponent_isa(comp);
 
-	if (kind == ICAL_VEVENT_COMPONENT ||
-	    kind == ICAL_VTODO_COMPONENT) {
+	if (kind == which) {
 		/* Get recurrence data */
 		struct icaltimetype cstart, cend; // Component times
 		struct icaltimetype istart, iend; // Instance times
@@ -112,15 +77,25 @@ static void add_events(icalarray *array, icalcomponent *comp,
 		iter   = icalrecur_iterator_new(recur, cstart);
 
 		/* Add recurrences */
-		while (1) {
-			istart = icalrecur_iterator_next(iter);
+		if (icaltime_is_null_time(cstart) ||
+		    which == ICAL_VTODO_COMPONENT) {
+			icalarray_append(array, &(ical_inst){
+				.comp  = comp,
+				.start = cstart,
+				.end   = cend,
+			});
+		} else while (1) {
+			istart = iend = icalrecur_iterator_next(iter);
 			if (icaltime_is_null_time(istart))
 				break;    // no more instances
-			iend   = icaltime_add(istart, length);
+			if (!icaltime_is_null_time(cend))
+				iend = icaltime_add(iend, length);
+
 			if (icaltime_compare(iend, start) <= 0)
 				continue; // instance ends before start time
 			if (icaltime_compare(istart, end) >= 0)
 				break;    // instance begins after stop time
+
 			icalarray_append(array, &(ical_inst){
 				.comp  = comp,
 				.start = istart,
@@ -133,9 +108,83 @@ static void add_events(icalarray *array, icalcomponent *comp,
 	icalcomponent_kind find = ICAL_ANY_COMPONENT;
 	icalcomponent *child = icalcomponent_get_first_component(comp, find);
 	while (child) {
-		add_events(array, child, start, end);
+		add_recur(array, child, start, end, which);
 		child = icalcomponent_get_next_component(comp, find);
 	}
+}
+
+/* Event functions */
+static event_t *to_event(ical_inst *inst)
+{
+	icalproperty *prop = icalcomponent_get_first_property(inst->comp, ICAL_CATEGORIES_PROPERTY);
+
+	event_t *event = calloc(1, sizeof(event_t));
+	event->name  = icalcomponent_get_summary(inst->comp);
+	event->desc  = icalcomponent_get_description(inst->comp);
+	event->loc   = icalcomponent_get_location(inst->comp);
+	event->cat   = icalproperty_get_value_as_string(prop);
+	event->start = to_date(inst->start);
+	event->end   = to_date(inst->end);
+	return event;
+}
+
+static event_t *to_events(icalarray *array)
+{
+	event_t  list = {};
+	event_t *tail = &list;
+	for (int i = 0; i < array->num_elements; i++) {
+		 ical_inst *inst = icalarray_element_at(array, i);
+		 tail->next = to_event(inst);
+		 tail = tail->next;
+	}
+	return list.next;
+}
+
+static void print_events(event_t *start)
+{
+	for (event_t *cur = start; cur; cur = cur->next)
+		printf("%04d-%02d-%02d %02d:%02d - %s\n",
+			cur->start.year, cur->start.month, cur->start.day,
+			cur->start.hour, cur->start.min,
+			cur->name ?: cur->desc ?: "[no summary]");
+}
+
+/* Todo functions */
+static todo_t *to_todo(ical_inst *inst)
+{
+	icalproperty *cat  = icalcomponent_get_first_property(inst->comp, ICAL_CATEGORIES_PROPERTY);
+	icalproperty *perc = icalcomponent_get_first_property(inst->comp, ICAL_PERCENTCOMPLETE_PROPERTY);
+
+	todo_t *todo = calloc(1, sizeof(todo_t));
+	todo->name   = icalcomponent_get_summary(inst->comp);
+	todo->desc   = icalcomponent_get_description(inst->comp);
+	todo->cat    = icalproperty_get_value_as_string(cat);
+	todo->status = icalcomponent_get_status(inst->comp) == ICAL_STATUS_COMPLETED ? 100 :
+	               perc ? icalproperty_get_percentcomplete(perc) : 0;
+	todo->start  = to_date(inst->start);
+	todo->due    = to_date(icalcomponent_get_due(inst->comp));
+	return todo;
+}
+
+static todo_t *to_todos(icalarray *array)
+{
+	todo_t  list = {};
+	todo_t *tail = &list;
+	for (int i = 0; i < array->num_elements; i++) {
+		 ical_inst *inst = icalarray_element_at(array, i);
+		 tail->next = to_todo(inst);
+		 tail = tail->next;
+	}
+	return list.next;
+}
+
+static void print_todos(todo_t *start)
+{
+	for (todo_t *cur = start; cur; cur = cur->next)
+		printf("%04d-%02d-%02d %02d:%02d - %d%% - %s\n",
+			cur->due.year, cur->due.month, cur->due.day,
+			cur->due.hour, cur->due.min,   cur->status,
+			cur->name ?: cur->desc ?: "[no summary]");
 }
 
 /* Event functions */
@@ -153,9 +202,9 @@ event_t *ical_events(cal_t *cal, year_t year, month_t month, day_t day, int days
 	icalarray *array = icalarray_new(sizeof(ical_inst), 1);
 	icaltimetype start = {.year = 2000};
 	icaltimetype end   = {.year = 2020};
-	add_events(array, ical, start, end);
+	add_recur(array, ical, start, end, ICAL_VEVENT_COMPONENT);
 	icalarray_sort(array, ical_compare);
-	return to_list(array);
+	return to_events(array);
 
 	/* Todo, memory management */
 }
@@ -163,7 +212,23 @@ event_t *ical_events(cal_t *cal, year_t year, month_t month, day_t day, int days
 /* Todo functions */
 todo_t *ical_todos(cal_t *cal, year_t year, month_t month, day_t day, int days)
 {
-	return NULL;
+	/* Load ical */
+	FILE *file = fopen("data/all.ics", "r");
+	if (!file)
+		return NULL;
+	icalparser *parser = icalparser_new();
+	icalparser_set_gen_data(parser, file);
+	icalcomponent *ical = icalparser_parse(parser, (void*)fgets);
+
+	/* Add todos */
+	icalarray *array = icalarray_new(sizeof(ical_inst), 1);
+	icaltimetype start = {.year = 2000};
+	icaltimetype end   = {.year = 2020};
+	add_recur(array, ical, start, end, ICAL_VTODO_COMPONENT);
+	icalarray_sort(array, ical_compare);
+	return to_todos(array);
+
+	/* Todo, memory management */
 }
 
 /* Test functions */
@@ -195,17 +260,32 @@ void ical_test(void)
 	icalparser_set_gen_data(parser, file);
 	icalcomponent *ical = icalparser_parse(parser, (void*)fgets);
 
-	/* Test print */
-	ical_printr(ical, 0);
-
-	/* Test Add */
-	icalarray *array = icalarray_new(sizeof(ical_inst), 1);
+	/* Misc */
+	icalarray *array;
 	icaltimetype start = {.year = 2000};
 	icaltimetype end   = {.year = 2020};
-	add_events(array, ical, start, end);
+
+	/* Find events */
+	array = icalarray_new(sizeof(ical_inst), 1);
+	add_recur(array, ical, start, end, ICAL_VEVENT_COMPONENT);
 	icalarray_sort(array, ical_compare);
-	event_t *events = to_list(array);
-	print_list(events);
+	event_t *events = to_events(array);
+
+	/* Find Todos */
+	array = icalarray_new(sizeof(ical_inst), 1);
+	add_recur(array, ical, start, end, ICAL_VTODO_COMPONENT);
+	icalarray_sort(array, ical_compare);
+	todo_t *todos = to_todos(array);
+
+	/* Print */
+	//ical_printr(ical, 0);
+	//print_events(events);
+	print_todos(todos);
+
+	(void)print_events;
+	(void)print_todos;
+	(void)events;
+	(void)todos;
 
 	/* Cleanup */
 	icalparser_free(parser);

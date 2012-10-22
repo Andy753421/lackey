@@ -34,6 +34,14 @@ void util_init(void)
 	debug_fd = fopen("/tmp/lackey.log", "w+");
 }
 
+/* String functions */
+void strsub(char *str, char find, char repl)
+{
+	for (char *cur = str; *cur; cur++)
+		if (*cur == find)
+			*cur = repl;
+}
+
 /* Debugging functions */
 int debug(char *fmt, ...)
 {

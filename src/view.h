@@ -19,10 +19,14 @@
 #define COLOR_TITLE 1
 #define COLOR_ERROR 2
 
-#define COLOR_CLASS 3
-#define COLOR_EC    4
-#define COLOR_WORK  5
-#define COLOR_OTHER 6
+#define COLOR_NEW   3
+#define COLOR_WIP   4
+#define COLOR_DONE  5
+
+#define COLOR_CLASS 6
+#define COLOR_EC    7
+#define COLOR_WORK  8
+#define COLOR_OTHER 9
 
 /* Helper functions */
 void event_box(WINDOW *win, event_t *event, int y, int x, int h, int w);

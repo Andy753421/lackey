@@ -24,40 +24,42 @@
 
 /* Static data */
 static WINDOW *win;
+static int     line;
+static int     rows;
 
 static int show_new      = 1;
 static int show_started  = 1;
 static int show_finished = 1;
 
 /* Helper functions */
-static int print_todos(WINDOW *win, int y, todo_t *todos, status_t low, status_t high)
+static int print_todos(WINDOW *win, int row, todo_t *todos, status_t low, status_t high)
 {
 	int n = 0;
 	for (todo_t *cur = todos; cur; cur = cur->next)
 		if (low <= cur->status && cur->status <= high)
-			todo_line(win, cur, y+n++, 2, COLS-2, 1);
+			todo_line(win, cur, row+n++, 4, COLS-4, 1);
 	return n;
 }
 
-static int print_group(WINDOW *win, int y, todo_t *todos,
+static int print_group(WINDOW *win, int row, todo_t *todos,
 		int show, const char *label, status_t low, status_t high)
 {
 	int n = 1;
 
 	/* Label */
-	mvwprintw(win, y, 0, "%s", label);
+	mvwprintw(win, row, 0, "%s", label);
 
 	/* Todos */
 	if (show)
-		n = print_todos(win, y+1, todos, low, high);
+		n = print_todos(win, row+1, todos, low, high);
 
 	/* Status */
 	if (!show)
-		mvwprintw(win, y+1, 4, "[hidden]");
+		mvwprintw(win, row+1, 4, "[hidden]");
 	if (n == 0)
-		mvwprintw(win, y+1, 4, "[no tasks]");
+		mvwprintw(win, row+1, 4, "[no tasks]");
 
-	return y+1+MAX(n,1)+1;
+	return row+1+MAX(n,1)+1;
 }
 
 /* Todo init */
@@ -74,28 +76,35 @@ void todo_size(int rows, int cols)
 /* Todo draw */
 void todo_draw(void)
 {
-	int y = 0;
+	int row = -line;
 
-	y = print_group(win, y, TODOS,
+	row = print_group(win, row, TODOS,
 		show_new, "New Tasks", NEW, NEW);
 
-	y = print_group(win, y, TODOS,
+	row = print_group(win, row, TODOS,
 		show_started, "Started Tasks", NEW+1, DONE-1);
 
-	y = print_group(win, y, TODOS,
+	row = print_group(win, row, TODOS,
 		show_finished, "Finished Tasks", DONE, DONE);
+
+	rows = row+line-1;
 }
 
 /* Todo run */
 int todo_run(int key, mmask_t btn, int row, int col)
 {
-	int ref = 0;
+	int scroll = 0, ref = 0;
 	switch (key)
 	{
+		case 'g': ref = 1; scroll = -line;    break;
+		case 'G': ref = 1; scroll =  rows;    break;
+		case 'j': ref = 1; scroll =  1;       break;
+		case 'k': ref = 1; scroll = -1;       break;
 		case 'n': ref = 1; show_new      ^= 1; break;
 		case 's': ref = 1; show_started  ^= 1; break;
 		case 'f': ref = 1; show_finished ^= 1; break;
 	}
+	line = CLAMP(line+scroll, 0, rows-1);
 	if (ref) {
 		werase(win);
 		todo_draw();

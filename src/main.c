@@ -52,6 +52,10 @@ int main(int argc, char **argv)
 	init_pair(COLOR_TITLE, COLOR_GREEN,   -1);
 	init_pair(COLOR_ERROR, COLOR_RED,     -1);
 
+	init_pair(COLOR_NEW,   COLOR_RED,     -1);
+	init_pair(COLOR_WIP,   COLOR_YELLOW,  -1);
+	init_pair(COLOR_DONE,  COLOR_GREEN,   -1);
+
 	init_pair(COLOR_CLASS, COLOR_BLUE,    -1);
 	init_pair(COLOR_EC,    COLOR_GREEN,   -1);
 	init_pair(COLOR_WORK,  COLOR_MAGENTA, -1);

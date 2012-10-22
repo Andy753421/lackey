@@ -129,20 +129,38 @@ void event_line(WINDOW *win, event_t *event, int y, int x, int w, int full)
 void todo_line(WINDOW *win, todo_t *todo, int y, int x, int w, int full)
 {
 	char perc[16];
+	char desc[LINES];
 	sprintf(perc, "%2d%%", todo->status);
 
-	int color = get_color(todo->cat);
-	if (color) wattron(win, COLOR_PAIR(color));
-	mvwaddch(win, y, 2, ACS_BLOCK);
-	if (color) wattroff(win, COLOR_PAIR(color));
+	int cat    = get_color(todo->cat);
+	int status = todo->status == NEW  ? COLOR_NEW  :
+		     todo->status == DONE ? COLOR_DONE : COLOR_WIP;
 
-	mvwprintw(win, y, 4, "%04d-%02d-%02d %2d:%02d",
+	sprintf(desc, "%s", todo->name ?: todo->desc ?: "");
+	strsub(desc, '\n', ';');
+
+	/* Print category */
+	if (cat) wattron(win, COLOR_PAIR(cat));
+	mvwaddch(win, y, x, ACS_BLOCK);
+	if (cat) wattroff(win, COLOR_PAIR(cat));
+	x += 2;
+
+	/* Print time */
+	mvwprintw(win, y, x, "%04d-%02d-%02d %2d:%02d",
 			todo->due.year, todo->due.month+1, todo->due.day+1,
 			todo->due.hour, todo->due.min);
-	mvwprintw(win, y, 22, "%s",
-			todo->status == NEW  ? "new"  :
-			todo->status == DONE ? "done" : perc);
-	mvwprintw(win, y, 30, "%s: %s", todo->name, todo->desc);
+	x += 18;
+
+	/* Print status */
+	if (status) wattron(win, COLOR_PAIR(status));
+	mvwprintw(win, y, x, "%s",
+		todo->status == NEW    ? "new"  :
+		todo->status == DONE   ? "done" : perc);
+	if (status) wattroff(win, COLOR_PAIR(status));
+	x += 6;
+
+	/* Print description */
+	mvwprintw(win, y, x, "%s", desc);
 }
 
 /* View init */
