@@ -50,7 +50,7 @@ view_t views[] = {
 	{ "Help",     help_init,     help_size,     help_draw,     help_run,     {KEY_F(8), '8', '?'} },
 };
 
-int active = 6;
+int active = 0;
 
 /* Local functions */
 static void draw_header(void)
@@ -113,8 +113,10 @@ void event_line(WINDOW *win, event_t *event, int y, int x, int w, int full)
 	if (color) wattroff(win, COLOR_PAIR(color));
 
 	if (full) {
-		mvwprintw(win, y, x, " %02d:%02d - ", event->start.hour, event->start.min);
-		x += 9;
+		mvwprintw(win, y, x, " %2d:%02d-%2d:%02d -",
+				event->start.hour, event->start.min,
+				event->end.hour,   event->end.min);
+		x += 15;
 	}
 	if (event->name) {
 		const char *label = event->name ?: event->desc;

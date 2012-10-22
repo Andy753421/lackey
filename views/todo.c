@@ -29,7 +29,7 @@ static int     rows;
 
 static int show_new      = 1;
 static int show_started  = 1;
-static int show_finished = 1;
+static int show_finished = 0;
 
 /* Helper functions */
 static int print_todos(WINDOW *win, int row, todo_t *todos, status_t low, status_t high)

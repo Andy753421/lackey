@@ -36,7 +36,7 @@ static WINDOW *body;
 static void clear_old(event_t **list, int n, event_t *cur)
 {
 	for (int i = 0; i < n; i++)
-		if (list[i] && compare(&list[i]->end, &cur->start) < 0)
+		if (list[i] && compare(&list[i]->end, &cur->start) <= 0)
 			list[i] = NULL;
 }
 
