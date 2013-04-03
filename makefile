@@ -9,7 +9,7 @@ PREFIX    ?= /usr/local
 MANPREFIX ?= $(PREFIX)/share/man
 
 # Compiler
-CC        ?= gcc
+GCC       ?= gcc
 CFLAGS    ?= -Wall --std=c99
 CPPFLAGS  ?= -Isrc
 LDFLAGS   ?= -lncursesw -lical
@@ -42,12 +42,12 @@ uninstall:
 
 # Rules
 $(PROG): $(PROG_SRC:%=src/%.o) $(VIEWS:%=views/%.o) $(CALS:%=cals/%.o)
-	$(CC) $(CFLAGS) -o $@ $+ $(LDFLAGS)
+	$(GCC) $(CFLAGS) -o $@ $+ $(LDFLAGS)
 
 $(TEST): $(TEST_SRC:%=src/%.o) $(CALS:%=cals/%.o)
-	$(CC) $(CFLAGS) -o $@ $+ $(LDFLAGS)
+	$(GCC) $(CFLAGS) -o $@ $+ $(LDFLAGS)
 
 %.o: %.c $(wildcard src/*.h) makefile
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+	$(GCC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 
 .PHONY: all clean dist install uninstall
