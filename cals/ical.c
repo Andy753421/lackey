@@ -122,7 +122,7 @@ static event_t *to_event(ical_inst *inst)
 	event->name  = icalcomponent_get_summary(inst->comp);
 	event->desc  = icalcomponent_get_description(inst->comp);
 	event->loc   = icalcomponent_get_location(inst->comp);
-	event->cat   = icalproperty_get_value_as_string(prop);
+	event->cat   = icalproperty_get_value_as_string_r(prop);
 	event->start = to_date(inst->start);
 	event->end   = to_date(inst->end);
 	return event;
