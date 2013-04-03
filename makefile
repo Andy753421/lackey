@@ -22,6 +22,9 @@ TEST_SRC  ?= test date util
 VIEWS     ?= day week month year events todo settings help
 CALS      ?= dummy ical
 
+# For ncursesw
+CPPFLAGS  += $(strip $(shell pkg-config --cflags ncursesw))
+
 # Targets
 all: $(PROG)
 
