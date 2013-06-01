@@ -16,7 +16,7 @@ LDFLAGS   ?= -lncursesw -lical
 
 # Sources
 PROG      ?= lackey
-PROG_SRC  ?= main view date cal util 
+PROG_SRC  ?= main view date cal util
 TEST      ?= test
 TEST_SRC  ?= test date util
 VIEWS     ?= day week month year events todo settings help
@@ -29,7 +29,7 @@ CPPFLAGS  += $(strip $(shell pkg-config --cflags ncursesw))
 all: $(PROG)
 
 clean:
-	rm -f src/*.o views/*.o cals/*.o $(PROG) $(TEST) 
+	rm -f src/*.o views/*.o cals/*.o $(PROG) $(TEST)
 
 dist:
 	tar -czf $(PROG)-$(VERSION).tar.gz --transform s::$(PROG)-$(VERSION)/: \
