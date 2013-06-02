@@ -22,11 +22,16 @@
 #define ROUND(x) ((int)((x)+0.5))
 #define N_ELEMENTS(x) (sizeof(x)/sizeof((x)[0]))
 
+#define new0(type) alloc0(sizeof(type))
+
 /* Debug functions */
 void util_init(void);
 
 /* Stirng functions */
 void strsub(char *str, char find, char repl);
+
+/* Memory functions */
+void *alloc0(int size);
 
 /* Debug functions */
 void debug(char *fmt, ...);

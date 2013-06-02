@@ -75,6 +75,15 @@ void strsub(char *str, char find, char repl)
 			*cur = repl;
 }
 
+/* Memory functions */
+void *alloc0(int size)
+{
+	void *data = calloc(1, size);
+	if (!data)
+		error("memory allocation failed");
+	return data;
+}
+
 /* Debugging functions */
 void debug(char *fmt, ...)
 {

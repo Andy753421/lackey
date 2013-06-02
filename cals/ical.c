@@ -118,7 +118,7 @@ static event_t *to_event(ical_inst *inst)
 {
 	icalproperty *prop = icalcomponent_get_first_property(inst->comp, ICAL_CATEGORIES_PROPERTY);
 
-	event_t *event = calloc(1, sizeof(event_t));
+	event_t *event = new0(event_t);
 	event->name  = icalcomponent_get_summary(inst->comp);
 	event->desc  = icalcomponent_get_description(inst->comp);
 	event->loc   = icalcomponent_get_location(inst->comp);
@@ -155,7 +155,7 @@ static todo_t *to_todo(ical_inst *inst)
 	icalproperty *cat  = icalcomponent_get_first_property(inst->comp, ICAL_CATEGORIES_PROPERTY);
 	icalproperty *perc = icalcomponent_get_first_property(inst->comp, ICAL_PERCENTCOMPLETE_PROPERTY);
 
-	todo_t *todo = calloc(1, sizeof(todo_t));
+	todo_t *todo = new0(todo_t);
 	todo->name   = icalcomponent_get_summary(inst->comp);
 	todo->desc   = icalcomponent_get_description(inst->comp);
 	todo->cat    = icalproperty_get_value_as_string(cat);
