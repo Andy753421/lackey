@@ -29,8 +29,5 @@ void util_init(void);
 void strsub(char *str, char find, char repl);
 
 /* Debug functions */
-#ifdef DEBUG
-int debug(char *fmt, ...);
-#else
-#define debug(...)
-#endif
+void debug(char *fmt, ...);
+void error(char *fmt, ...);

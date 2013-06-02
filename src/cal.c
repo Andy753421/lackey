@@ -31,11 +31,11 @@ void cal_init(void)
 
 	/* Debug */
 	for (event_t *e = EVENTS; e; e = e->next)
-		debug("event: %04d-%02d-%02d %02d:%02d: %s - %s\n",
+		debug("event: %04d-%02d-%02d %02d:%02d: %s - %s",
 				e->start.year, e->start.month, e->start.day,
 				e->start.hour, e->start.min, e->name, e->desc);
 	for (todo_t *e = TODOS; e; e = e->next)
-		debug("todo: %04d-%02d-%02d %02d:%02d: %s - %s\n",
+		debug("todo: %04d-%02d-%02d %02d:%02d: %s - %s",
 				e->start.year, e->start.month, e->start.day,
 				e->start.hour, e->start.min, e->name, e->desc);
 }

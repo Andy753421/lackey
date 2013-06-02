@@ -23,9 +23,43 @@
 #include "date.h"
 #include "cal.h"
 #include "view.h"
+#include "util.h"
 
 /* Static data */
 static FILE *debug_fd = NULL;
+
+/* Helper functions */
+static void message(FILE *output_fd, const char *prefix, const char *fmt, va_list ap)
+{
+	va_list tmp;
+
+	/* Log to standard out */
+	if (output_fd) {
+		va_copy(tmp, ap);
+		fprintf(output_fd, "%s: ", prefix);
+		vfprintf(output_fd, fmt, tmp);
+		fprintf(output_fd, "\n");
+	}
+
+	/* Log to debug file */
+	if (debug_fd) {
+		va_copy(tmp, ap);
+		fprintf(debug_fd, "%s: ", prefix);
+		vfprintf(debug_fd, fmt, tmp);
+		fprintf(debug_fd, "\n");
+	}
+
+	/* Log to status bar */
+	if (stdscr) {
+		va_copy(tmp, ap);
+		mvhline(LINES-2, 0, ACS_HLINE, COLS);
+		move(LINES-1, 0);
+		attron(COLOR_PAIR(COLOR_ERROR));
+		vwprintw(stdscr, fmt, tmp);
+		attroff(COLOR_PAIR(COLOR_ERROR));
+		clrtoeol();
+	}
+}
 
 /* Initialize */
 void util_init(void)
@@ -42,29 +76,25 @@ void strsub(char *str, char find, char repl)
 }
 
 /* Debugging functions */
-int debug(char *fmt, ...)
+void debug(char *fmt, ...)
 {
-	int rval;
 	va_list ap;
-
-	/* Log to debug file */
-	if (debug_fd) {
-		va_start(ap, fmt);
-		vfprintf(debug_fd, "debug: ", ap);
-		rval = vfprintf(debug_fd, fmt, ap);
-	}
-
-	/* Log to status bar */
-	if (stdscr) {
-		va_start(ap, fmt);
-		mvhline(LINES-2, 0, ACS_HLINE, COLS);
-		move(LINES-1, 0);
-		attron(COLOR_PAIR(COLOR_ERROR));
-		vwprintw(stdscr, fmt, ap);
-		attroff(COLOR_PAIR(COLOR_ERROR));
-		clrtoeol();
-	}
-
+	va_start(ap, fmt);
+	message(NULL, "debug", fmt, ap);
 	va_end(ap);
-	return rval;
+}
+
+void error(char *fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	fflush(stdout);
+	fflush(stderr);
+	message(stderr, "error", fmt, ap);
+	va_end(ap);
+	if (stdscr) {
+		getch();
+		endwin();
+	}
+	exit(-1);
 }

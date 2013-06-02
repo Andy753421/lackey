@@ -96,11 +96,11 @@ int main(int argc, char **argv)
 		}
 		if (view_run(chr, btn.bstate, btn.y, btn.x))
 			continue;
-		debug("main: Unhandled key - Dec %3d,  Hex %02x,  Oct %03o,  Chr <%c>\n",
+		debug("main: Unhandled key - Dec %3d,  Hex %02x,  Oct %03o,  Chr <%c>",
 				chr, chr, chr, chr);
 	}
 
-	/* Cleanup, see also on_sigint */
+	/* Cleanup, see also on_sigint, error */
 	endwin();
 	return 0;
 }
