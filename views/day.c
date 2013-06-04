@@ -167,5 +167,5 @@ int day_run(int key, mmask_t btn, int row, int col)
 		day_draw();
 		wrefresh(win);
 	}
-	return 0;
+	return ref;
 }

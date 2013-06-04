@@ -110,5 +110,5 @@ int todo_run(int key, mmask_t btn, int row, int col)
 		todo_draw();
 		wrefresh(win);
 	}
-	return 0;
+	return ref;
 }

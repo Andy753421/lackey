@@ -136,5 +136,5 @@ int month_run(int key, mmask_t btn, int row, int col)
 		month_draw();
 		wrefresh(win);
 	}
-	return 0;
+	return days || months;
 }

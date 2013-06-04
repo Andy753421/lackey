@@ -108,5 +108,5 @@ int events_run(int key, mmask_t btn, int row, int col)
 		events_draw();
 		wrefresh(win);
 	}
-	return 0;
+	return scroll;
 }

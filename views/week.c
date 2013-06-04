@@ -138,5 +138,5 @@ int week_run(int key, mmask_t btn, int row, int col)
 		week_draw();
 		wrefresh(win);
 	}
-	return 0;
+	return ref;
 }

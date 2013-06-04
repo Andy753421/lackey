@@ -164,8 +164,10 @@ int year_run(int key, mmask_t btn, int row, int col)
 	}
 
 	/* Refresh */
-	werase(win);
-	year_draw();
-	wrefresh(win);
-	return 0;
+	if (dir || y != YEAR) {
+		werase(win);
+		year_draw();
+		wrefresh(win);
+	}
+	return dir || y != YEAR;
 }
