@@ -21,9 +21,17 @@
 #include <ncurses.h>
 
 #include "util.h"
+#include "conf.h"
 #include "date.h"
 #include "cal.h"
 #include "view.h"
+
+/* Config parser */
+static void on_config(const char *group, const char *name, const char *key, const char *value)
+{
+	view_config(group, name, key, value);
+	cal_config(group, name, key, value);
+}
 
 /* Control-C handler, so we don't hose the therminal */
 static void on_sigint(int signum)
@@ -61,8 +69,12 @@ int main(int argc, char **argv)
 	init_pair(COLOR_WORK,  COLOR_MAGENTA, -1);
 	init_pair(COLOR_OTHER, COLOR_RED,     -1);
 
+	/* Configuration */
+	conf_setup(argc, argv, ".lackeyrc", on_config);
+
 	/* Initialize */
 	util_init();
+	conf_init();
 	date_init();
 	cal_init();
 	view_init();
@@ -73,6 +85,7 @@ int main(int argc, char **argv)
 	/* Run */
 	while (1) {
 		MEVENT btn;
+		conf_sync();
 		int chr = getch();
 		if (chr == 'q')
 			break;

@@ -23,6 +23,7 @@
 
 /* Macros */
 #define CAL(name) \
+	void     name##_config(const char *group, const char *name, const char *key, const char *value); \
 	event_t *name##_events(date_t start, date_t end); \
 	todo_t  *name##_todos(date_t start, date_t end)
 
@@ -149,4 +150,13 @@ void cal_load(year_t year, month_t month, day_t day, int days)
 		dummy_todos(start, end),
 		 ical_todos(start, end));
 
+}
+
+/* Config parser */
+void cal_config(const char *group, const char *name, const char *key, const char *value)
+{
+	if (match(group, "dummy"))
+		dummy_config(group, name, key, value);
+	else if (match(group, "ical"))
+		ical_config(group, name, key, value);
 }

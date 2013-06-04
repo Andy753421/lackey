@@ -35,6 +35,9 @@ int match(const char *a, const char *b);
 /* Memory functions */
 void *alloc0(int size);
 
+/* File functions */
+char *read_file(const char *path, int *len);
+
 /* Debug functions */
 void debug(char *fmt, ...);
 void error(char *fmt, ...);

@@ -18,6 +18,7 @@
 #include <stdlib.h>
 
 #include "util.h"
+#include "conf.h"
 #include "date.h"
 #include "cal.h"
 
@@ -45,6 +46,13 @@ static todo_t todo = {
 };
 
 static int     enable;
+
+/* Config parser */
+void dummy_config(const char *group, const char *name, const char *key, const char *value)
+{
+	if (match(group, "dummy") && match(key, "enable"))
+		enable = get_bool(value);
+}
 
 /* Event functions */
 event_t *dummy_events(date_t start, date_t end)

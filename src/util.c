@@ -109,6 +109,39 @@ void *alloc0(int size)
 	return data;
 }
 
+/* File functions */
+char *read_file(const char *path, int *len)
+{
+	/* we could use stat, but we'll try to be portable */
+	FILE *fd = fopen(path, "rt+");
+	if (!fd)
+		return NULL;
+
+	int   block = 512; // read size
+	int   size  = 512; // buffer size
+	int   slen  = 0;   // string length
+	char *buf   = malloc(size);
+	if (!buf)
+		goto err;
+
+	while (!feof(fd)) {
+		if (slen + block + 1 > size) {
+			size *= 2;
+			buf   = realloc(buf, size);
+			if (!buf)
+				goto err;
+		}
+		slen += fread(&buf[slen], 1, block, fd);
+		buf[slen] = '\0';
+	}
+
+err:
+	if (len)
+		*len = slen;
+	fclose(fd);
+	return buf;
+}
+
 /* Debugging functions */
 void debug(char *fmt, ...)
 {

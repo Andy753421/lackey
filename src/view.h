@@ -43,6 +43,7 @@ void todo_line(WINDOW *win, todo_t *todo, int y, int x, int w, int full);
 
 /* View functions */
 void view_init(void);
+void view_config(const char *group, const char *name, const char *key, const char *value);
 void view_resize(void);
 void view_draw(void);
 int  view_run(int key, mmask_t btn, int row, int col);

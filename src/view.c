@@ -21,6 +21,7 @@
 #include <ncurses.h>
 
 #include "util.h"
+#include "conf.h"
 #include "date.h"
 #include "cal.h"
 #include "view.h"
@@ -54,6 +55,12 @@ VIEW(settings);
 VIEW(help);
 
 /* View data */
+static const char *names[] = {
+	"day", "week", "month", "year",
+	"|", "events", "todo",
+	"|", "settings", "help",
+};
+
 view_t views[] = {
 	{ "Day",      day_init,      day_size,      day_draw,      day_run,      {KEY_F(1), '1',    } },
 	{ "Week",     week_init,     week_size,     week_draw,     week_run,     {KEY_F(2), '2',    } },
@@ -228,6 +235,17 @@ void view_init(void)
 	}
 }
 
+/* Config parser */
+void view_config(const char *group, const char *name, const char *key, const char *value)
+{
+	if (match(group, "view")) {
+		if (match(key, "compact"))
+			COMPACT = get_bool(value);
+		else if (match(key, "active"))
+			ACTIVE = get_enum(value, names, N_ELEMENTS(names));
+	}
+}
+
 /* View draw */
 void view_resize(void)
 {
@@ -256,6 +274,8 @@ int view_set(int num)
 {
 	if (ACTIVE != num) {
 		ACTIVE = num;
+		set_enum("view", 0, "active", ACTIVE,
+				names, N_ELEMENTS(names));
 		view_draw();
 	}
 	return 1;
@@ -267,6 +287,7 @@ int view_run(int key, mmask_t btn, int row, int col)
 	/* Check for compact mode toggle */
 	if (key == 'c') {
 		COMPACT ^= 1;
+		set_bool("view", 0, "compact", COMPACT);
 		view_resize();
 		view_draw();
 		return 1;

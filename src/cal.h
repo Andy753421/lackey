@@ -58,3 +58,4 @@ extern todo_t  *TODOS;
 /* Calendar functions */
 void cal_init(void);
 void cal_load(year_t year, month_t month, day_t day, int days);
+void cal_config(const char *group, const char *name, const char *key, const char *value);

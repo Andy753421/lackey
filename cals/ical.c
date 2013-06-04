@@ -23,6 +23,7 @@
 #include <libical/ical.h>
 
 #include "util.h"
+#include "conf.h"
 #include "date.h"
 #include "cal.h"
 
@@ -43,9 +44,7 @@ typedef struct ical_t {
 } ical_t;
 
 /* Static data */
-static ical_t  calendars[] = {
-	{ .location = "data/all.ics" },
-};
+static ical_t *calendars;
 
 /* Helper functions */
 static int ical_compare(const void *_a, const void *_b)
@@ -236,6 +235,40 @@ static void print_todos(todo_t *start)
 			cur->due.year, cur->due.month, cur->due.day,
 			cur->due.hour, cur->due.min,   cur->status,
 			cur->name ?: cur->desc ?: "[no summary]");
+}
+
+/* Config parser */
+void ical_config(const char *group, const char *name, const char *key, const char *value)
+{
+	ical_t *cal = NULL, *last = NULL;
+
+	/* Make sure it's valid */
+	if (!match(group, "ical") || !name)
+		return;
+
+	/* Find existing calendar */
+	for (cal = calendars; cal; last = cal, cal = cal->next)
+		if (match(cal->name, name))
+			break;
+
+	/* Create new calendar */
+	if (!cal) {
+		cal = new0(ical_t);
+		cal->name = get_name(name);
+		if (last)
+			last->next = cal;
+		else
+			calendars = cal;
+		return;
+	}
+
+	/* Set calendar values */
+	if (match(key, "location"))
+		cal->location = get_string(value);
+	else if (match(key, "username"))
+		cal->username = get_string(value);
+	else if (match(key, "password"))
+		cal->password = get_string(value);
 }
 
 /* Event functions */

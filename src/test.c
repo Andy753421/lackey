@@ -17,16 +17,19 @@
 
 #include "date.h"
 #include "cal.h"
+#include "conf.h"
 #include "util.h"
 
 void date_test(void);
 void ical_test(void);
+void conf_test(void);
 
 int main(int argc, char **argv)
 {
 	for (int i = 1; i < argc; i++) {
 		if (match(argv[i], "date")) date_test();
 		if (match(argv[i], "ical")) ical_test();
+		if (match(argv[i], "conf")) conf_test();
 	}
 	return 0;
 }
