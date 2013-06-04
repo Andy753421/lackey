@@ -28,6 +28,10 @@
 #define COLOR_WORK  8
 #define COLOR_OTHER 9
 
+/* Config data */
+extern int COMPACT;
+extern int ACTIVE;
+
 /* Helper functions */
 void event_box(WINDOW *win, event_t *event, int y, int x, int h, int w);
 void event_line(WINDOW *win, event_t *event, int y, int x, int w, int full);

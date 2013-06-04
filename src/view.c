@@ -36,7 +36,7 @@ typedef struct {
 	WINDOW *win;
 } view_t;
 
-/* Data */
+/* View data */
 view_t views[] = {
 	{ "Day",      day_init,      day_size,      day_draw,      day_run,      {KEY_F(1), '1',    } },
 	{ "Week",     week_init,     week_size,     week_draw,     week_run,     {KEY_F(2), '2',    } },
@@ -50,7 +50,9 @@ view_t views[] = {
 	{ "Help",     help_init,     help_size,     help_draw,     help_run,     {KEY_F(8), '8', '?'} },
 };
 
-int active = 0;
+/* Config data */
+int COMPACT = 0;
+int ACTIVE  = 0;
 
 /* Local functions */
 static void draw_header(void)
@@ -58,14 +60,15 @@ static void draw_header(void)
 	move(0, 0);
 	attron(COLOR_PAIR(COLOR_TITLE));
 	for (int i = 0; i < N_ELEMENTS(views); i++) {
-		if (i == active)
+		if (i == ACTIVE)
 			attron(A_BOLD);
 		printw("%s ", views[i].name);
-		if (i == active)
+		if (i == ACTIVE)
 			attroff(A_BOLD);
 	}
 	attroff(COLOR_PAIR(COLOR_TITLE));
-	mvhline(1, 0, ACS_HLINE, COLS);
+	if (!COMPACT)
+		mvhline(1, 0, ACS_HLINE, COLS);
 	refresh();
 }
 
@@ -174,9 +177,10 @@ void todo_line(WINDOW *win, todo_t *todo, int y, int x, int w, int full)
 /* View init */
 void view_init(void)
 {
+	int hdr = COMPACT ? 1 : 2;
 	for (int i = 0; i < N_ELEMENTS(views); i++) {
 		if (views[i].init) {
-			views[i].win = newwin(LINES-2, COLS, 2, 0);
+			views[i].win = newwin(LINES-hdr, COLS, hdr, 0);
 			views[i].init(views[i].win);
 		}
 	}
@@ -185,11 +189,14 @@ void view_init(void)
 /* View draw */
 void view_resize(void)
 {
+	int hdr = COMPACT ? 1 : 2;
 	for (int i = 0; i < N_ELEMENTS(views); i++) {
-		if (views[i].win)
-			wresize(views[i].win, LINES-2, COLS);
+		if (views[i].win) {
+			wresize(views[i].win, LINES-hdr, COLS);
+			mvwin(views[i].win, hdr, 0);
+		}
 		if (views[i].size)
-			views[i].size(LINES-2, COLS);
+			views[i].size(LINES-hdr, COLS);
 	}
 }
 
@@ -197,16 +204,16 @@ void view_resize(void)
 void view_draw(void)
 {
 	draw_header();
-	werase(views[active].win);
-	views[active].draw();
-	wrefresh(views[active].win);
+	werase(views[ACTIVE].win);
+	views[ACTIVE].draw();
+	wrefresh(views[ACTIVE].win);
 }
 
 /* View set */
 int view_set(int num)
 {
-	if (active != num) {
-		active = num;
+	if (ACTIVE != num) {
+		ACTIVE = num;
 		view_draw();
 	}
 	return 1;
@@ -215,6 +222,14 @@ int view_set(int num)
 /* View run */
 int view_run(int key, mmask_t btn, int row, int col)
 {
+	/* Check for compact mode toggle */
+	if (key == 'c') {
+		COMPACT ^= 1;
+		view_resize();
+		view_draw();
+		return 1;
+	}
+
 	/* Check for mouse events */
 	if (key == KEY_MOUSE && row == 0) {
 		int start = 1;
@@ -228,7 +243,7 @@ int view_run(int key, mmask_t btn, int row, int col)
 
 	/* Check for view change */
 	for (int i = 0; i < N_ELEMENTS(views); i++) {
-		if (i == active)
+		if (i == ACTIVE)
 			continue;
 		for (int j = 0; j < N_ELEMENTS(views[i].keys); j++)
 			if (views[i].keys[j] == key)
@@ -236,7 +251,7 @@ int view_run(int key, mmask_t btn, int row, int col)
 	}
 
 	/* Shift windows */
-	int num   = active;
+	int num   = ACTIVE;
 	int shift = key == KEY_RIGHT ? +1 :
 		    key == KEY_LEFT  ? -1 : 0;
 	while (shift) {
@@ -248,5 +263,5 @@ int view_run(int key, mmask_t btn, int row, int col)
 	}
 
 	/* Pass key to active view */
-	return views[active].run(key, btn, row, col);
+	return views[ACTIVE].run(key, btn, row, col);
 }

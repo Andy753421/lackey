@@ -89,7 +89,10 @@ void year_draw(void)
 	int sum = h[0]+h[1]+h[2]+h[3];
 
 	/* Print Header */
+	if (COMPACT) wattron(win, A_REVERSE | A_BOLD);
+	if (COMPACT) mvwhline(win, y, 0, A_REVERSE | A_BOLD, COLS);
 	mvwprintw(win, y++, COLS/2-2, "%d", YEAR);
+	if (COMPACT) wattroff(win, A_REVERSE | A_BOLD);
 
 	/* Print Months */
 	for (int m = 0; m < 12; m++) {

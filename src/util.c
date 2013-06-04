@@ -25,6 +25,9 @@
 #include "view.h"
 #include "util.h"
 
+/* For testing */
+#pragma weak COMPACT
+
 /* Static data */
 static FILE *debug_fd = NULL;
 
@@ -50,14 +53,17 @@ static void message(FILE *output_fd, const char *prefix, const char *fmt, va_lis
 	}
 
 	/* Log to status bar */
-	if (stdscr) {
+	if (&COMPACT && stdscr) {
+		int rev = COMPACT ? A_BOLD : 0;
 		va_copy(tmp, ap);
-		mvhline(LINES-2, 0, ACS_HLINE, COLS);
+		if (!COMPACT)
+			mvhline(LINES-2, 0, ACS_HLINE, COLS);
 		move(LINES-1, 0);
-		attron(COLOR_PAIR(COLOR_ERROR));
+		attron(COLOR_PAIR(COLOR_ERROR) | rev);
 		vwprintw(stdscr, fmt, tmp);
-		attroff(COLOR_PAIR(COLOR_ERROR));
-		clrtoeol();
+		attroff(COLOR_PAIR(COLOR_ERROR) | rev);
+		if (!COMPACT)
+			clrtoeol();
 	}
 }
 

@@ -92,7 +92,7 @@ static int get_col(event_t **list, int n, event_t *event, int *ncols)
 /* Day init */
 void day_init(WINDOW *_win)
 {
-	win   = _win; //  lines  cols  y  x
+	win   = _win; //    lines      cols    y  x
 	head  = derwin(win,         1, COLS,   0, 0);
 	times = derwin(win, LINES-2-2,      5, 2, 0);
 	body  = derwin(win, LINES-2-2, COLS-6, 2, 6);
@@ -102,9 +102,11 @@ void day_init(WINDOW *_win)
 /* Day size */
 void day_size(int rows, int cols)
 {
-	wresize(head,       1, cols  );
-	wresize(times, rows-2,      5);
-	wresize(body,  rows-2, cols-6);
+	mvderwin(times, 2-COMPACT, 0);
+	mvderwin(body,  2-COMPACT, 6);
+	wresize(head,   1,         cols);
+	wresize(times,  rows-2-COMPACT,      5);
+	wresize(body,   rows-2-COMPACT, cols-6);
 }
 
 /* Day draw */
@@ -114,8 +116,10 @@ void day_draw(void)
 	const char *dstr = day_to_string(day_of_week(YEAR, MONTH, DAY));
 
 	/* Print Header */
-	mvwprintw(head, 0, 0, "%s, %s %d", dstr, mstr, DAY+1);
+	if (COMPACT) wattron(head, A_REVERSE | A_BOLD);
+	mvwprintw(head, 0, 0, "%s, %s %-*d", dstr, mstr, COLS, DAY+1);
 	mvwprintw(head, 0, COLS-10, "%d-%02d-%02d", YEAR, MONTH, DAY+1);
+	if (COMPACT) wattroff(head, A_REVERSE | A_BOLD);
 
 	/* Print times */
 	mvwprintw(times, 0, 0, "%02d:%02d", ((line/4)-1)%12+1, (line*15)%60);
@@ -142,8 +146,9 @@ void day_draw(void)
 	}
 
 	/* Print lines */
-	mvwhline(win, 1, 0, ACS_HLINE, COLS);
-	mvwvline(win, 2, 5, ACS_VLINE, LINES-4);
+	if (!COMPACT)
+		mvwhline(win, 1, 0, ACS_HLINE, COLS);
+	mvwvline(win, 2-COMPACT, 5, ACS_VLINE, LINES-4+COMPACT+COMPACT);
 }
 
 /* Day run */
