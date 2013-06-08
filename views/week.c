@@ -17,7 +17,6 @@
 
 #define _XOPEN_SOURCE_EXTENDED
 
-#include <string.h>
 #include <ncurses.h>
 
 #include "util.h"

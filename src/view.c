@@ -75,9 +75,9 @@ static void draw_header(void)
 static int get_color(const char *cat)
 {
 	return cat == NULL           ? 0           :
-	       !strcmp(cat, "class") ? COLOR_CLASS :
-	       !strcmp(cat, "ec")    ? COLOR_EC    :
-	       !strcmp(cat, "work")  ? COLOR_WORK  : COLOR_OTHER ;
+	       match(cat, "class") ? COLOR_CLASS :
+	       match(cat, "ec")    ? COLOR_EC    :
+	       match(cat, "work")  ? COLOR_WORK  : COLOR_OTHER ;
 }
 
 /* Helper functions */

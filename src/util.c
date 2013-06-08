@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Andy Spencer <andy753421@gmail.com>
+ * Copyright (C) 2012,2013 Andy Spencer <andy753421@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,6 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#define _XOPEN_SOURCE
+#define _XOPEN_SOURCE_EXTENDED
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -79,6 +82,22 @@ void strsub(char *str, char find, char repl)
 	for (char *cur = str; *cur; cur++)
 		if (*cur == find)
 			*cur = repl;
+}
+
+char *strcopy(const char *str)
+{
+	if (str == NULL)
+		return NULL;
+	return strdup(str);
+}
+
+int match(const char *a, const char *b)
+{
+	if (a == b)
+		return 1;
+	if (!a || !b)
+		return 0;
+	return !strcmp(a, b);
 }
 
 /* Memory functions */

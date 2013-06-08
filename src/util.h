@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Andy Spencer <andy753421@gmail.com>
+ * Copyright (C) 2012,2013 Andy Spencer <andy753421@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,8 @@ void util_init(void);
 
 /* Stirng functions */
 void strsub(char *str, char find, char repl);
+char *strcopy(const char *str);
+int match(const char *a, const char *b);
 
 /* Memory functions */
 void *alloc0(int size);
