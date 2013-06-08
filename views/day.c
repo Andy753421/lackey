@@ -112,6 +112,7 @@ void day_draw(void)
 	const char *dstr = day_to_string(day_of_week(YEAR, MONTH, DAY));
 
 	int y = !COMPACT+1;
+	event_t *event;
 
 	/* Print Header */
 	if (COMPACT) wattron(win, A_REVERSE | A_BOLD);
@@ -120,23 +121,37 @@ void day_draw(void)
 	mvwprintw(win, 0, COLS-10, "%d-%02d-%02d", YEAR, MONTH, DAY+1);
 	if (COMPACT) wattroff(win, A_REVERSE | A_BOLD);
 
+	/* Print all day events */
+	event = EVENTS;
+	int allday = 0;
+	while (event && before(&event->start, YEAR, MONTH, DAY, 24, 0)) {
+		if (!before(&event->end, YEAR, MONTH, DAY, 0, 1) &&
+		    get_mins(&event->start, &event->end) > 23*60)
+			event_line(win, event, y+allday++, 6, COLS, 1);
+		event = event->next;
+	}
+	if (allday && !COMPACT)
+		allday++;
+
 	/* Resize body */
-	wshrink(times, y);
-	wshrink(body,  y);
+	wshrink(times, y+allday);
+	wshrink(body,  y+allday);
+
 	/* Print times */
 	mvwprintw(times, 0, 0, "%02d:%02d", ((line/4)-1)%12+1, (line*15)%60);
 	for (int h = 0; h < 24; h++)
 		mvwprintw(times, h*4-line, 0, "%02d:%02d", (h-1)%12+1, 0);
 
 	/* Print events */
-	event_t *event = EVENTS;
+	event = EVENTS;
 	event_t *active[10] = {};
 	int ncols = 0;
 	for (int h = 0; h < 24; h++)
 	for (int m = 0; m < 60; m+=15)
 	while (event && before(&event->start,
 			YEAR, MONTH, DAY, h+(m+15)/60, (m+15)%60)) {
-		if (!before(&event->start, YEAR, MONTH, DAY, h, m)) {
+		if (!before(&event->start, YEAR, MONTH, DAY, h, m) &&
+		    get_mins(&event->start, &event->end) <= 23*60) {
 			int col    = get_col(active, N_ELEMENTS(active), event, &ncols);
 			int left   = ROUND((col+0.0)*(COLS-6)/ncols) + 1;
 			int right  = ROUND((col+1.0)*(COLS-6)/ncols) + 1;
@@ -150,6 +165,8 @@ void day_draw(void)
 	/* Print lines */
 	if (!COMPACT)
 		mvwhline(win, 1, 0, ACS_HLINE, COLS);
+	if (!COMPACT && allday)
+		mvwhline(win, allday+1, 0, ACS_HLINE, COLS);
 	mvwvline(body, 0, 0, ACS_VLINE, LINES-4+COMPACT+COMPACT);
 }
 

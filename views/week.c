@@ -53,6 +53,7 @@ void week_draw(void)
 	int x = 6;
 	int y = 3 - COMPACT;
 	const float hstep = (float)(COLS-x)/7.0;
+	event_t *event;
 
 	/* Get start of week */
 	year_t  year  = YEAR;
@@ -84,23 +85,47 @@ void week_draw(void)
 	}
 	wattroff(win, rev);
 
+	/* Print all day events */
+	int allday = 0;
+	event = EVENTS;
+	add_days(&year, &month, &day, -7);
+	for (int d = 0; d <  7; d++) {
+		int n = 0;
+		while (event && before(&event->start, year, month, day, 24, 0)) {
+			if (!before(&event->end, year, month, day, 0, 1) &&
+			    get_mins(&event->start, &event->end) > 23*60) {
+				int s = ROUND(d*hstep);
+				int w = ROUND((d+1)*hstep) - 1 - s;
+				event_line(win, event, y+n++, x+s, w, 0);
+			}
+			event = event->next;
+			if (n > allday)
+				allday = n;
+		}
+		add_days(&year,&month,&day,1);
+	}
+	if (allday && !COMPACT)
+		allday++;
+
 	/* Resize body */
-	wshrink(times, y-!COMPACT);
-	wshrink(body,  y-!COMPACT);
+	wshrink(times, y+allday-!COMPACT);
+	wshrink(body,  y+allday-!COMPACT);
+
 	/* Print times */
 	mvwprintw(times, !COMPACT, 0, "%02d:%02d", ((line/4)-1)%12+1, (line*15)%60);
 	for (int h = 0; h < 24; h++)
 		mvwprintw(times, !COMPACT+h*4-line, 0, "%02d:%02d", (h-1)%12+1, 0);
 
 	/* Print events */
-	event_t *event = EVENTS;
+	event = EVENTS;
 	add_days(&year, &month, &day, -7);
 	for (int d = 0; d <  7; d++, add_days(&year,&month,&day,1))
 	for (int h = 0; h < 24; h++)
 	for (int m = 0; m < 60; m+=15)
 	while (event && before(&event->start,
 			year, month, day, h+(m+15)/60, (m+15)%60)) {
-		if (!before(&event->start, year, month, day, h, m)) {
+		if (!before(&event->start, year, month, day, h, m) &&
+		    get_mins(&event->start, &event->end) <= 23*60) {
 			int y = h*4 + m/15 - line + !COMPACT;
 			int x = ROUND(d*hstep) + 1;
 			int h = (get_mins(&event->start, &event->end)-1)/15+1;
@@ -113,10 +138,12 @@ void week_draw(void)
 	/* Print header lines */
 	if (!COMPACT)
 		mvwhline(win, y-1, 0, ACS_HLINE, COLS);
+	if (!COMPACT && allday)
+		mvwhline(win, y-1+allday, 0, ACS_HLINE, COLS);
 
 	/* Print day lines */
 	for (int d = 0; d < 7; d++)
-		mvwvline(body, !COMPACT, ROUND(d*hstep), ACS_VLINE, LINES-y-2+COMPACT);
+		mvwvline(body, !COMPACT, ROUND(d*hstep), ACS_VLINE, LINES-y-2+COMPACT-allday);
 	mvwvline_set(body, 0, l, WACS_T_VLINE, LINES-y-1+COMPACT);
 	mvwvline_set(body, 0, r, WACS_T_VLINE, LINES-y-1+COMPACT);
 	for (int h = (line+3)/4; h < 24; h++) {
