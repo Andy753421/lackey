@@ -15,8 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define _XOPEN_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <wordexp.h>
 #include <libical/ical.h>
 
 #include "util.h"
@@ -29,6 +32,20 @@ typedef struct {
 	struct icaltimetype start;
 	struct icaltimetype end;
 } ical_inst;
+
+typedef struct ical_t {
+	char          *name;
+	char          *location;
+	char          *username;
+	char          *password;
+	icalcomponent *ical;
+	struct ical_t *next;
+} ical_t;
+
+/* Static data */
+static ical_t  calendars[] = {
+	{ .location = "data/all.ics" },
+};
 
 /* Helper functions */
 static int ical_compare(const void *_a, const void *_b)
@@ -115,6 +132,27 @@ static void add_recur(icalarray *array, icalcomponent *comp,
 	}
 }
 
+static void read_icals(void)
+{
+	for (ical_t *cal = calendars; cal; cal = cal->next) {
+		if (cal->ical == NULL && cal->location) {
+			wordexp_t wexp;
+			wordexp(cal->location, &wexp, WRDE_NOCMD);
+			if (wexp.we_wordc == 0)
+				continue;
+			FILE *file = fopen(wexp.we_wordv[0], "r");
+			wordfree(&wexp);
+			if (!file)
+				continue;
+
+			icalparser *parser = icalparser_new();
+			icalparser_set_gen_data(parser, file);
+			cal->ical = icalparser_parse(parser, (void*)fgets);
+			icalparser_free(parser);
+		}
+	}
+}
+
 /* Event functions */
 static event_t *to_event(ical_inst *inst)
 {
@@ -192,24 +230,16 @@ static void print_todos(todo_t *start)
 /* Event functions */
 event_t *ical_events(cal_t *cal, year_t year, month_t month, day_t day, int days)
 {
-	/* Load ical */
-	FILE *file = fopen("data/all.ics", "r");
-	if (!file)
-		return NULL;
-	icalparser *parser = icalparser_new();
-	icalparser_set_gen_data(parser, file);
-	icalcomponent *ical = icalparser_parse(parser, (void*)fgets);
-	icalparser_free(parser);
+	read_icals();
 
-	/* Add events */
 	icalarray *array = icalarray_new(sizeof(ical_inst), 1);
-	icaltimetype start = {.year = 2000};
-	icaltimetype end   = {.year = 2020};
-	add_recur(array, ical, start, end, ICAL_VEVENT_COMPONENT);
+	icaltimetype start = {.year = year-10};
+	icaltimetype end   = {.year = year+10};
+	for (ical_t *cal = calendars; cal; cal = cal->next)
+		add_recur(array, cal->ical, start, end, ICAL_VEVENT_COMPONENT);
 	icalarray_sort(array, ical_compare);
 	event_t *events = to_events(array);
 	icalarray_free(array);
-	icalcomponent_free(ical);
 
 	return events;
 }
@@ -217,24 +247,16 @@ event_t *ical_events(cal_t *cal, year_t year, month_t month, day_t day, int days
 /* Todo functions */
 todo_t *ical_todos(cal_t *cal, year_t year, month_t month, day_t day, int days)
 {
-	/* Load ical */
-	FILE *file = fopen("data/all.ics", "r");
-	if (!file)
-		return NULL;
-	icalparser *parser = icalparser_new();
-	icalparser_set_gen_data(parser, file);
-	icalcomponent *ical = icalparser_parse(parser, (void*)fgets);
-	icalparser_free(parser);
+	read_icals();
 
-	/* Add todos */
 	icalarray *array = icalarray_new(sizeof(ical_inst), 1);
-	icaltimetype start = {.year = 2000};
-	icaltimetype end   = {.year = 2020};
-	add_recur(array, ical, start, end, ICAL_VTODO_COMPONENT);
+	icaltimetype start = {.year = year-10};
+	icaltimetype end   = {.year = year+10};
+	for (ical_t *cal = calendars; cal; cal = cal->next)
+		add_recur(array, cal->ical, start, end, ICAL_VTODO_COMPONENT);
 	icalarray_sort(array, ical_compare);
 	todo_t *todos = to_todos(array);
 	icalarray_free(array);
-	icalcomponent_free(ical);
 
 	return todos;
 }
