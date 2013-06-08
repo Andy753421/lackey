@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdlib.h>
+
 #include "util.h"
 #include "date.h"
 #include "cal.h"
@@ -22,6 +24,53 @@
 /* Global data */
 event_t *EVENTS;
 todo_t  *TODOS;
+
+/* Merge events and todos */
+static void add_event(event_t **first, event_t **last, event_t **next)
+{
+	if (*last)
+		(*last)->next = *next;
+	else
+		(*first) = *next;
+	(*last) = (*next);
+	(*next) = (*next)->next;
+}
+
+static void add_todo(todo_t **first, todo_t **last, todo_t **next)
+{
+	if (*last)
+		(*last)->next = *next;
+	else
+		(*first) = *next;
+	(*last) = (*next);
+	(*next) = (*next)->next;
+}
+
+static event_t *merge_events(event_t *a, event_t *b)
+{
+	event_t *first = NULL, *last = NULL;
+	while (a && b)
+		if (compare(&a->start, &b->start) <= 0)
+			add_event(&first, &last, &a);
+		else
+			add_event(&first, &last, &b);
+	while (a) add_event(&first, &last, &a);
+	while (b) add_event(&first, &last, &b);
+	return first;
+}
+
+static todo_t *merge_todos(todo_t *a, todo_t *b)
+{
+	todo_t *first = NULL, *last = NULL;
+	while (a && b)
+		if (compare(&a->start, &b->start) <= 0)
+			add_todo(&first, &last, &a);
+		else
+			add_todo(&first, &last, &b);
+	while (a) add_todo(&first, &last, &a);
+	while (b) add_todo(&first, &last, &b);
+	return first;
+}
 
 /* Initialize */
 void cal_init(void)
@@ -43,13 +92,15 @@ void cal_init(void)
 /* Get events */
 event_t *cal_events(year_t year, month_t month, day_t day, int days)
 {
-	return ical_events(0, year, month, day, days)
-	   ?: dummy_events(0, year, month, day, days);
+	event_t *dummy = dummy_events(0, year, month, day, days);
+	event_t *ical  =  ical_events(0, year, month, day, days);
+	return merge_events(dummy, ical);
 }
 
 /* Get todos */
 todo_t *cal_todos(year_t year, month_t month, day_t day, int days)
 {
-	return ical_todos(0, year, month, day, days)
-	   ?: dummy_todos(0, year, month, day, days);
+	todo_t *dummy = dummy_todos(0, year, month, day, days);
+	todo_t *ical  =  ical_todos(0, year, month, day, days);
+	return merge_todos(dummy, ical);
 }
