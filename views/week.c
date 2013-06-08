@@ -27,17 +27,15 @@
 /* Static data */
 static int     line;
 static WINDOW *win;
-static WINDOW *head;
 static WINDOW *times;
 static WINDOW *body;
 
 /* Week init */
 void week_init(WINDOW *_win)
 {
-	win   = _win; //  lines  cols  y  x
-	head  = derwin(win,         2, COLS,   0, 0);
-	times = derwin(win, LINES-2-3,      5, 3, 0);
-	body  = derwin(win, LINES-2-3, COLS-6, 3, 6);
+	win   = _win; //    lines    cols    y  x
+	times = derwin(win, LINES-2,      5, 0, 0);
+	body  = derwin(win, LINES-2, COLS-5, 0, 5);
 	line  = 10*4; // 10:00
 }
 
@@ -45,11 +43,8 @@ void week_init(WINDOW *_win)
 void week_size(int rows, int cols)
 {
 	int hdr = 3-COMPACT;
-	wresize(head,  2,        cols  );
-	wresize(times, rows-hdr,      5);
-	wresize(body,  rows-hdr, cols-6);
-	mvderwin(times, hdr, 0);
-	mvderwin(body,  hdr, 6);
+	wmvresize(times, hdr, 0, rows-hdr,      5);
+	wmvresize(body,  hdr, 5, rows-hdr, cols-5);
 }
 
 /* Week draw */
@@ -67,32 +62,35 @@ void week_draw(void)
 	add_days(&year, &month, &day, -shift);
 
 	/* For today */
-	int l = x+ROUND((shift+0)*hstep)-1;
-	int r = x+ROUND((shift+1)*hstep)-1;
+	int l = ROUND((shift+0)*hstep);
+	int r = ROUND((shift+1)*hstep);
 
 	/* Print Header */
 	int rev = COMPACT ? A_REVERSE | A_BOLD : 0;
-	wattron(head, rev);
-	mvwprintw(head, 0, 0, "%-*s",   COLS, month_to_str(MONTH));
-	mvwprintw(head, 1, 0, "%-0*d", COLS, YEAR);
-	wattroff(head, rev);
-	mvwhline(head,  0, l+1, ' ', r-l-1);
-	mvwhline(head,  1, l+1, ' ', r-l-1);
-	wattron(head, rev);
+	wattron(win, rev);
+	mvwprintw(win, 0, 0, "%-*s",  COLS, month_to_str(MONTH));
+	mvwprintw(win, 1, 0, "%-0*d", COLS, YEAR);
+	wattroff(win, rev);
+	mvwhline(win, 0, x+l, ' ', r-l-1);
+	mvwhline(win, 1, x+l, ' ', r-l-1);
+	wattron(win, rev);
 	for (int d = 0; d < 7; d++) {
 		const char *str = hstep >= 10 ? day_to_string(d) : day_to_str(d);
-		if (d == shift) wattrset(head, A_BOLD);
-		mvwprintw(head, 0, x+ROUND(d*hstep), "%s", str);
-		mvwprintw(head, 1, x+ROUND(d*hstep), "%02d/%02d", month+1, day+1);
-		if (d == shift) wattrset(head, rev);
+		if (d == shift) wattrset(win, A_BOLD);
+		mvwprintw(win, 0, x+ROUND(d*hstep), "%s", str);
+		mvwprintw(win, 1, x+ROUND(d*hstep), "%02d/%02d", month+1, day+1);
+		if (d == shift) wattrset(win, rev);
 		add_days(&year, &month, &day, 1);
 	}
-	wattroff(head, rev);
+	wattroff(win, rev);
 
+	/* Resize body */
+	wshrink(times, y-!COMPACT);
+	wshrink(body,  y-!COMPACT);
 	/* Print times */
-	mvwprintw(times, 0, 0, "%02d:%02d", ((line/4)-1)%12+1, (line*15)%60);
+	mvwprintw(times, !COMPACT, 0, "%02d:%02d", ((line/4)-1)%12+1, (line*15)%60);
 	for (int h = 0; h < 24; h++)
-		mvwprintw(times, h*4-line, 0, "%02d:%02d", (h-1)%12+1, 0);
+		mvwprintw(times, !COMPACT+h*4-line, 0, "%02d:%02d", (h-1)%12+1, 0);
 
 	/* Print events */
 	event_t *event = EVENTS;
@@ -103,30 +101,30 @@ void week_draw(void)
 	while (event && before(&event->start,
 			year, month, day, h+(m+15)/60, (m+15)%60)) {
 		if (!before(&event->start, year, month, day, h, m)) {
-			int y = h*4 + m/15 - line;
-			int x = ROUND(d*hstep);
+			int y = h*4 + m/15 - line + !COMPACT;
+			int x = ROUND(d*hstep) + 1;
 			int h = (get_mins(&event->start, &event->end)-1)/15+1;
-			int w = ROUND((d+1)*hstep) - 1 - x;
+			int w = ROUND((d+1)*hstep) - x;
 			event_box(body, event, y, x, h, w);
 		}
 		event = event->next;
 	}
 
-	/* Print lines */
+	/* Print header lines */
 	if (!COMPACT)
 		mvwhline(win, y-1, 0, ACS_HLINE, COLS);
-	for (int d = 0; d < 7; d++)
-		mvwvline(win, y, x+ROUND(d*hstep)-1, ACS_VLINE, LINES-y-2+COMPACT);
 
-	/* Draw today */
-	if (!COMPACT)
-		mvwhline(win, y-1, l, ACS_BLOCK, r-l+1);
-	mvwvline_set(win, y,   l, WACS_T_VLINE, LINES-y-2);
-	mvwvline_set(win, y,   r, WACS_T_VLINE, LINES-y-2);
+	/* Print day lines */
+	for (int d = 0; d < 7; d++)
+		mvwvline(body, !COMPACT, ROUND(d*hstep), ACS_VLINE, LINES-y-2+COMPACT);
+	mvwvline_set(body, 0, l, WACS_T_VLINE, LINES-y-1+COMPACT);
+	mvwvline_set(body, 0, r, WACS_T_VLINE, LINES-y-1+COMPACT);
 	for (int h = (line+3)/4; h < 24; h++) {
-		mvwadd_wch(win, y+h*4-line, l, WACS_T_LTEE);
-		mvwadd_wch(win, y+h*4-line, r, WACS_T_RTEE);
+		mvwadd_wch(body, h*4-line+!COMPACT, l, WACS_T_LTEE);
+		mvwadd_wch(body, h*4-line+!COMPACT, r, WACS_T_RTEE);
 	}
+	if (!COMPACT)
+		mvwhline(body, 0, l, ACS_BLOCK, r-l+1);
 }
 
 /* Week run */

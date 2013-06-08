@@ -88,9 +88,10 @@ int main(int argc, char **argv)
 				view_resize();
 				view_draw();
 				continue;
-			case '\14':
+			case '\14': // Ctrl-L
 				clear();
-			case '\7':
+			case '\7':  // Ctrl-G
+				view_resize();
 				view_draw();
 				continue;
 		}

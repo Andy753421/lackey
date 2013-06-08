@@ -32,6 +32,10 @@
 extern int COMPACT;
 extern int ACTIVE;
 
+/* Curses functions */
+void wmvresize(WINDOW *win, int top, int left, int rows, int cols);
+void wshrink(WINDOW *win, int top);
+
 /* Helper functions */
 void event_box(WINDOW *win, event_t *event, int y, int x, int h, int w);
 void event_line(WINDOW *win, event_t *event, int y, int x, int w, int full);

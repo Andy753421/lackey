@@ -28,7 +28,6 @@
 /* Static data */
 static int     line;
 static WINDOW *win;
-static WINDOW *head;
 static WINDOW *times;
 static WINDOW *body;
 
@@ -92,21 +91,18 @@ static int get_col(event_t **list, int n, event_t *event, int *ncols)
 /* Day init */
 void day_init(WINDOW *_win)
 {
-	win   = _win; //    lines      cols    y  x
-	head  = derwin(win,         1, COLS,   0, 0);
-	times = derwin(win, LINES-2-2,      5, 2, 0);
-	body  = derwin(win, LINES-2-2, COLS-6, 2, 6);
+	win   = _win; //    lines    cols    y  x
+	times = derwin(win, LINES-2,      5, 0, 0);
+	body  = derwin(win, LINES-2, COLS-5, 0, 5);
 	line  = 10*4; // 10:00
 }
 
 /* Day size */
 void day_size(int rows, int cols)
 {
-	mvderwin(times, 2-COMPACT, 0);
-	mvderwin(body,  2-COMPACT, 6);
-	wresize(head,   1,         cols);
-	wresize(times,  rows-2-COMPACT,      5);
-	wresize(body,   rows-2-COMPACT, cols-6);
+	int hdr = 2-COMPACT;
+	wmvresize(times, hdr, 0, rows-hdr,      5);
+	wmvresize(body,  hdr, 5, rows-hdr, cols-5);
 }
 
 /* Day draw */
@@ -115,12 +111,18 @@ void day_draw(void)
 	const char *mstr = month_to_string(MONTH);
 	const char *dstr = day_to_string(day_of_week(YEAR, MONTH, DAY));
 
-	/* Print Header */
-	if (COMPACT) wattron(head, A_REVERSE | A_BOLD);
-	mvwprintw(head, 0, 0, "%s, %s %-*d", dstr, mstr, COLS, DAY+1);
-	mvwprintw(head, 0, COLS-10, "%d-%02d-%02d", YEAR, MONTH, DAY+1);
-	if (COMPACT) wattroff(head, A_REVERSE | A_BOLD);
+	int y = !COMPACT+1;
 
+	/* Print Header */
+	if (COMPACT) wattron(win, A_REVERSE | A_BOLD);
+	mvwhline(win, 0, 0, ' ', COLS);
+	mvwprintw(win, 0, 0, "%s, %s %d", dstr, mstr, DAY+1);
+	mvwprintw(win, 0, COLS-10, "%d-%02d-%02d", YEAR, MONTH, DAY+1);
+	if (COMPACT) wattroff(win, A_REVERSE | A_BOLD);
+
+	/* Resize body */
+	wshrink(times, y);
+	wshrink(body,  y);
 	/* Print times */
 	mvwprintw(times, 0, 0, "%02d:%02d", ((line/4)-1)%12+1, (line*15)%60);
 	for (int h = 0; h < 24; h++)
@@ -136,8 +138,8 @@ void day_draw(void)
 			YEAR, MONTH, DAY, h+(m+15)/60, (m+15)%60)) {
 		if (!before(&event->start, YEAR, MONTH, DAY, h, m)) {
 			int col    = get_col(active, N_ELEMENTS(active), event, &ncols);
-			int left   = ROUND((col+0.0)*(COLS-6)/ncols);
-			int right  = ROUND((col+1.0)*(COLS-6)/ncols);
+			int left   = ROUND((col+0.0)*(COLS-6)/ncols) + 1;
+			int right  = ROUND((col+1.0)*(COLS-6)/ncols) + 1;
 			int row    = h*4 + m/15 - line;
 			int height = (get_mins(&event->start, &event->end)-1)/15+1;
 			event_box(body, event, row, left, height, right-left);
@@ -148,7 +150,7 @@ void day_draw(void)
 	/* Print lines */
 	if (!COMPACT)
 		mvwhline(win, 1, 0, ACS_HLINE, COLS);
-	mvwvline(win, 2-COMPACT, 5, ACS_VLINE, LINES-4+COMPACT+COMPACT);
+	mvwvline(body, 0, 0, ACS_VLINE, LINES-4+COMPACT+COMPACT);
 }
 
 /* Day run */
