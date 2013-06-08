@@ -43,6 +43,13 @@ uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/$(PROG)
 	rm -f $(DESTDIR)$(MANPREFIX)/man1/$(PROG).1
 
+memcheck: $(PROG)
+	valgrind --log-file=valgrind.out \
+	         --track-origins=yes     \
+	         --leak-check=full       \
+	         --leak-resolution=high  \
+	         ./$(PROG)
+
 # Rules
 $(PROG): $(PROG_SRC:%=src/%.o) $(VIEWS:%=views/%.o) $(CALS:%=cals/%.o)
 	$(GCC) $(CFLAGS) -o $@ $+ $(LDFLAGS)

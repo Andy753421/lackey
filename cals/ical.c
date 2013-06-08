@@ -102,6 +102,8 @@ static void add_recur(icalarray *array, icalcomponent *comp,
 				.end   = iend,
 			});
 		}
+
+		icalrecur_iterator_free(iter);
 	}
 
 	/* Add children */
@@ -119,9 +121,9 @@ static event_t *to_event(ical_inst *inst)
 	icalproperty *prop = icalcomponent_get_first_property(inst->comp, ICAL_CATEGORIES_PROPERTY);
 
 	event_t *event = new0(event_t);
-	event->name  = icalcomponent_get_summary(inst->comp);
-	event->desc  = icalcomponent_get_description(inst->comp);
-	event->loc   = icalcomponent_get_location(inst->comp);
+	event->name  = strcopy(icalcomponent_get_summary(inst->comp));
+	event->desc  = strcopy(icalcomponent_get_description(inst->comp));
+	event->loc   = strcopy(icalcomponent_get_location(inst->comp));
 	event->cat   = icalproperty_get_value_as_string_r(prop);
 	event->start = to_date(inst->start);
 	event->end   = to_date(inst->end);
@@ -156,9 +158,9 @@ static todo_t *to_todo(ical_inst *inst)
 	icalproperty *perc = icalcomponent_get_first_property(inst->comp, ICAL_PERCENTCOMPLETE_PROPERTY);
 
 	todo_t *todo = new0(todo_t);
-	todo->name   = icalcomponent_get_summary(inst->comp);
-	todo->desc   = icalcomponent_get_description(inst->comp);
-	todo->cat    = icalproperty_get_value_as_string(cat);
+	todo->name   = strcopy(icalcomponent_get_summary(inst->comp));
+	todo->desc   = strcopy(icalcomponent_get_description(inst->comp));
+	todo->cat    = strcopy(icalproperty_get_value_as_string(cat));
 	todo->status = icalcomponent_get_status(inst->comp) == ICAL_STATUS_COMPLETED ? 100 :
 	               perc ? icalproperty_get_percentcomplete(perc) : 0;
 	todo->start  = to_date(inst->start);
@@ -197,6 +199,7 @@ event_t *ical_events(cal_t *cal, year_t year, month_t month, day_t day, int days
 	icalparser *parser = icalparser_new();
 	icalparser_set_gen_data(parser, file);
 	icalcomponent *ical = icalparser_parse(parser, (void*)fgets);
+	icalparser_free(parser);
 
 	/* Add events */
 	icalarray *array = icalarray_new(sizeof(ical_inst), 1);
@@ -204,9 +207,11 @@ event_t *ical_events(cal_t *cal, year_t year, month_t month, day_t day, int days
 	icaltimetype end   = {.year = 2020};
 	add_recur(array, ical, start, end, ICAL_VEVENT_COMPONENT);
 	icalarray_sort(array, ical_compare);
-	return to_events(array);
+	event_t *events = to_events(array);
+	icalarray_free(array);
+	icalcomponent_free(ical);
 
-	/* Todo, memory management */
+	return events;
 }
 
 /* Todo functions */
@@ -219,6 +224,7 @@ todo_t *ical_todos(cal_t *cal, year_t year, month_t month, day_t day, int days)
 	icalparser *parser = icalparser_new();
 	icalparser_set_gen_data(parser, file);
 	icalcomponent *ical = icalparser_parse(parser, (void*)fgets);
+	icalparser_free(parser);
 
 	/* Add todos */
 	icalarray *array = icalarray_new(sizeof(ical_inst), 1);
@@ -226,9 +232,11 @@ todo_t *ical_todos(cal_t *cal, year_t year, month_t month, day_t day, int days)
 	icaltimetype end   = {.year = 2020};
 	add_recur(array, ical, start, end, ICAL_VTODO_COMPONENT);
 	icalarray_sort(array, ical_compare);
-	return to_todos(array);
+	todo_t *todos = to_todos(array);
+	icalarray_free(array);
+	icalcomponent_free(ical);
 
-	/* Todo, memory management */
+	return todos;
 }
 
 /* Test functions */
@@ -270,12 +278,14 @@ void ical_test(void)
 	add_recur(array, ical, start, end, ICAL_VEVENT_COMPONENT);
 	icalarray_sort(array, ical_compare);
 	event_t *events = to_events(array);
+	icalarray_free(array);
 
 	/* Find Todos */
 	array = icalarray_new(sizeof(ical_inst), 1);
 	add_recur(array, ical, start, end, ICAL_VTODO_COMPONENT);
 	icalarray_sort(array, ical_compare);
 	todo_t *todos = to_todos(array);
+	icalarray_free(array);
 
 	/* Print */
 	//ical_printr(ical, 0);
