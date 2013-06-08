@@ -44,6 +44,7 @@ static todo_t todo = {
 	.status  = 50,
 };
 
+static int     enable;
 static event_t events[8];
 static todo_t  todos[6];
 
@@ -59,7 +60,7 @@ event_t *dummy_events(cal_t *cal, year_t year, month_t month, day_t day, int day
 		if (i+1 < N_ELEMENTS(events))
 			events[i].next = &events[i+1];
 	}
-	return &events[0];
+	return enable ? &events[0] : 0;
 }
 
 /* Todo functions */
@@ -71,5 +72,5 @@ todo_t *dummy_todos(cal_t *cal, year_t year, month_t month, day_t day, int days)
 		if (i+1 < N_ELEMENTS(todos))
 			todos[i].next = &todos[i+1];
 	}
-	return &todos[0];
+	return enable ? &todos[0] : 0;
 }
