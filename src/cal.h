@@ -30,10 +30,10 @@ typedef struct {
 
 /* Calendar item types */
 typedef struct event_t {
-	const char     *name;
-	const char     *desc;
-	const char     *loc;
-	const char     *cat;
+	char           *name;
+	char           *desc;
+	char           *loc;
+	char           *cat;
 	date_t          start;
 	date_t          end;
 	const cal_t    *cal;
@@ -41,9 +41,9 @@ typedef struct event_t {
 } event_t;
 
 typedef struct todo_t {
-	const char    *name;
-	const char    *desc;
-	const char    *cat;
+	char          *name;
+	char          *desc;
+	char          *cat;
 	status_t       status;
 	date_t         start;
 	date_t         due;

@@ -45,32 +45,43 @@ static todo_t todo = {
 };
 
 static int     enable;
-static event_t events[8];
-static todo_t  todos[6];
 
 /* Event functions */
 event_t *dummy_events(date_t start, date_t end)
 {
-	for (int i = 0; i < N_ELEMENTS(events); i++) {
-		date_t *s = &events[i].start;
-		date_t *e = &events[i].end;
-		events[i] = event;
+	event_t *last = &event;
+	for (int i = 0; i < 8; i++) {
+		last->next        = new0(event_t);
+		last->next->cal   = event.cal;
+		last->next->start = event.start;
+		last->next->end   = event.end;
+		last->next->name  = strcopy(event.name);
+		last->next->desc  = strcopy(event.desc);
+
+		date_t *s = &last->next->start;
+		date_t *e = &last->next->end;
 		add_days(&s->year, &s->month, &s->day, 7*i);
 		add_days(&e->year, &e->month, &e->day, 7*i);
-		if (i+1 < N_ELEMENTS(events))
-			events[i].next = &events[i+1];
+
+		last = last->next;
+		last->next = NULL;
 	}
-	return enable ? &events[0] : 0;
+	return enable ? event.next : 0;
 }
 
 /* Todo functions */
 todo_t *dummy_todos(date_t start, date_t end)
 {
-	for (int i = 0; i < N_ELEMENTS(todos); i++) {
-		todos[i] = todo;
-		todos[i].status = i*20;
-		if (i+1 < N_ELEMENTS(todos))
-			todos[i].next = &todos[i+1];
+	todo_t *last = &todo;
+	for (int i = 0; i < 6; i++) {
+		last->next = new0(event_t);
+		last->next->cal    = todo.cal;
+		last->next->name   = strcopy(todo.name);
+		last->next->desc   = strcopy(todo.desc);
+		last->next->due    = todo.due;
+		last->next->status = todo.status;
+		last = last->next;
+		last->next = NULL;
 	}
-	return enable ? &todos[0] : 0;
+	return enable ? todo.next : 0;
 }

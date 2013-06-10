@@ -116,7 +116,21 @@ void cal_load(year_t year, month_t month, day_t day, int days)
 	     	return;
 
 	/* Free uneeded data */
-	// TODO
+	for (event_t *next, *cur = EVENTS; cur; cur = next) {
+		next = cur->next;
+		if (cur->name) free(cur->name);
+		if (cur->desc) free(cur->desc);
+		if (cur->loc)  free(cur->loc);
+		if (cur->cat)  free(cur->cat);
+		free(cur);
+	}
+	for (todo_t *next, *cur = TODOS; cur; cur = next) {
+		next = cur->next;
+		if (cur->name) free(cur->name);
+		if (cur->desc) free(cur->desc);
+		if (cur->cat)  free(cur->cat);
+		free(cur);
+	}
 
 	/* Push dates out a bit to avoid reloading,
 	 * enough to at least cover the current year */
