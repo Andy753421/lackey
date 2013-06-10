@@ -57,16 +57,6 @@ extern todo_t  *TODOS;
 
 /* Calendar functions */
 void cal_init(void);
-event_t *cal_events(year_t year, month_t month, day_t day, int days);
-todo_t  *cal_todos(year_t year, month_t month, day_t day, int days);
-
-/* Calendar event functions */
-event_t *dummy_events(cal_t *cal, year_t year, month_t month, day_t day, int days);
-event_t *ical_events(cal_t *cal, year_t year, month_t month, day_t day, int days);
-
-/* Calendar todo functions */
-todo_t  *dummy_todos(cal_t *cal, year_t year, month_t month, day_t day, int days);
-todo_t  *ical_todos(cal_t *cal, year_t year, month_t month, day_t day, int days);
 
 /* Test fuctions */
 void ical_test(void);

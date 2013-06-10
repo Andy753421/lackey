@@ -36,6 +36,23 @@ typedef struct {
 	WINDOW *win;
 } view_t;
 
+/* Macros */
+#define VIEW(name)                     \
+	void name##_init(WINDOW *win); \
+	void name##_size(int,int);     \
+	void name##_draw(void);        \
+	int  name##_run(int,mmask_t,int,int)
+
+/* Prototypes */
+VIEW(day);
+VIEW(week);
+VIEW(month);
+VIEW(year);
+VIEW(events);
+VIEW(todo);
+VIEW(settings);
+VIEW(help);
+
 /* View data */
 view_t views[] = {
 	{ "Day",      day_init,      day_size,      day_draw,      day_run,      {KEY_F(1), '1',    } },

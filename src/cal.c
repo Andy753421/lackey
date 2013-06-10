@@ -21,6 +21,18 @@
 #include "date.h"
 #include "cal.h"
 
+/* Macros */
+#define CAL(name) \
+	event_t *name##_events(cal_t *cal, year_t year, month_t month, day_t day, int days); \
+	todo_t  *name##_todos(cal_t *cal, year_t year, month_t month, day_t day, int days)
+
+/* Prototypes */
+CAL(dummy);
+CAL(ical);
+
+event_t *cal_events(year_t year, month_t month, day_t day, int days);
+todo_t  *cal_todos(year_t year, month_t month, day_t day, int days);
+
 /* Global data */
 event_t *EVENTS;
 todo_t  *TODOS;
