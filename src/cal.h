@@ -58,6 +58,3 @@ extern todo_t  *TODOS;
 /* Calendar functions */
 void cal_init(void);
 void cal_load(year_t year, month_t month, day_t day, int days);
-
-/* Test fuctions */
-void ical_test(void);

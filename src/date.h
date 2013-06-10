@@ -89,6 +89,3 @@ const char *month_to_string(month_t month);
 const char *day_to_st(wday_t day);
 const char *day_to_str(wday_t day);
 const char *day_to_string(wday_t day);
-
-/* Tests */
-void date_test(void);
