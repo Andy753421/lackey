@@ -24,6 +24,7 @@
 /* Macros */
 #define CAL(name) \
 	void     name##_config(const char *group, const char *name, const char *key, const char *value); \
+	cal_t   *name##_cals(void); \
 	event_t *name##_events(date_t start, date_t end); \
 	todo_t  *name##_todos(date_t start, date_t end)
 
@@ -32,6 +33,7 @@ CAL(dummy);
 CAL(ical);
 
 /* Global data */
+cal_t   *CALS;
 event_t *EVENTS;
 todo_t  *TODOS;
 
@@ -58,6 +60,18 @@ static void add_todo(todo_t **first, todo_t **last, todo_t **next)
 		(*first) = *next;
 	(*last) = (*next);
 	(*next) = (*next)->next;
+}
+
+static cal_t *merge_cals(cal_t *a, cal_t *b)
+{
+	// TODO - we should sort these
+	if (!a) return b;
+	if (!b) return a;
+	cal_t *last = a;
+	while (last->next)
+		last = last->next;
+	last->next = b;
+	return a;
 }
 
 static event_t *merge_events(event_t *a, event_t *b)
@@ -89,8 +103,13 @@ static todo_t *merge_todos(todo_t *a, todo_t *b)
 /* Initialize */
 void cal_init(void)
 {
-	/* Load a year's worth of data */
-	cal_load(YEAR-1, DEC, 31-7, 366+7+7);
+	/* Load calendars */
+	CALS = merge_cals(
+		dummy_cals(),
+		 ical_cals());
+
+	/* Load data */
+	cal_load(YEAR, MONTH, DAY, 1);
 
 	/* Debug */
 	for (event_t *e = EVENTS; e; e = e->next)

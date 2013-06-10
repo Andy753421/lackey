@@ -35,11 +35,11 @@ typedef struct {
 } ical_inst;
 
 typedef struct ical_t {
-	char          *name;
+	cal_t          cal;
 	char          *location;
 	char          *username;
 	char          *password;
-	icalcomponent *ical;
+	icalcomponent *comp;
 	struct ical_t *next;
 } ical_t;
 
@@ -145,7 +145,7 @@ static void add_recur(icalarray *array, icalcomponent *comp,
 static void read_icals(void)
 {
 	for (ical_t *cal = calendars; cal; cal = cal->next) {
-		if (cal->ical == NULL && cal->location) {
+		if (cal->comp == NULL && cal->location) {
 			wordexp_t wexp;
 			wordexp(cal->location, &wexp, WRDE_NOCMD);
 			if (wexp.we_wordc == 0)
@@ -157,7 +157,7 @@ static void read_icals(void)
 
 			icalparser *parser = icalparser_new();
 			icalparser_set_gen_data(parser, file);
-			cal->ical = icalparser_parse(parser, (void*)fgets);
+			cal->comp = icalparser_parse(parser, (void*)fgets);
 			icalparser_free(parser);
 		}
 	}
@@ -248,13 +248,14 @@ void ical_config(const char *group, const char *name, const char *key, const cha
 
 	/* Find existing calendar */
 	for (cal = calendars; cal; last = cal, cal = cal->next)
-		if (match(cal->name, name))
+		if (match(cal->cal.name, name))
 			break;
 
 	/* Create new calendar */
 	if (!cal) {
 		cal = new0(ical_t);
-		cal->name = get_name(name);
+		cal->cal.type = "ical";
+		cal->cal.name = get_name(name);
 		if (last)
 			last->next = cal;
 		else
@@ -271,6 +272,17 @@ void ical_config(const char *group, const char *name, const char *key, const cha
 		cal->password = get_string(value);
 }
 
+/* Cal functions */
+cal_t *ical_cals(void)
+{
+	read_icals();
+
+	for (ical_t *cal = calendars; cal; cal = cal->next)
+		cal->cal.next = &cal->next->cal;
+
+	return &calendars->cal;
+}
+
 /* Event functions */
 event_t *ical_events(date_t _start, date_t _end)
 {
@@ -280,7 +292,7 @@ event_t *ical_events(date_t _start, date_t _end)
 	icaltimetype end   = to_itime(_end);
 	icalarray *array = icalarray_new(sizeof(ical_inst), 1);
 	for (ical_t *cal = calendars; cal; cal = cal->next)
-		add_recur(array, cal->ical, start, end, ICAL_VEVENT_COMPONENT);
+		add_recur(array, cal->comp, start, end, ICAL_VEVENT_COMPONENT);
 	icalarray_sort(array, ical_compare);
 	event_t *events = to_events(array);
 	icalarray_free(array);
@@ -297,7 +309,7 @@ todo_t *ical_todos(date_t _start, date_t _end)
 	icaltimetype end   = to_itime(_end);
 	icalarray *array = icalarray_new(sizeof(ical_inst), 1);
 	for (ical_t *cal = calendars; cal; cal = cal->next)
-		add_recur(array, cal->ical, start, end, ICAL_VTODO_COMPONENT);
+		add_recur(array, cal->comp, start, end, ICAL_VTODO_COMPONENT);
 	icalarray_sort(array, ical_compare);
 	todo_t *todos = to_todos(array);
 	icalarray_free(array);
@@ -332,7 +344,7 @@ void ical_test(void)
 	FILE *file = fopen("data/all.ics", "r");
 	icalparser *parser = icalparser_new();
 	icalparser_set_gen_data(parser, file);
-	icalcomponent *ical = icalparser_parse(parser, (void*)fgets);
+	icalcomponent *comp = icalparser_parse(parser, (void*)fgets);
 
 	/* Misc */
 	icalarray *array;
@@ -341,20 +353,20 @@ void ical_test(void)
 
 	/* Find events */
 	array = icalarray_new(sizeof(ical_inst), 1);
-	add_recur(array, ical, start, end, ICAL_VEVENT_COMPONENT);
+	add_recur(array, comp, start, end, ICAL_VEVENT_COMPONENT);
 	icalarray_sort(array, ical_compare);
 	event_t *events = to_events(array);
 	icalarray_free(array);
 
 	/* Find Todos */
 	array = icalarray_new(sizeof(ical_inst), 1);
-	add_recur(array, ical, start, end, ICAL_VTODO_COMPONENT);
+	add_recur(array, comp, start, end, ICAL_VTODO_COMPONENT);
 	icalarray_sort(array, ical_compare);
 	todo_t *todos = to_todos(array);
 	icalarray_free(array);
 
 	/* Print */
-	//ical_printr(ical, 0);
+	//ical_printr(comp, 0);
 	//print_events(events);
 	print_todos(todos);
 

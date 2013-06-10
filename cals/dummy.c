@@ -24,9 +24,9 @@
 
 /* Test data */
 static cal_t cal = {
+	.type  = "dummy",
 	.name  = "dummy",
 	.desc  = "dummy calendar",
-	.data  = NULL,
 };
 
 static event_t event = {
@@ -52,6 +52,12 @@ void dummy_config(const char *group, const char *name, const char *key, const ch
 {
 	if (match(group, "dummy") && match(key, "enable"))
 		enable = get_bool(value);
+}
+
+/* Cal functions */
+cal_t *dummy_cals(void)
+{
+	return &cal;
 }
 
 /* Event functions */

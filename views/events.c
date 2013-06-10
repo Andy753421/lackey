@@ -69,12 +69,12 @@ void events_draw(void)
 				row++;
 			if (newdate) {
 				wday_t wday = day_of_week(next.year, next.month, next.day);
-				wattron(win, A_UNDERLINE);
+				wattron(win, A_BOLD);
 				mvwprintw(win, row-line, 0,  "%04d-%02d-%02d",
 					next.year, next.month+1, next.day+1);
 				mvwprintw(win, row-line, 13, "%s, %s %d",
 					day_to_string(wday), month_to_string(next.month), next.day);
-				wattroff(win, A_UNDERLINE);
+				wattroff(win, A_BOLD);
 				row++;
 			}
 			event_line(win, event, row++-line, 4, COLS-2, 1);

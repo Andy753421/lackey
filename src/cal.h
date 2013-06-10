@@ -22,10 +22,11 @@ typedef enum {
 } status_t;
 
 /* Calendar type */
-typedef struct {
-	char *name;
-	char *desc;
-	void *data;
+typedef struct cal_t {
+	char         *type;
+	char         *name;
+	char         *desc;
+	struct cal_t *next;
 } cal_t;
 
 /* Calendar item types */
@@ -52,6 +53,7 @@ typedef struct todo_t {
 } todo_t;
 
 /* Global data */
+extern cal_t   *CALS;
 extern event_t *EVENTS;
 extern todo_t  *TODOS;
 
