@@ -62,6 +62,9 @@ void week_draw(void)
 	int shift = day_of_week(year, month, day);
 	add_days(&year, &month, &day, -shift);
 
+	/* Load cal data */
+	cal_load(year, month, day, 7);
+
 	/* For today */
 	int l = ROUND((shift+0)*hstep);
 	int r = ROUND((shift+1)*hstep);

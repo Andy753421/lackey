@@ -23,19 +23,20 @@
 
 /* Macros */
 #define CAL(name) \
-	event_t *name##_events(cal_t *cal, year_t year, month_t month, day_t day, int days); \
-	todo_t  *name##_todos(cal_t *cal, year_t year, month_t month, day_t day, int days)
+	event_t *name##_events(date_t start, date_t end); \
+	todo_t  *name##_todos(date_t start, date_t end)
 
 /* Prototypes */
 CAL(dummy);
 CAL(ical);
 
-event_t *cal_events(year_t year, month_t month, day_t day, int days);
-todo_t  *cal_todos(year_t year, month_t month, day_t day, int days);
-
 /* Global data */
 event_t *EVENTS;
 todo_t  *TODOS;
+
+/* Local data */
+static date_t start;
+static date_t end;
 
 /* Merge events and todos */
 static void add_event(event_t **first, event_t **last, event_t **next)
@@ -87,8 +88,8 @@ static todo_t *merge_todos(todo_t *a, todo_t *b)
 /* Initialize */
 void cal_init(void)
 {
-	EVENTS = cal_events(2012, JAN, 0, 366);
-	TODOS  = cal_todos(2012, JAN, 0, 366);
+	/* Load a year's worth of data */
+	cal_load(YEAR-1, DEC, 31-7, 366+7+7);
 
 	/* Debug */
 	for (event_t *e = EVENTS; e; e = e->next)
@@ -101,18 +102,37 @@ void cal_init(void)
 				e->start.hour, e->start.min, e->name, e->desc);
 }
 
-/* Get events */
-event_t *cal_events(year_t year, month_t month, day_t day, int days)
+/* Load events and todos */
+void cal_load(year_t year, month_t month, day_t day, int days)
 {
-	event_t *dummy = dummy_events(0, year, month, day, days);
-	event_t *ical  =  ical_events(0, year, month, day, days);
-	return merge_events(dummy, ical);
-}
+	year_t  eyear  = year;
+	month_t emonth = month;
+	day_t   eday   = day;
+	add_days(&eyear, &emonth, &eday, days);
 
-/* Get todos */
-todo_t *cal_todos(year_t year, month_t month, day_t day, int days)
-{
-	todo_t *dummy = dummy_todos(0, year, month, day, days);
-	todo_t *ical  =  ical_todos(0, year, month, day, days);
-	return merge_todos(dummy, ical);
+	/* Skip if we already loaded enough info */
+	if (!before(&start, year,  month,  day,  0, 0) &&
+	     before(&end,  eyear, emonth, eday, 24, 0))
+	     	return;
+
+	/* Free uneeded data */
+	// TODO
+
+	/* Push dates out a bit to avoid reloading,
+	 * enough to at least cover the current year */
+	add_days(&year,  &month,  &day, -366);
+	add_days(&eyear, &emonth, &eday, 366);
+	start = (date_t){year,  month,  day};
+	end   = (date_t){eyear, emonth, eday};
+
+	/* Load events */
+	EVENTS = merge_events(
+		dummy_events(start, end),
+		 ical_events(start, end));
+
+	/* Load todos */
+	TODOS  = merge_todos(
+		dummy_todos(start, end),
+		 ical_todos(start, end));
+
 }

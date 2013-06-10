@@ -49,7 +49,7 @@ static event_t events[8];
 static todo_t  todos[6];
 
 /* Event functions */
-event_t *dummy_events(cal_t *cal, year_t year, month_t month, day_t day, int days)
+event_t *dummy_events(date_t start, date_t end)
 {
 	for (int i = 0; i < N_ELEMENTS(events); i++) {
 		date_t *s = &events[i].start;
@@ -64,7 +64,7 @@ event_t *dummy_events(cal_t *cal, year_t year, month_t month, day_t day, int day
 }
 
 /* Todo functions */
-todo_t *dummy_todos(cal_t *cal, year_t year, month_t month, day_t day, int days)
+todo_t *dummy_todos(date_t start, date_t end)
 {
 	for (int i = 0; i < N_ELEMENTS(todos); i++) {
 		todos[i] = todo;

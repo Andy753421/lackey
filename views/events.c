@@ -50,6 +50,7 @@ void events_draw(void)
 	date_t cur   = {YEAR, MONTH, DAY-1,  0, 0};
 	date_t end   = {YEAR, MONTH, DAY,   24, 0};
 	add_days(&end.year, &end.month, &end.day, days);
+	cal_load(YEAR, MONTH, DAY, days);
 
 	int      row   = 0;
 	int      count = 0;

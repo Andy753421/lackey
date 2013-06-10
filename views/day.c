@@ -114,6 +114,9 @@ void day_draw(void)
 	int y = !COMPACT+1;
 	event_t *event;
 
+	/* Load cal data */
+	cal_load(YEAR, MONTH, DAY, 1);
+
 	/* Print Header */
 	if (COMPACT) wattron(win, A_REVERSE | A_BOLD);
 	mvwhline(win, 0, 0, ' ', COLS);

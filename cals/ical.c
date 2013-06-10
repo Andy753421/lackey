@@ -69,6 +69,17 @@ static date_t to_date(struct icaltimetype time)
 	};
 }
 
+static icaltimetype to_itime(date_t time)
+{
+	return (struct icaltimetype){
+		.year   = time.year,
+		.month  = time.month + 1,
+		.day    = time.day   + 1,
+		.hour   = time.hour,
+		.minute = time.min
+	};
+}
+
 static void add_recur(icalarray *array, icalcomponent *comp,
 		icaltimetype start, icaltimetype end,
 		icalcomponent_kind which)
@@ -228,13 +239,13 @@ static void print_todos(todo_t *start)
 }
 
 /* Event functions */
-event_t *ical_events(cal_t *cal, year_t year, month_t month, day_t day, int days)
+event_t *ical_events(date_t _start, date_t _end)
 {
 	read_icals();
 
+	icaltimetype start = to_itime(_start);
+	icaltimetype end   = to_itime(_end);
 	icalarray *array = icalarray_new(sizeof(ical_inst), 1);
-	icaltimetype start = {.year = year-10};
-	icaltimetype end   = {.year = year+10};
 	for (ical_t *cal = calendars; cal; cal = cal->next)
 		add_recur(array, cal->ical, start, end, ICAL_VEVENT_COMPONENT);
 	icalarray_sort(array, ical_compare);
@@ -245,13 +256,13 @@ event_t *ical_events(cal_t *cal, year_t year, month_t month, day_t day, int days
 }
 
 /* Todo functions */
-todo_t *ical_todos(cal_t *cal, year_t year, month_t month, day_t day, int days)
+todo_t *ical_todos(date_t _start, date_t _end)
 {
 	read_icals();
 
+	icaltimetype start = to_itime(_start);
+	icaltimetype end   = to_itime(_end);
 	icalarray *array = icalarray_new(sizeof(ical_inst), 1);
-	icaltimetype start = {.year = year-10};
-	icaltimetype end   = {.year = year+10};
 	for (ical_t *cal = calendars; cal; cal = cal->next)
 		add_recur(array, cal->ical, start, end, ICAL_VTODO_COMPONENT);
 	icalarray_sort(array, ical_compare);

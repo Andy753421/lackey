@@ -81,6 +81,9 @@ void year_draw(void)
 	int y = 0;
 	int h[4] = {};
 
+	/* Load cal data */
+	cal_load(YEAR, 0, 0, 366);
+
 	/* Determine heights */
 	for (int m = 0; m < 12; m++) {
 		int weeks = weeks_in_month(YEAR, m);

@@ -51,6 +51,9 @@ void month_draw(void)
 	const float hstep = (float)(COLS-1)/7.0;
 	const float vstep = (float)(LINES-2-hdr+COMPACT)/weeks;
 
+	/* Load cal data */
+	cal_load(YEAR, MONTH, 0, days);
+
 	/* Print Header */
 	if (COMPACT) wattron(win, A_REVERSE | A_BOLD);
 	if (COMPACT) mvwhline(win, 0, 0, ' ' | A_REVERSE | A_BOLD, COLS);
