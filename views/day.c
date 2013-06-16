@@ -130,7 +130,7 @@ void day_draw(void)
 	while (event && before(&event->start, YEAR, MONTH, DAY, 24, 0)) {
 		if (!before(&event->end, YEAR, MONTH, DAY, 0, 1) &&
 		    get_mins(&event->start, &event->end) > 23*60)
-			event_line(win, event, y+allday++, 6, COLS, 1);
+			event_line(win, event, y+allday++, 6, COLS, SHOW_DETAILS);
 		event = event->next;
 	}
 	if (allday && !COMPACT)

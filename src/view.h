@@ -28,6 +28,10 @@
 #define COLOR_WORK  8
 #define COLOR_OTHER 9
 
+/* Display flags */
+#define SHOW_DETAILS 0x1
+#define SHOW_ACTIVE  0x2
+
 /* Config data */
 extern int COMPACT;
 
@@ -37,8 +41,8 @@ void wshrink(WINDOW *win, int top);
 
 /* Helper functions */
 void event_box(WINDOW *win, event_t *event, int y, int x, int h, int w);
-void event_line(WINDOW *win, event_t *event, int y, int x, int w, int full);
-void todo_line(WINDOW *win, todo_t *todo, int y, int x, int w, int full);
+void event_line(WINDOW *win, event_t *event, int y, int x, int w, int flags);
+void todo_line(WINDOW *win, todo_t *todo, int y, int x, int w, int flags);
 
 /* View functions */
 void view_init(void);

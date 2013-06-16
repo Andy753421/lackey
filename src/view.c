@@ -187,7 +187,7 @@ void event_box(WINDOW *win, event_t *event, int y, int x, int h, int w)
 	if (l<h && event->desc) mvwprintw(win, y+l++, x+1, "%.*s",   w-2, event->desc);
 }
 
-void event_line(WINDOW *win, event_t *event, int y, int x, int w, int full)
+void event_line(WINDOW *win, event_t *event, int y, int x, int w, int flags)
 {
 	int color = get_color(event->cat);
 
@@ -195,26 +195,31 @@ void event_line(WINDOW *win, event_t *event, int y, int x, int w, int full)
 	mvwaddch(win, y, x++, ACS_BLOCK);
 	if (color) wattroff(win, COLOR_PAIR(color));
 
-	if (full) {
+	if (flags & SHOW_ACTIVE)
+		wattron(win, A_REVERSE | A_BOLD);
+	if (flags & SHOW_DETAILS) {
 		if (all_day(&event->start, &event->end))
-			mvwprintw(win, y, x, " [all day]   -");
+			mvwprintw(win, y, x+1, "[all day]   - ");
 		else
-			mvwprintw(win, y, x, " %2d:%02d-%2d:%02d -",
+			mvwprintw(win, y, x+1, "%2d:%02d-%2d:%02d - ",
 					event->start.hour, event->start.min,
 					event->end.hour,   event->end.min);
 		x += 15;
+		w -= 15;
 	}
 	if (event->name) {
 		const char *label = event->name ?: event->desc;
 		mvwprintw(win, y, x, "%-*.*s", w-1, w-1, label);
 		x += MIN(strlen(label), w-1);
 	}
-	if (full && event->loc) {
+	if (flags & SHOW_DETAILS && event->loc) {
 		mvwprintw(win, y, x, " @ %s", event->loc);
 	}
+	if (flags & SHOW_ACTIVE)
+		wattroff(win, A_REVERSE | A_BOLD);
 }
 
-void todo_line(WINDOW *win, todo_t *todo, int y, int x, int w, int full)
+void todo_line(WINDOW *win, todo_t *todo, int y, int x, int w, int flags)
 {
 	char perc[16];
 	char desc[LINES];
@@ -232,6 +237,11 @@ void todo_line(WINDOW *win, todo_t *todo, int y, int x, int w, int full)
 	mvwaddch(win, y, x, ACS_BLOCK);
 	if (cat) wattroff(win, COLOR_PAIR(cat));
 	x += 2;
+
+	/* Set background */
+	if (flags & SHOW_ACTIVE)
+		wattron(win, A_REVERSE | A_BOLD);
+	mvwhline(win, y, x, ' ', COLS-x);
 
 	/* Print time */
 	if (no_date(&todo->due))
@@ -252,6 +262,10 @@ void todo_line(WINDOW *win, todo_t *todo, int y, int x, int w, int full)
 
 	/* Print description */
 	mvwprintw(win, y, x, "%s", desc);
+
+	/* Reset flags */
+	if (flags & SHOW_ACTIVE)
+		wattroff(win, A_REVERSE | A_BOLD);
 }
 
 /* View init */

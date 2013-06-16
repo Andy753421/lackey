@@ -37,7 +37,7 @@ static int print_todos(WINDOW *win, int row, todo_t *todos, status_t low, status
 	int n = 0;
 	for (todo_t *cur = todos; cur; cur = cur->next)
 		if (low <= cur->status && cur->status <= high)
-			todo_line(win, cur, row+n++, 4, COLS-4, 1);
+			todo_line(win, cur, row+n++, 4, COLS-4, SHOW_DETAILS);
 	return n;
 }
 

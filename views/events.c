@@ -77,7 +77,7 @@ void events_draw(void)
 				wattroff(win, A_BOLD);
 				row++;
 			}
-			event_line(win, event, row++-line, 4, COLS-2, 1);
+			event_line(win, event, row++-line, 4, COLS-4, SHOW_DETAILS);
 			if (event->name && event->desc)
 				mvwprintw(win, row++-line, 14, "%s", event->desc);
 			cur = next;
