@@ -60,6 +60,7 @@ int main(int argc, char **argv)
 	keypad(stdscr, TRUE);
 	start_color();
 	curs_set(false);
+	timeout(100);
 	use_default_colors();
 	mousemask(ALL_MOUSE_EVENTS, NULL);
 
@@ -86,6 +87,7 @@ int main(int argc, char **argv)
 	view_init();
 
 	/* Draw initial view */
+	date_sync();
 	view_draw();
 
 	/* Run */
@@ -93,14 +95,13 @@ int main(int argc, char **argv)
 		MEVENT btn;
 		conf_sync();
 		int chr = getch();
+		date_sync();
 		if (chr == 'q')
 			break;
 		if (chr == KEY_MOUSE)
 			if (getmouse(&btn) != OK)
 				continue;
 		switch (chr) {
-			case ERR:
-				continue;
 			case KEY_RESIZE:
 				endwin();
 				refresh();
@@ -115,6 +116,8 @@ int main(int argc, char **argv)
 				continue;
 		}
 		if (view_run(chr, btn.bstate, btn.y, btn.x))
+			continue;
+		if (chr == ERR) // timeout
 			continue;
 		debug("main: Unhandled key - Dec %3d,  Hex %02x,  Oct %03o,  Chr <%c>",
 				chr, chr, chr, chr);

@@ -23,6 +23,7 @@
 #include "date.h"
 
 /* Global data */
+date_t  NOW;
 date_t  SEL;
 
 /* Initialize */
@@ -34,6 +35,19 @@ void date_init(void)
 	SEL.year  = tm->tm_year+1900;
 	SEL.month = tm->tm_mon;
 	SEL.day   = tm->tm_mday-1;
+}
+
+void date_sync(void)
+{
+	time_t     sec = time(NULL);
+	struct tm *tm  = localtime(&sec);
+
+	NOW.year  = tm->tm_year+1900;
+	NOW.month = tm->tm_mon;
+	NOW.day   = tm->tm_mday-1;
+	NOW.hour  = tm->tm_hour;
+	NOW.min   = tm->tm_min;
+	NOW.sec   = tm->tm_sec;
 }
 
 /* Time functions */

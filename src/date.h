@@ -22,6 +22,7 @@ typedef int year_t;
 typedef int day_t;
 typedef int hour_t;
 typedef int min_t;
+typedef int sec_t;
 
 typedef enum {
 	JAN =  0,
@@ -54,13 +55,16 @@ typedef struct {
 	day_t   day;
 	hour_t  hour;
 	min_t   min;
+	sec_t   sec;
 } date_t;
 
 /* Global data */
+extern date_t NOW; // current wall clock time, refreshed at 10 Hz
 extern date_t SEL; // date and time the user is looking at
 
 /* Initialize */
 void date_init(void);
+void date_sync(void);
 
 /* Time functions */
 int is_leap_year(year_t year);

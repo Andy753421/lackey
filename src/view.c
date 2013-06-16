@@ -94,6 +94,9 @@ static void draw_header(void)
 {
 	move(0, 0);
 	attron(COLOR_PAIR(COLOR_TITLE));
+	clrtoeol();
+
+	/* Draw menu */
 	for (int i = 0; i < N_ELEMENTS(menu); i++) {
 		if (menu[i] == active)
 			attron(A_BOLD);
@@ -101,13 +104,21 @@ static void draw_header(void)
 		if (menu[i] == active)
 			attroff(A_BOLD);
 	}
-	clrtoeol();
+
+	/* Draw popup window */
 	if (popup) {
+		printw("| ");
 		attron(A_BOLD);
-		move(0, COLS-strlen(popup->title)-2);
 		printw("[%s]", popup->title);
 		attroff(A_BOLD);
 	}
+
+	/* Draw date */
+	move(0, COLS-19);
+	printw("%04d-%02d-%02d %02d:%02d:%02d",
+			NOW.year, NOW.month, NOW.day,
+			NOW.hour, NOW.min,   NOW.sec);
+
 	attroff(COLOR_PAIR(COLOR_TITLE));
 	if (!COMPACT)
 		mvhline(1, 0, ACS_HLINE, COLS);
@@ -320,6 +331,9 @@ void view_draw(void)
 /* View run */
 int view_run(int key, mmask_t btn, int row, int col)
 {
+	/* Refresh timestamp */
+	draw_header();
+
 	/* Check for mouse events on the menu */
 	if (key == KEY_MOUSE && row == 0) {
 		int start = 1;
