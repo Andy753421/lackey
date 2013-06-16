@@ -57,7 +57,7 @@ $(PROG): $(PROG_SRC:%=src/%.o) $(VIEWS:%=views/%.o) $(CALS:%=cals/%.o)
 $(TEST): $(TEST_SRC:%=src/%.o) $(CALS:%=cals/%.o)
 	$(GCC) $(CFLAGS) -o $@ $+ $(LDFLAGS)
 
-%.o: %.c $(wildcard src/*.h) makefile
+%.o: %.c $(wildcard src/*.h makefile config.mk)
 	$(GCC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 
 .PHONY: all clean dist install uninstall
