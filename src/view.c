@@ -53,6 +53,7 @@ VIEW(events);
 VIEW(todo);
 VIEW(settings);
 VIEW(help);
+VIEW(edit);
 
 /* View data */
 static const char *names[] = {
@@ -73,6 +74,7 @@ view_t views[] = {
 	{ "Settings", settings_init, settings_size, settings_draw, settings_run, {KEY_F(7), '7'} },
 	{ "Help",     help_init,     help_size,     help_draw,     help_run,     {KEY_F(8), '8'} },
 	{ NULL,       NULL,          NULL,          NULL,          NULL,         {             } },
+	{ "Edit",     edit_init,     edit_size,     edit_draw,     edit_run,     {             } },
 };
 
 /* Config data */
@@ -346,6 +348,8 @@ int view_run(int key, mmask_t btn, int row, int col)
 			return view_set(ACTIVE, -1);
 		case '?':    // help
 			return view_set(ACTIVE, 9);
+		case 'e':    // edit
+			return view_set(ACTIVE, 11);
 	}
 
 	/* Pass key to active view */
