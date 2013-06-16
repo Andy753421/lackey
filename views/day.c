@@ -108,27 +108,27 @@ void day_size(int rows, int cols)
 /* Day draw */
 void day_draw(void)
 {
-	const char *mstr = month_to_string(MONTH);
-	const char *dstr = day_to_string(day_of_week(YEAR, MONTH, DAY));
+	const char *mstr = month_to_string(SEL.month);
+	const char *dstr = day_to_string(day_of_week(SEL.year, SEL.month, SEL.day));
 
 	int y = !COMPACT+1;
 	event_t *event;
 
 	/* Load cal data */
-	cal_load(YEAR, MONTH, DAY, 1);
+	cal_load(SEL.year, SEL.month, SEL.day, 1);
 
 	/* Print Header */
 	if (COMPACT) wattron(win, A_REVERSE | A_BOLD);
 	mvwhline(win, 0, 0, ' ', COLS);
-	mvwprintw(win, 0, 0, "%s, %s %d", dstr, mstr, DAY+1);
-	mvwprintw(win, 0, COLS-10, "%d-%02d-%02d", YEAR, MONTH, DAY+1);
+	mvwprintw(win, 0, 0, "%s, %s %d", dstr, mstr, SEL.day+1);
+	mvwprintw(win, 0, COLS-10, "%d-%02d-%02d", SEL.year, SEL.month, SEL.day+1);
 	if (COMPACT) wattroff(win, A_REVERSE | A_BOLD);
 
 	/* Print all day events */
 	event = EVENTS;
 	int allday = 0;
-	while (event && before(&event->start, YEAR, MONTH, DAY, 24, 0)) {
-		if (!before(&event->end, YEAR, MONTH, DAY, 0, 1) &&
+	while (event && before(&event->start, SEL.year, SEL.month, SEL.day, 24, 0)) {
+		if (!before(&event->end, SEL.year, SEL.month, SEL.day, 0, 1) &&
 		    get_mins(&event->start, &event->end) > 23*60)
 			event_line(win, event, y+allday++, 6, COLS, SHOW_DETAILS);
 		event = event->next;
@@ -152,8 +152,8 @@ void day_draw(void)
 	for (int h = 0; h < 24; h++)
 	for (int m = 0; m < 60; m+=15)
 	while (event && before(&event->start,
-			YEAR, MONTH, DAY, h+(m+15)/60, (m+15)%60)) {
-		if (!before(&event->start, YEAR, MONTH, DAY, h, m) &&
+			SEL.year, SEL.month, SEL.day, h+(m+15)/60, (m+15)%60)) {
+		if (!before(&event->start, SEL.year, SEL.month, SEL.day, h, m) &&
 		    get_mins(&event->start, &event->end) <= 23*60) {
 			int col    = get_col(active, N_ELEMENTS(active), event, &ncols);
 			int left   = ROUND((col+0.0)*(COLS-6)/ncols) + 1;
@@ -188,7 +188,7 @@ int day_run(int key, mmask_t btn, int row, int col)
 	}
 	line = CLAMP(line, 0, 24*4);
 	if (days)
-		add_days(&YEAR, &MONTH, &DAY, days);
+		add_days(&SEL.year, &SEL.month, &SEL.day, days);
 	if (ref) {
 		werase(win);
 		day_draw();

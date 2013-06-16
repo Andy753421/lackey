@@ -23,9 +23,7 @@
 #include "date.h"
 
 /* Global data */
-year_t  YEAR;
-month_t MONTH;
-day_t   DAY;
+date_t  SEL;
 
 /* Initialize */
 void date_init(void)
@@ -33,9 +31,9 @@ void date_init(void)
 	time_t     sec = time(NULL);
 	struct tm *tm  = localtime(&sec);
 
-	YEAR  = tm->tm_year+1900;
-	MONTH = tm->tm_mon;
-	DAY   = tm->tm_mday-1;
+	SEL.year  = tm->tm_year+1900;
+	SEL.month = tm->tm_mon;
+	SEL.day   = tm->tm_mday-1;
 }
 
 /* Time functions */

@@ -44,11 +44,11 @@ void events_draw(void)
 	int days = 2*7;
 	int min  = 12;
 
-	date_t start = {YEAR, MONTH, DAY,    0, 0};
-	date_t cur   = {YEAR, MONTH, DAY-1,  0, 0};
-	date_t end   = {YEAR, MONTH, DAY,   24, 0};
+	date_t start = {SEL.year, SEL.month, SEL.day,    0, 0};
+	date_t cur   = {SEL.year, SEL.month, SEL.day-1,  0, 0};
+	date_t end   = {SEL.year, SEL.month, SEL.day,   24, 0};
 	add_days(&end.year, &end.month, &end.day, days);
-	cal_load(YEAR, MONTH, DAY, days);
+	cal_load(SEL.year, SEL.month, SEL.day, days);
 
 	int      row   = 0;
 	int      count = 0;

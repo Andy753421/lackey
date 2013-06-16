@@ -111,7 +111,7 @@ void cal_init(void)
 		 ical_cals());
 
 	/* Load data */
-	cal_load(YEAR, MONTH, DAY, 1);
+	cal_load(SEL.year, SEL.month, SEL.day, 1);
 
 	/* Debug */
 #ifdef DEBUG_CALS

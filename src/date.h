@@ -57,9 +57,7 @@ typedef struct {
 } date_t;
 
 /* Global data */
-extern year_t  YEAR;
-extern month_t MONTH;
-extern day_t   DAY;
+extern date_t SEL; // date and time the user is looking at
 
 /* Initialize */
 void date_init(void);

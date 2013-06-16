@@ -42,23 +42,23 @@ void month_size(int rows, int cols)
 /* Month draw */
 void month_draw(void)
 {
-	const char *name  = month_to_string(MONTH);
-	const int   start = start_of_month(YEAR, MONTH);
-	const int   days  = days_in_month(YEAR, MONTH);
-	const int   weeks = weeks_in_month(YEAR, MONTH);
+	const char *name  = month_to_string(SEL.month);
+	const int   start = start_of_month(SEL.year, SEL.month);
+	const int   days  = days_in_month(SEL.year, SEL.month);
+	const int   weeks = weeks_in_month(SEL.year, SEL.month);
 	const int   hdr   = COMPACT ? 3 : 4;
 	const float midpt = (float)COLS/2.0 - (strlen(name) + 1 + 4)/2.0;
 	const float hstep = (float)(COLS-1)/7.0;
 	const float vstep = (float)(LINES-2-hdr+COMPACT)/weeks;
 
 	/* Load cal data */
-	cal_load(YEAR, MONTH, 0, days);
+	cal_load(SEL.year, SEL.month, 0, days);
 
 	/* Print Header */
 	if (COMPACT) wattron(win, A_REVERSE | A_BOLD);
 	if (COMPACT) mvwhline(win, 0, 0, ' ' | A_REVERSE | A_BOLD, COLS);
 	if (COMPACT) mvwhline(win, 1, 0, ' ' | A_REVERSE | A_BOLD, COLS);
-	mvwprintw(win, 0, midpt, "%s %d", name, YEAR);
+	mvwprintw(win, 0, midpt, "%s %d", name, SEL.year);
 	for (int d = 0; d < 7; d++) {
 		const char *str = hstep >= 10 ? day_to_string(d+SUN) : day_to_str(d+SUN);
 		mvwprintw(win, 1, ROUND(1+d*hstep), "%s", str);
@@ -70,9 +70,9 @@ void month_draw(void)
 	for (int d = 0; d < days; d++) {
 		int row = (start + d) / 7;
 		int col = (start + d) % 7;
-		if (d == DAY) wattron(win, A_BOLD);
+		if (d == SEL.day) wattron(win, A_BOLD);
 		mvwprintw(win, ROUND(hdr+row*vstep), ROUND(1+col*hstep), "%d", d+1);
-		if (d == DAY) wattroff(win, A_BOLD);
+		if (d == SEL.day) wattroff(win, A_BOLD);
 	}
 
 	/* Print events */
@@ -82,8 +82,8 @@ void month_draw(void)
 		int e = ROUND(hdr+(((start + d) / 7)+1)*vstep)-2;
 		int x = ROUND(1  +(((start + d) % 7)  )*hstep)+3;
 		int w = ROUND(1  +(((start + d) % 7)+1)*hstep)-x-1;
-		while (event && before(&event->start, YEAR, MONTH, d, 24, 0)) {
-			if (!before(&event->start, YEAR, MONTH, d, 0, 0)){
+		while (event && before(&event->start, SEL.year, SEL.month, d, 24, 0)) {
+			if (!before(&event->start, SEL.year, SEL.month, d, 0, 0)){
 				if (y == e) mvwhline(win, y, x-3, ACS_DARROW, 2);
 				if (y <= e) event_line(win, event, y, x, w, 0);
 				y++;
@@ -108,8 +108,8 @@ void month_draw(void)
 	}
 
 	/* Draw today */
-	int col = day_of_week(YEAR, MONTH, DAY);
-	int row = (start+DAY) / 7;
+	int col = day_of_week(SEL.year, SEL.month, SEL.day);
+	int row = (start+SEL.day) / 7;
 	int l = ROUND((col+0)*hstep);
 	int r = ROUND((col+1)*hstep);
 	int t = ROUND((row+0)*vstep+hdr-1);
@@ -138,8 +138,8 @@ int month_run(int key, mmask_t btn, int row, int col)
 		case 'o': months =  1; break;
 	}
 	if (days || months) {
-		add_days(&YEAR, &MONTH, &DAY, days);
-		add_months(&YEAR, &MONTH, months);
+		add_days(&SEL.year, &SEL.month, &SEL.day, days);
+		add_months(&SEL.year, &SEL.month, months);
 		werase(win);
 		month_draw();
 		wrefresh(win);

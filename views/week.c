@@ -56,9 +56,9 @@ void week_draw(void)
 	event_t *event;
 
 	/* Get start of week */
-	year_t  year  = YEAR;
-	month_t month = MONTH;
-	day_t   day   = DAY;
+	year_t  year  = SEL.year;
+	month_t month = SEL.month;
+	day_t   day   = SEL.day;
 	int shift = day_of_week(year, month, day);
 	add_days(&year, &month, &day, -shift);
 
@@ -72,8 +72,8 @@ void week_draw(void)
 	/* Print Header */
 	int rev = COMPACT ? A_REVERSE | A_BOLD : 0;
 	wattron(win, rev);
-	mvwprintw(win, 0, 0, "%-*s",  COLS, month_to_str(MONTH));
-	mvwprintw(win, 1, 0, "%-0*d", COLS, YEAR);
+	mvwprintw(win, 0, 0, "%-*s",  COLS, month_to_str(SEL.month));
+	mvwprintw(win, 1, 0, "%-0*d", COLS, SEL.year);
 	wattroff(win, rev);
 	mvwhline(win, 0, x+l, ' ', r-l-1);
 	mvwhline(win, 1, x+l, ' ', r-l-1);
@@ -172,7 +172,7 @@ int week_run(int key, mmask_t btn, int row, int col)
 	}
 	line = CLAMP(line, 0, 24*4);
 	if (days)
-		add_days(&YEAR, &MONTH, &DAY, days);
+		add_days(&SEL.year, &SEL.month, &SEL.day, days);
 	if (ref) {
 		werase(win);
 		week_draw();
