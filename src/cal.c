@@ -131,8 +131,8 @@ void cal_load(year_t year, month_t month, day_t day, int days)
 	add_days(&eyear, &emonth, &eday, days);
 
 	/* Skip if we already loaded enough info */
-	if (!before(&start, year,  month,  day,  0, 0) &&
-	     before(&end,  eyear, emonth, eday, 24, 0))
+	if (before(&start, year,  month,  day,  0, 0) &&
+	   !before(&end,  eyear, emonth, eday, 24, 0))
 	     	return;
 
 	/* Free uneeded data */
