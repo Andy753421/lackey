@@ -103,10 +103,10 @@ static void set_value(const char *group, const char *name,
 	if (groupend) {
 		/* Append to group */
 		line_t *line = new0(line_t);
-		groupend->next = line;
 		line->key      = strcopy(key);
 		line->value    = strcopy(value);
 		line->next     = groupend->next;
+		groupend->next = line;
 	} else if (fileend)  {
 		/* Create new group */
 		line_t *blank  = new0(line_t);
