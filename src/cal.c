@@ -169,6 +169,13 @@ void cal_load(year_t year, month_t month, day_t day, int days)
 		dummy_todos(start, end),
 		 ical_todos(start, end));
 
+	/* Verify events and todos*/
+	//for (event_t *cur = EVENTS; cur; cur = cur->next)
+	//	if (!cur->cal)
+	//		error("Missing cal in event '%s'", cur->name);
+	//for (todo_t *cur = TODOS; cur; cur = cur->next)
+	//	if (!cur->cal)
+	//		error("Missing cal in todo '%s'", cur->name);
 }
 
 /* Config parser */

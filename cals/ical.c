@@ -29,6 +29,7 @@
 
 /* Local types */
 typedef struct {
+	cal_t *cal;
 	icalcomponent *comp;
 	struct icaltimetype start;
 	struct icaltimetype end;
@@ -79,7 +80,8 @@ static icaltimetype to_itime(date_t time)
 	};
 }
 
-static void add_recur(icalarray *array, icalcomponent *comp,
+static void add_recur(cal_t *cal,
+		icalarray *array, icalcomponent *comp,
 		icaltimetype start, icaltimetype end,
 		icalcomponent_kind which)
 {
@@ -107,6 +109,7 @@ static void add_recur(icalarray *array, icalcomponent *comp,
 		if (icaltime_is_null_time(cstart) ||
 		    which == ICAL_VTODO_COMPONENT) {
 			icalarray_append(array, &(ical_inst){
+				.cal   = cal,
 				.comp  = comp,
 				.start = cstart,
 				.end   = cend,
@@ -124,6 +127,7 @@ static void add_recur(icalarray *array, icalcomponent *comp,
 				break;    // instance begins after stop time
 
 			icalarray_append(array, &(ical_inst){
+				.cal   = cal,
 				.comp  = comp,
 				.start = istart,
 				.end   = iend,
@@ -137,7 +141,7 @@ static void add_recur(icalarray *array, icalcomponent *comp,
 	icalcomponent_kind find = ICAL_ANY_COMPONENT;
 	icalcomponent *child = icalcomponent_get_first_component(comp, find);
 	while (child) {
-		add_recur(array, child, start, end, which);
+		add_recur(cal, array, child, start, end, which);
 		child = icalcomponent_get_next_component(comp, find);
 	}
 }
@@ -175,6 +179,7 @@ static event_t *to_event(ical_inst *inst)
 	event->cat   = icalproperty_get_value_as_string_r(prop);
 	event->start = to_date(inst->start);
 	event->end   = to_date(inst->end);
+	event->cal   = inst->cal;
 	return event;
 }
 
@@ -213,6 +218,7 @@ static todo_t *to_todo(ical_inst *inst)
 	               perc ? icalproperty_get_percentcomplete(perc) : 0;
 	todo->start  = to_date(inst->start);
 	todo->due    = to_date(icalcomponent_get_due(inst->comp));
+	todo->cal    = inst->cal;
 	return todo;
 }
 
@@ -292,7 +298,7 @@ event_t *ical_events(date_t _start, date_t _end)
 	icaltimetype end   = to_itime(_end);
 	icalarray *array = icalarray_new(sizeof(ical_inst), 1);
 	for (ical_t *cal = calendars; cal; cal = cal->next)
-		add_recur(array, cal->comp, start, end, ICAL_VEVENT_COMPONENT);
+		add_recur(&cal->cal, array, cal->comp, start, end, ICAL_VEVENT_COMPONENT);
 	icalarray_sort(array, ical_compare);
 	event_t *events = to_events(array);
 	icalarray_free(array);
@@ -309,7 +315,7 @@ todo_t *ical_todos(date_t _start, date_t _end)
 	icaltimetype end   = to_itime(_end);
 	icalarray *array = icalarray_new(sizeof(ical_inst), 1);
 	for (ical_t *cal = calendars; cal; cal = cal->next)
-		add_recur(array, cal->comp, start, end, ICAL_VTODO_COMPONENT);
+		add_recur(&cal->cal, array, cal->comp, start, end, ICAL_VTODO_COMPONENT);
 	icalarray_sort(array, ical_compare);
 	todo_t *todos = to_todos(array);
 	icalarray_free(array);
@@ -353,14 +359,14 @@ void ical_test(void)
 
 	/* Find events */
 	array = icalarray_new(sizeof(ical_inst), 1);
-	add_recur(array, comp, start, end, ICAL_VEVENT_COMPONENT);
+	add_recur(NULL, array, comp, start, end, ICAL_VEVENT_COMPONENT);
 	icalarray_sort(array, ical_compare);
 	event_t *events = to_events(array);
 	icalarray_free(array);
 
 	/* Find Todos */
 	array = icalarray_new(sizeof(ical_inst), 1);
-	add_recur(array, comp, start, end, ICAL_VTODO_COMPONENT);
+	add_recur(NULL, array, comp, start, end, ICAL_VTODO_COMPONENT);
 	icalarray_sort(array, ical_compare);
 	todo_t *todos = to_todos(array);
 	icalarray_free(array);
