@@ -28,79 +28,84 @@
 
 /* Types */
 typedef struct {
-	char   *name;
-	void  (*init)(WINDOW*);
-	void  (*size)(int,int);
-	void  (*draw)(void);
-	int   (*run)(int,mmask_t,int,int);
-	int     keys[8];
-	WINDOW *win;
+	const char *name;
+	const char *title;
+	void      (*init)(WINDOW*);
+	void      (*size)(int,int);
+	void      (*draw)(void);
+	int       (*run)(int,mmask_t,int,int);
+	int         keys[8];
+	WINDOW     *win;
 } view_t;
 
 /* Macros */
-#define VIEW(name)                     \
-	void name##_init(WINDOW *win); \
-	void name##_size(int,int);     \
-	void name##_draw(void);        \
-	int  name##_run(int,mmask_t,int,int)
+#define VIEW(name, title, ...)                \
+	void name##_init(WINDOW *win);        \
+	void name##_size(int,int);            \
+	void name##_draw(void);               \
+	int  name##_run(int,mmask_t,int,int); \
+	view_t name##_view = {                \
+		#name,                        \
+		title,                        \
+		name##_init,                  \
+		name##_size,                  \
+		name##_draw,                  \
+		name##_run,                   \
+		{ __VA_ARGS__ }               \
+	}
 
-/* Prototypes */
-VIEW(day);
-VIEW(week);
-VIEW(month);
-VIEW(year);
-VIEW(events);
-VIEW(todo);
-VIEW(settings);
-VIEW(help);
-VIEW(edit);
+/* Views */
+VIEW(day,      "Day",      KEY_F(1), '1');
+VIEW(week,     "Week",     KEY_F(2), '2');
+VIEW(month,    "Month",    KEY_F(3), '3');
+VIEW(year,     "Year",     KEY_F(4), '4');
+VIEW(events,   "Events",   KEY_F(5), '5');
+VIEW(todo,     "Todo",     KEY_F(6), '6');
+VIEW(settings, "Settings", KEY_F(7), '7');
+VIEW(help,     "Help",     KEY_F(8), '8');
+VIEW(edit,     "Edit");
 
 /* View data */
-static const char *names[] = {
-	"day", "week", "month", "year",
-	"|", "events", "todo",
-	"|", "settings", "help",
+view_t  spacer = { "|", "|" };
+
+view_t *views[] = {
+	&day_view, &week_view, &month_view, &year_view,
+	&events_view, &todo_view,
+	&settings_view, &help_view,
+	&edit_view
 };
 
-view_t views[] = {
-	{ "Day",      day_init,      day_size,      day_draw,      day_run,      {KEY_F(1), '1'} },
-	{ "Week",     week_init,     week_size,     week_draw,     week_run,     {KEY_F(2), '2'} },
-	{ "Month",    month_init,    month_size,    month_draw,    month_run,    {KEY_F(3), '3'} },
-	{ "Year",     year_init,     year_size,     year_draw,     year_run,     {KEY_F(4), '4'} },
-	{ "|",        NULL,          NULL,          NULL,          NULL,         {             } },
-	{ "Events",   events_init,   events_size,   events_draw,   events_run,   {KEY_F(5), '5'} },
-	{ "Todo",     todo_init,     todo_size,     todo_draw,     todo_run,     {KEY_F(6), '6'} },
-	{ "|",        NULL,          NULL,          NULL,          NULL,         {             } },
-	{ "Settings", settings_init, settings_size, settings_draw, settings_run, {KEY_F(7), '7'} },
-	{ "Help",     help_init,     help_size,     help_draw,     help_run,     {KEY_F(8), '8'} },
-	{ NULL,       NULL,          NULL,          NULL,          NULL,         {             } },
-	{ "Edit",     edit_init,     edit_size,     edit_draw,     edit_run,     {             } },
+view_t *menu[] = {
+	&day_view, &week_view, &month_view, &year_view,
+	&spacer, &events_view, &todo_view,
+	&spacer, &settings_view, &help_view
 };
 
-/* Config data */
+/* Global data */
 int COMPACT = 0;
-int ACTIVE  = 0;
-int POPUP   = -1;
+
+/* Local data */
+view_t *view   = &day_view;
+view_t *active = &day_view;
+view_t *popup  = NULL;
 
 /* Local functions */
 static void draw_header(void)
 {
 	move(0, 0);
 	attron(COLOR_PAIR(COLOR_TITLE));
-	for (int i = 0; i < N_ELEMENTS(views); i++) {
-		if (!views[i].name)
-			break;
-		if (i == ACTIVE)
+	for (int i = 0; i < N_ELEMENTS(menu); i++) {
+		if (menu[i] == active)
 			attron(A_BOLD);
-		printw("%s ", views[i].name);
-		if (i == ACTIVE)
+		printw("%s ", menu[i]->title);
+		if (menu[i] == active)
 			attroff(A_BOLD);
 	}
 	clrtoeol();
-	if (POPUP >= 0) {
+	if (popup) {
 		attron(A_BOLD);
-		move(0, COLS-strlen(views[POPUP].name)-2);
-		printw("[%s]", views[POPUP].name);
+		move(0, COLS-strlen(popup->title)-2);
+		printw("[%s]", popup->title);
 		attroff(A_BOLD);
 	}
 	attroff(COLOR_PAIR(COLOR_TITLE));
@@ -117,16 +122,16 @@ static int get_color(const char *cat)
 	       match(cat, "work")  ? COLOR_WORK  : COLOR_OTHER ;
 }
 
-static int view_set(int active, int popup)
+static int set_view(view_t *_active, view_t *_popup)
 {
-	if (ACTIVE != active) {
-		ACTIVE = active;
-		set_enum("view", 0, "active", ACTIVE,
-				names, N_ELEMENTS(names));
+	view = _popup ?: _active;
+	if (active != _active) {
+		active = _active;
+		set_string("view", 0, "active", active->name);
 		view_draw();
 	}
-	if (POPUP != popup) {
-		POPUP = popup;
+	if (popup != _popup) {
+		popup = _popup;
 		view_draw();
 	}
 	return 1;
@@ -254,12 +259,9 @@ void view_init(void)
 {
 	int hdr = COMPACT ? 1 : 2;
 	for (int i = 0; i < N_ELEMENTS(views); i++) {
-		if (views[i].init) {
-			views[i].win = newwin(LINES-hdr, COLS, hdr, 0);
-			views[i].init(views[i].win);
-		}
-		if (views[i].size)
-			views[i].size(LINES-hdr, COLS);
+		views[i]->win = newwin(LINES-hdr, COLS, hdr, 0);
+		views[i]->init(views[i]->win);
+		views[i]->size(LINES-hdr, COLS);
 	}
 }
 
@@ -267,10 +269,17 @@ void view_init(void)
 void view_config(const char *group, const char *name, const char *key, const char *value)
 {
 	if (match(group, "view")) {
-		if (match(key, "compact"))
+		if (match(key, "compact")) {
 			COMPACT = get_bool(value);
-		else if (match(key, "active"))
-			ACTIVE = get_enum(value, names, N_ELEMENTS(names));
+		} else if (match(key, "active")) {
+			for (int i = 0; i < N_ELEMENTS(views); i++) {
+				if (match(value, views[i]->name)) {
+					get_string(value);
+					view = active = views[i];
+					break;
+				}
+			}
+		}
 	}
 }
 
@@ -279,80 +288,74 @@ void view_resize(void)
 {
 	int hdr = COMPACT ? 1 : 2;
 	for (int i = 0; i < N_ELEMENTS(views); i++) {
-		if (views[i].win) {
-			wresize(views[i].win, LINES-hdr, COLS);
-			mvwin(views[i].win, hdr, 0);
-		}
-		if (views[i].size)
-			views[i].size(LINES-hdr, COLS);
+		wresize(views[i]->win, LINES-hdr, COLS);
+		mvwin(views[i]->win, hdr, 0);
+		views[i]->size(LINES-hdr, COLS);
 	}
 }
 
 /* View draw */
 void view_draw(void)
 {
-	int view = POPUP >= 0 ? POPUP : ACTIVE;
 	draw_header();
-	werase(views[view].win);
-	views[view].draw();
-	wrefresh(views[view].win);
+	werase(view->win);
+	view->draw();
+	wrefresh(view->win);
 }
 
 /* View run */
 int view_run(int key, mmask_t btn, int row, int col)
 {
-	/* Check for compact mode toggle */
-	if (key == 'c') {
-		COMPACT ^= 1;
-		set_bool("view", 0, "compact", COMPACT);
-		view_resize();
-		view_draw();
-		return 1;
-	}
-
-	/* Check for mouse events */
+	/* Check for mouse events on the menu */
 	if (key == KEY_MOUSE && row == 0) {
 		int start = 1;
-		for (int i = 0; i < N_ELEMENTS(views); i++) {
-			int end = start + strlen(views[i].name) - 1;
-			if (start <= col && col <= end && views[i].draw)
-				return view_set(i, -1);
+		for (int i = 0; i < N_ELEMENTS(menu); i++) {
+			int end = start + strlen(menu[i]->name) - 1;
+			if (start <= col && col <= end && menu[i]->draw)
+				return set_view(menu[i], NULL);
 			start = end + 2;
 		}
 	}
 
-	/* Check for view change */
-	for (int i = 0; i < N_ELEMENTS(views); i++) {
-		if (i == ACTIVE)
-			continue;
-		for (int j = 0; j < N_ELEMENTS(views[i].keys); j++)
-			if (views[i].keys[j] == key)
-				return view_set(i, -1);
+	/* Look though menu for hotkeys */
+	for (int i = 0; i < N_ELEMENTS(menu); i++) {
+		for (int j = 0; j < N_ELEMENTS(menu[i]->keys); j++)
+			if (menu[i]->keys[j] == key)
+				return set_view(menu[i], NULL);
 	}
 
-	/* Shift windows */
-	int num   = ACTIVE;
+	/* Shift windows with left/right keys */
 	int shift = key == KEY_RIGHT ? +1 :
 		    key == KEY_LEFT  ? -1 : 0;
-	while (shift) {
-		num += shift;
-		num += N_ELEMENTS(views);
-		num %= N_ELEMENTS(views);
-		if (views[num].run)
-			return view_set(num, -1);
+	if (shift) {
+		int num = 0;
+		for (int i = 0; i < N_ELEMENTS(menu); i++)
+			if (menu[i] == active)
+				num = i;
+		do  {
+			num += shift;
+			num += N_ELEMENTS(menu);
+			num %= N_ELEMENTS(menu);
+		} while (menu[num] == &spacer);
+		return set_view(menu[num], NULL);
 	}
 
-	/* Handle popup views */
+	/* Handle other keys */
 	switch (key) {
+		case 'c':
+			COMPACT ^= 1;
+			set_bool("view", 0, "compact", COMPACT);
+			view_resize();
+			view_draw();
+			return 1;
 		case '\033': // escape
-			return view_set(ACTIVE, -1);
+			return set_view(active, NULL);
 		case '?':    // help
-			return view_set(ACTIVE, 9);
+			return set_view(active, &help_view);
 		case 'e':    // edit
-			return view_set(ACTIVE, 11);
+			return set_view(active, &edit_view);
 	}
 
 	/* Pass key to active view */
-	int view = POPUP >= 0 ? POPUP : ACTIVE;
-	return views[view].run(key, btn, row, col);
+	return view->run(key, btn, row, col);
 }
