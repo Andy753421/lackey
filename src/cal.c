@@ -112,6 +112,7 @@ void cal_init(void)
 	cal_load(YEAR, MONTH, DAY, 1);
 
 	/* Debug */
+#ifdef DEBUG_CALS
 	for (event_t *e = EVENTS; e; e = e->next)
 		debug("event: %04d-%02d-%02d %02d:%02d: %s - %s",
 				e->start.year, e->start.month, e->start.day,
@@ -120,6 +121,7 @@ void cal_init(void)
 		debug("todo: %04d-%02d-%02d %02d:%02d: %s - %s",
 				e->start.year, e->start.month, e->start.day,
 				e->start.hour, e->start.min, e->name, e->desc);
+#endif
 }
 
 /* Load events and todos */
@@ -170,12 +172,14 @@ void cal_load(year_t year, month_t month, day_t day, int days)
 		 ical_todos(start, end));
 
 	/* Verify events and todos*/
-	//for (event_t *cur = EVENTS; cur; cur = cur->next)
-	//	if (!cur->cal)
-	//		error("Missing cal in event '%s'", cur->name);
-	//for (todo_t *cur = TODOS; cur; cur = cur->next)
-	//	if (!cur->cal)
-	//		error("Missing cal in todo '%s'", cur->name);
+#ifdef DEBUG_CALS
+	for (event_t *cur = EVENTS; cur; cur = cur->next)
+		if (!cur->cal)
+			error("Missing cal in event '%s'", cur->name);
+	for (todo_t *cur = TODOS; cur; cur = cur->next)
+		if (!cur->cal)
+			error("Missing cal in todo '%s'", cur->name);
+#endif
 }
 
 /* Config parser */

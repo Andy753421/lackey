@@ -1,5 +1,5 @@
 PREFIX  ?= /usr
-CFLAGS  ?= -g -Wall -Werror --std=c99
+CFLAGS  ?= -g -Wall -Werror --std=c99 -DDEBUG_CALS
 
 default: all run-lackey
 #default: all run-test

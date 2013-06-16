@@ -372,8 +372,8 @@ void ical_test(void)
 	icalarray_free(array);
 
 	/* Print */
-	//ical_printr(comp, 0);
-	//print_events(events);
+	ical_printr(comp, 0);
+	print_events(events);
 	print_todos(todos);
 
 	(void)print_events;
