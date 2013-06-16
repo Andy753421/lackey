@@ -104,6 +104,40 @@ static int get_color(const char *cat)
 	       match(cat, "work")  ? COLOR_WORK  : COLOR_OTHER ;
 }
 
+static int view_set(int num)
+{
+	if (ACTIVE != num) {
+		ACTIVE = num;
+		set_enum("view", 0, "active", ACTIVE,
+				names, N_ELEMENTS(names));
+		view_draw();
+	}
+	return 1;
+}
+
+/* Curses functions */
+void wmvresize(WINDOW *win, int top, int left, int rows, int cols)
+{
+	int y = getpary(win);
+	if (top < y)
+		mvderwin(win, top, left);
+	wresize(win, rows, cols);
+	if (top > y)
+		mvderwin(win, top, left);
+}
+
+void wshrink(WINDOW *win, int top)
+{
+	int x    = getparx(win);
+	int y    = getpary(win);
+	int r    = getmaxy(win);
+	int c    = getmaxx(win);
+	int rows = r + (y - top);
+	if (top  <  y) mvderwin(win, top, x);
+	if (rows != r) wresize(win, rows, c);
+	if (top  >  y) mvderwin(win, top, x);
+}
+
 /* Helper functions */
 void event_box(WINDOW *win, event_t *event, int y, int x, int h, int w)
 {
@@ -198,29 +232,6 @@ void todo_line(WINDOW *win, todo_t *todo, int y, int x, int w, int full)
 	mvwprintw(win, y, x, "%s", desc);
 }
 
-/* Curses functions */
-void wmvresize(WINDOW *win, int top, int left, int rows, int cols)
-{
-	int y = getpary(win);
-	if (top < y)
-		mvderwin(win, top, left);
-	wresize(win, rows, cols);
-	if (top > y)
-		mvderwin(win, top, left);
-}
-
-void wshrink(WINDOW *win, int top)
-{
-	int x    = getparx(win);
-	int y    = getpary(win);
-	int r    = getmaxy(win);
-	int c    = getmaxx(win);
-	int rows = r + (y - top);
-	if (top  <  y) mvderwin(win, top, x);
-	if (rows != r) wresize(win, rows, c);
-	if (top  >  y) mvderwin(win, top, x);
-}
-
 /* View init */
 void view_init(void)
 {
@@ -267,18 +278,6 @@ void view_draw(void)
 	werase(views[ACTIVE].win);
 	views[ACTIVE].draw();
 	wrefresh(views[ACTIVE].win);
-}
-
-/* View set */
-int view_set(int num)
-{
-	if (ACTIVE != num) {
-		ACTIVE = num;
-		set_enum("view", 0, "active", ACTIVE,
-				names, N_ELEMENTS(names));
-		view_draw();
-	}
-	return 1;
 }
 
 /* View run */
