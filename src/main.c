@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define _XOPEN_SOURCE
+
 #include <stdlib.h>
 #include <signal.h>
 #include <locale.h>
@@ -45,6 +47,10 @@ int main(int argc, char **argv)
 {
 	/* Misc setup */
 	signal(SIGINT, on_sigint);
+
+	/* Set default escape timeout */
+	if (!getenv("ESCDELAY"))
+		putenv("ESCDELAY=25");
 
 	/* Setup Curses */
 	setlocale(LC_ALL, "");
