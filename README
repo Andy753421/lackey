@@ -15,7 +15,7 @@ Build and install lackey:
 
 Running lackey
 --------------
-Start lackey from from a termainl:
+Start lackey from from a terminal:
 
     lackey
 
@@ -23,6 +23,6 @@ Start lackey from from a termainl:
 Hacking
 -------
 Common source files are in the src directory. Each Curses screen has it's own
-source file in the view directory and each calendar backend has a source file
-in the cal directory. The views and calendar backends are access though the
+source file in the views directory and each calendar backend has a source file
+in the cals directory. The views and calendar backends are access though the
 view.c and cal.c files, respectively.

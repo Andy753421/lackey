@@ -2,10 +2,10 @@ PREFIX  ?= /usr
 CFLAGS  ?= -g -Wall -Werror --std=c99
 
 default: all run-lackey
+#default: all run-test
 
 run-lackey: lackey
 	@urxvt -e ./$<
-	@cat /tmp/lackey.log
 
 run-test: test
-	./$<
+	./$< date ical conf

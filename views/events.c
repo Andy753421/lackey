@@ -19,10 +19,10 @@
 
 #include <ncurses.h>
 
-#include <util.h>
-#include <date.h>
-#include <cal.h>
-#include <view.h>
+#include "util.h"
+#include "date.h"
+#include "cal.h"
+#include "view.h"
 
 /* Static data */
 static WINDOW *win;
