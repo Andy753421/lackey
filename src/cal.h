@@ -39,6 +39,7 @@ typedef struct event_t {
 	date_t          end;
 	const cal_t    *cal;
 	struct event_t *next;
+	struct event_t *prev;
 } event_t;
 
 typedef struct todo_t {
@@ -50,6 +51,7 @@ typedef struct todo_t {
 	date_t         due;
 	cal_t         *cal;
 	struct todo_t *next;
+	struct todo_t *prev;
 } todo_t;
 
 /* Global data */

@@ -48,6 +48,7 @@ static void add_event(event_t **first, event_t **last, event_t **next)
 		(*last)->next = *next;
 	else
 		(*first) = *next;
+	(*next)->prev = *last;
 	(*last) = (*next);
 	(*next) = (*next)->next;
 }
@@ -58,6 +59,7 @@ static void add_todo(todo_t **first, todo_t **last, todo_t **next)
 		(*last)->next = *next;
 	else
 		(*first) = *next;
+	(*next)->prev = *last;
 	(*last) = (*next);
 	(*next) = (*next)->next;
 }
@@ -173,12 +175,20 @@ void cal_load(year_t year, month_t month, day_t day, int days)
 
 	/* Verify events and todos*/
 #ifdef DEBUG_CALS
-	for (event_t *cur = EVENTS; cur; cur = cur->next)
+	for (event_t *cur = EVENTS; cur; cur = cur->next) {
 		if (!cur->cal)
 			error("Missing cal in event '%s'", cur->name);
-	for (todo_t *cur = TODOS; cur; cur = cur->next)
+		if ((cur->next && cur->next->prev != cur) ||
+		    (cur->prev && cur->prev->next != cur))
+			error("Broken link in event '%s'", cur->name);
+	}
+	for (todo_t *cur = TODOS; cur; cur = cur->next) {
 		if (!cur->cal)
 			error("Missing cal in todo '%s'", cur->name);
+		if ((cur->next && cur->next->prev != cur) ||
+		    (cur->prev && cur->prev->next != cur))
+			error("Broken link in todo '%s'", cur->name);
+	}
 #endif
 }
 
