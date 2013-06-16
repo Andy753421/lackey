@@ -62,21 +62,23 @@ static const char *names[] = {
 };
 
 view_t views[] = {
-	{ "Day",      day_init,      day_size,      day_draw,      day_run,      {KEY_F(1), '1',    } },
-	{ "Week",     week_init,     week_size,     week_draw,     week_run,     {KEY_F(2), '2',    } },
-	{ "Month",    month_init,    month_size,    month_draw,    month_run,    {KEY_F(3), '3',    } },
-	{ "Year",     year_init,     year_size,     year_draw,     year_run,     {KEY_F(4), '4',    } },
-	{ "|",        NULL,          NULL,          NULL,          NULL,         {                  } },
-	{ "Events",   events_init,   events_size,   events_draw,   events_run,   {KEY_F(5), '5',    } },
-	{ "Todo",     todo_init,     todo_size,     todo_draw,     todo_run,     {KEY_F(6), '6',    } },
-	{ "|",        NULL,          NULL,          NULL,          NULL,         {                  } },
-	{ "Settings", settings_init, settings_size, settings_draw, settings_run, {KEY_F(7), '7',    } },
-	{ "Help",     help_init,     help_size,     help_draw,     help_run,     {KEY_F(8), '8', '?'} },
+	{ "Day",      day_init,      day_size,      day_draw,      day_run,      {KEY_F(1), '1'} },
+	{ "Week",     week_init,     week_size,     week_draw,     week_run,     {KEY_F(2), '2'} },
+	{ "Month",    month_init,    month_size,    month_draw,    month_run,    {KEY_F(3), '3'} },
+	{ "Year",     year_init,     year_size,     year_draw,     year_run,     {KEY_F(4), '4'} },
+	{ "|",        NULL,          NULL,          NULL,          NULL,         {             } },
+	{ "Events",   events_init,   events_size,   events_draw,   events_run,   {KEY_F(5), '5'} },
+	{ "Todo",     todo_init,     todo_size,     todo_draw,     todo_run,     {KEY_F(6), '6'} },
+	{ "|",        NULL,          NULL,          NULL,          NULL,         {             } },
+	{ "Settings", settings_init, settings_size, settings_draw, settings_run, {KEY_F(7), '7'} },
+	{ "Help",     help_init,     help_size,     help_draw,     help_run,     {KEY_F(8), '8'} },
+	{ NULL,       NULL,          NULL,          NULL,          NULL,         {             } },
 };
 
 /* Config data */
 int COMPACT = 0;
 int ACTIVE  = 0;
+int POPUP   = -1;
 
 /* Local functions */
 static void draw_header(void)
@@ -84,11 +86,20 @@ static void draw_header(void)
 	move(0, 0);
 	attron(COLOR_PAIR(COLOR_TITLE));
 	for (int i = 0; i < N_ELEMENTS(views); i++) {
+		if (!views[i].name)
+			break;
 		if (i == ACTIVE)
 			attron(A_BOLD);
 		printw("%s ", views[i].name);
 		if (i == ACTIVE)
 			attroff(A_BOLD);
+	}
+	clrtoeol();
+	if (POPUP >= 0) {
+		attron(A_BOLD);
+		move(0, COLS-strlen(views[POPUP].name)-2);
+		printw("[%s]", views[POPUP].name);
+		attroff(A_BOLD);
 	}
 	attroff(COLOR_PAIR(COLOR_TITLE));
 	if (!COMPACT)
@@ -104,12 +115,16 @@ static int get_color(const char *cat)
 	       match(cat, "work")  ? COLOR_WORK  : COLOR_OTHER ;
 }
 
-static int view_set(int num)
+static int view_set(int active, int popup)
 {
-	if (ACTIVE != num) {
-		ACTIVE = num;
+	if (ACTIVE != active) {
+		ACTIVE = active;
 		set_enum("view", 0, "active", ACTIVE,
 				names, N_ELEMENTS(names));
+		view_draw();
+	}
+	if (POPUP != popup) {
+		POPUP = popup;
 		view_draw();
 	}
 	return 1;
@@ -274,10 +289,11 @@ void view_resize(void)
 /* View draw */
 void view_draw(void)
 {
+	int view = POPUP >= 0 ? POPUP : ACTIVE;
 	draw_header();
-	werase(views[ACTIVE].win);
-	views[ACTIVE].draw();
-	wrefresh(views[ACTIVE].win);
+	werase(views[view].win);
+	views[view].draw();
+	wrefresh(views[view].win);
 }
 
 /* View run */
@@ -298,7 +314,7 @@ int view_run(int key, mmask_t btn, int row, int col)
 		for (int i = 0; i < N_ELEMENTS(views); i++) {
 			int end = start + strlen(views[i].name) - 1;
 			if (start <= col && col <= end && views[i].draw)
-				return view_set(i);
+				return view_set(i, -1);
 			start = end + 2;
 		}
 	}
@@ -309,7 +325,7 @@ int view_run(int key, mmask_t btn, int row, int col)
 			continue;
 		for (int j = 0; j < N_ELEMENTS(views[i].keys); j++)
 			if (views[i].keys[j] == key)
-				return view_set(i);
+				return view_set(i, -1);
 	}
 
 	/* Shift windows */
@@ -321,9 +337,18 @@ int view_run(int key, mmask_t btn, int row, int col)
 		num += N_ELEMENTS(views);
 		num %= N_ELEMENTS(views);
 		if (views[num].run)
-			return view_set(num);
+			return view_set(num, -1);
+	}
+
+	/* Handle popup views */
+	switch (key) {
+		case '\033': // escape
+			return view_set(ACTIVE, -1);
+		case '?':    // help
+			return view_set(ACTIVE, 9);
 	}
 
 	/* Pass key to active view */
-	return views[ACTIVE].run(key, btn, row, col);
+	int view = POPUP >= 0 ? POPUP : ACTIVE;
+	return views[view].run(key, btn, row, col);
 }

@@ -31,6 +31,7 @@
 /* Config data */
 extern int COMPACT;
 extern int ACTIVE;
+extern int POPUP;
 
 /* Curses functions */
 void wmvresize(WINDOW *win, int top, int left, int rows, int cols);
