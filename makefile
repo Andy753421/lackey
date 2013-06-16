@@ -1,5 +1,5 @@
 # lackey - curses calendar program
-# See COPYING file for copyright and license details.
+# See COPYING file for license details.
 
 -include config.mk
 
