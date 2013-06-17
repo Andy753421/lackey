@@ -32,8 +32,19 @@
 #define SHOW_DETAILS 0x1
 #define SHOW_ACTIVE  0x2
 
+/* Edit modes */
+typedef enum {
+	EDIT_NONE,
+	EDIT_CAL,
+	EDIT_EVENT,
+	EDIT_TODO,
+} edit_t;
+
 /* Config data */
-extern int COMPACT;
+extern int COMPACT; // reduce layout spacing
+
+/* Global data */
+extern edit_t EDIT; // edit mode 0=cal 1=event 3=todo
 
 /* Curses functions */
 void wmvresize(WINDOW *win, int top, int left, int rows, int cols);
@@ -50,3 +61,4 @@ void view_config(const char *group, const char *name, const char *key, const cha
 void view_resize(void);
 void view_draw(void);
 int  view_run(int key, mmask_t btn, int row, int col);
+void view_edit(edit_t mode);

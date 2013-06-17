@@ -33,9 +33,9 @@ CAL(dummy);
 CAL(ical);
 
 /* Global data */
-cal_t   *CALS;
-event_t *EVENTS;
-todo_t  *TODOS;
+cal_t   *CAL,   *CALS;
+event_t *EVENT, *EVENTS;
+todo_t  *TODO,  *TODOS;
 
 /* Local data */
 static date_t start;

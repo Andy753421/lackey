@@ -81,8 +81,11 @@ view_t *menu[] = {
 	&spacer, &settings_view, &help_view
 };
 
-/* Global data */
+/* Config data */
 int COMPACT = 0;
+
+/* Global data */
+edit_t EDIT = EDIT_NONE;
 
 /* Local data */
 view_t *view   = &day_view;
@@ -206,7 +209,7 @@ void event_line(WINDOW *win, event_t *event, int y, int x, int w, int flags)
 	mvwaddch(win, y, x++, ACS_BLOCK);
 	if (color) wattroff(win, COLOR_PAIR(color));
 
-	if (flags & SHOW_ACTIVE)
+	if (flags & SHOW_ACTIVE && event == EVENT)
 		wattron(win, A_REVERSE | A_BOLD);
 	if (flags & SHOW_DETAILS) {
 		if (all_day(&event->start, &event->end))
@@ -226,7 +229,7 @@ void event_line(WINDOW *win, event_t *event, int y, int x, int w, int flags)
 	if (flags & SHOW_DETAILS && event->loc) {
 		mvwprintw(win, y, x, " @ %s", event->loc);
 	}
-	if (flags & SHOW_ACTIVE)
+	if (flags & SHOW_ACTIVE && event == EVENT)
 		wattroff(win, A_REVERSE | A_BOLD);
 }
 
@@ -250,7 +253,7 @@ void todo_line(WINDOW *win, todo_t *todo, int y, int x, int w, int flags)
 	x += 2;
 
 	/* Set background */
-	if (flags & SHOW_ACTIVE)
+	if (flags & SHOW_ACTIVE && todo == TODO)
 		wattron(win, A_REVERSE | A_BOLD);
 	mvwhline(win, y, x, ' ', COLS-x);
 
@@ -275,7 +278,7 @@ void todo_line(WINDOW *win, todo_t *todo, int y, int x, int w, int flags)
 	mvwprintw(win, y, x, "%s", desc);
 
 	/* Reset flags */
-	if (flags & SHOW_ACTIVE)
+	if (flags & SHOW_ACTIVE && todo == TODO)
 		wattroff(win, A_REVERSE | A_BOLD);
 }
 
@@ -386,4 +389,11 @@ int view_run(int key, mmask_t btn, int row, int col)
 
 	/* Pass key to active view */
 	return view->run(key, btn, row, col);
+}
+
+/* View event */
+void view_edit(edit_t mode)
+{
+	EDIT = mode;
+	set_view(active, &edit_view);
 }

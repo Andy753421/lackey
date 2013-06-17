@@ -55,9 +55,9 @@ typedef struct todo_t {
 } todo_t;
 
 /* Global data */
-extern cal_t   *CALS;
-extern event_t *EVENTS;
-extern todo_t  *TODOS;
+extern cal_t   *CAL,   *CALS;
+extern event_t *EVENT, *EVENTS;
+extern todo_t  *TODO,  *TODOS;
 
 /* Calendar functions */
 void cal_init(void);
