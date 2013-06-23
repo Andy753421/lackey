@@ -79,7 +79,7 @@ void events_draw(void)
 				mvwprintw(win, row-line, 0,  "%04d-%02d-%02d",
 					next.year, next.month+1, next.day+1);
 				mvwprintw(win, row-line, 13, "%s, %s %d",
-					day_to_string(wday), month_to_string(next.month), next.day);
+					day_to_string(wday), month_to_string(next.month), next.day+1);
 				wattroff(win, A_BOLD);
 				row++;
 			}

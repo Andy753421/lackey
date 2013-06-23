@@ -119,8 +119,8 @@ static void draw_header(void)
 	/* Draw date */
 	move(0, COLS-19);
 	printw("%04d-%02d-%02d %02d:%02d:%02d",
-			NOW.year, NOW.month, NOW.day,
-			NOW.hour, NOW.min,   NOW.sec);
+			NOW.year, NOW.month+1, NOW.day+1,
+			NOW.hour, NOW.min,     NOW.sec);
 
 	attroff(COLOR_PAIR(COLOR_TITLE));
 	if (!COMPACT)

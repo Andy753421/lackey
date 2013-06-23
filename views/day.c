@@ -121,7 +121,7 @@ void day_draw(void)
 	if (COMPACT) wattron(win, A_REVERSE | A_BOLD);
 	mvwhline(win, 0, 0, ' ', COLS);
 	mvwprintw(win, 0, 0, "%s, %s %d", dstr, mstr, SEL.day+1);
-	mvwprintw(win, 0, COLS-10, "%d-%02d-%02d", SEL.year, SEL.month, SEL.day+1);
+	mvwprintw(win, 0, COLS-10, "%d-%02d-%02d", SEL.year, SEL.month+1, SEL.day+1);
 	if (COMPACT) wattroff(win, A_REVERSE | A_BOLD);
 
 	/* Print all day events */
