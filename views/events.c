@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string.h>
 #include <ncurses.h>
 
 #include "util.h"
@@ -87,8 +88,10 @@ void events_draw(void)
 			/* Print event info */
 			event_line(win, event, row++-line, 4, COLS-4,
 					SHOW_DETAILS | SHOW_ACTIVE);
-			if (event->name && event->desc)
-				mvwprintw(win, row++-line, 14, "%s", event->desc);
+			if (event->name && event->desc) {
+				int n = MIN(COLS-14, strcspn(event->desc, "\n"));
+				mvwprintw(win, row++-line, 14, "%.*s", n, event->desc);
+			}
 
 			cur = next;
 			count += 1;
