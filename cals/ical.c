@@ -152,17 +152,16 @@ static void read_icals(void)
 		if (cal->comp == NULL && cal->location) {
 			wordexp_t wexp;
 			wordexp(cal->location, &wexp, WRDE_NOCMD);
-			if (wexp.we_wordc == 0)
-				continue;
-			FILE *file = fopen(wexp.we_wordv[0], "r");
-			wordfree(&wexp);
-			if (!file)
-				continue;
-
 			icalparser *parser = icalparser_new();
-			icalparser_set_gen_data(parser, file);
+			for (int i = 0; i < wexp.we_wordc; i++) {
+				FILE *file = fopen(wexp.we_wordv[i], "r");
+				if (!file)
+					continue;
+				icalparser_set_gen_data(parser, file);
+			}
 			cal->comp = icalparser_parse(parser, (void*)fgets);
 			icalparser_free(parser);
+			wordfree(&wexp);
 		}
 	}
 }
