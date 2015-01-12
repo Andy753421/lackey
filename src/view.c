@@ -83,6 +83,7 @@ view_t *menu[] = {
 
 /* Config data */
 int COMPACT = 0;
+int MORNING = 8;
 
 /* Global data */
 edit_t EDIT = EDIT_NONE;
@@ -299,6 +300,8 @@ void view_config(const char *group, const char *name, const char *key, const cha
 	if (match(group, "view")) {
 		if (match(key, "compact")) {
 			COMPACT = get_bool(value);
+		} else if (match(key, "morning")) {
+			MORNING = get_number(value);
 		} else if (match(key, "active")) {
 			for (int i = 0; i < N_ELEMENTS(views); i++) {
 				if (match(value, views[i]->name)) {

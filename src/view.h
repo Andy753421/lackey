@@ -42,6 +42,7 @@ typedef enum {
 
 /* Config data */
 extern int COMPACT; // reduce layout spacing
+extern int MORNING; // first line to display
 
 /* Global data */
 extern edit_t EDIT; // edit mode 0=cal 1=event 3=todo

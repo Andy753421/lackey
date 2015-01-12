@@ -94,7 +94,7 @@ void day_init(WINDOW *_win)
 	win   = _win; //    lines    cols    y  x
 	times = derwin(win, LINES-2,      5, 0, 0);
 	body  = derwin(win, LINES-2, COLS-5, 0, 5);
-	line  = 10*4; // 10:00
+	line  = MORNING*4;
 }
 
 /* Day size */
