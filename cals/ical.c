@@ -101,11 +101,7 @@ static void add_recur(cal_t *cal,
 		cend   = icalcomponent_get_dtend(comp);
 		length = icaltime_subtract(cend, cstart);
 
-		rrule  = icalcomponent_get_first_property(comp, ICAL_RRULE_PROPERTY);
-		recur  = icalproperty_get_rrule(rrule);
-		iter   = icalrecur_iterator_new(recur, cstart);
-
-		/* Add recurrences */
+		/* Full day event */
 		if (icaltime_is_null_time(cstart) ||
 		    which == ICAL_VTODO_COMPONENT) {
 			icalarray_append(array, &(ical_inst){
@@ -114,27 +110,38 @@ static void add_recur(cal_t *cal,
 				.start = cstart,
 				.end   = cend,
 			});
-		} else while (1) {
-			istart = iend = icalrecur_iterator_next(iter);
-			if (icaltime_is_null_time(istart))
-				break;    // no more instances
-			if (!icaltime_is_null_time(cend))
-				iend = icaltime_add(iend, length);
-
-			if (icaltime_compare(iend, start) <= 0)
-				continue; // instance ends before start time
-			if (icaltime_compare(istart, end) >= 0)
-				break;    // instance begins after stop time
-
-			icalarray_append(array, &(ical_inst){
-				.cal   = cal,
-				.comp  = comp,
-				.start = istart,
-				.end   = iend,
-			});
 		}
 
-		icalrecur_iterator_free(iter);
+		/* Add all recurrences */
+		rrule = icalcomponent_get_first_property(comp, ICAL_RRULE_PROPERTY);
+		while (rrule) {
+			recur = icalproperty_get_rrule(rrule);
+			iter  = icalrecur_iterator_new(recur, cstart);
+
+			/* Add recurrence for this rrule */
+			while (1) {
+				istart = iend = icalrecur_iterator_next(iter);
+				if (icaltime_is_null_time(istart))
+					break;    // no more instances
+				if (!icaltime_is_null_time(cend))
+					iend = icaltime_add(iend, length);
+
+				if (icaltime_compare(iend, start) <= 0)
+					continue; // instance ends before start time
+				if (icaltime_compare(istart, end) >= 0)
+					break;    // instance begins after stop time
+
+				icalarray_append(array, &(ical_inst){
+					.cal   = cal,
+					.comp  = comp,
+					.start = istart,
+					.end   = iend,
+				});
+			}
+
+			icalrecur_iterator_free(iter);
+			rrule = icalcomponent_get_next_property(comp, ICAL_RRULE_PROPERTY);
+		}
 	}
 
 	/* Add children */
