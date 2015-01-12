@@ -80,6 +80,7 @@ void add_months(year_t *year, month_t *month, int months);
 stamp_t get_stamp(date_t *date);
 int get_mins(date_t *start, date_t *end);
 int compare(date_t *a, date_t *b);
+int same_day(date_t *a, date_t *b);
 int before(date_t *start, int year, int month, int day, int hour, int min);
 
 int all_day(date_t *start, date_t *end);

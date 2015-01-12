@@ -178,7 +178,7 @@ void wshrink(WINDOW *win, int top)
 /* Helper functions */
 void event_box(WINDOW *win, event_t *event, int y, int x, int h, int w)
 {
-	int l = 0;
+	int i, l = 0;
 	int s = y < 0 ? -y-1 : 0;
 
 	int color = get_color(event->cat);
@@ -195,11 +195,18 @@ void event_box(WINDOW *win, event_t *event, int y, int x, int h, int w)
 	if (h >= 2) mvwadd_wch(win,   y+h-1, x+w-1, WACS_T_LRCORNER);
 	if (h >= 2) mvwhline_set(win, y+h-1, x+1,   WACS_T_HLINE, w-2);
 
+	for (i = 1; i < h-1; i++)
+		mvwhline(win, y+i, x+1, ' ', w-2);
+
 	if (color) wattroff(win, COLOR_PAIR(color));
 
+	if (event == EVENT)     wattron(win, WA_BOLD | WA_REVERSE);
+	if (event == EVENT)     mvwhline(win, y+s, x, ' ', w);
 	if (l<h && event->name) mvwprintw(win, y+l++, x+1, "%.*s",   w-2, event->name);
+	if (event == EVENT)     wattroff(win, WA_REVERSE);
 	if (l<h && event->loc)  mvwprintw(win, y+l++, x+1, "@ %.*s", w-4, event->loc);
 	if (l<h && event->desc) mvwprintw(win, y+l++, x+1, "%.*s",   w-2, event->desc);
+	if (event == EVENT)     wattroff(win, WA_BOLD);
 }
 
 void event_line(WINDOW *win, event_t *event, int y, int x, int w, int flags)

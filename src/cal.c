@@ -200,3 +200,33 @@ void cal_config(const char *group, const char *name, const char *key, const char
 	else if (match(group, "ical"))
 		ical_config(group, name, key, value);
 }
+
+/* Find event for matching target date */
+event_t *find_event(date_t *target)
+{
+	int      min   = 0;
+	event_t *event = NULL;
+
+	if (EVENT && compare(&EVENT->start, target) == 0)
+		return EVENT;
+
+	for (event_t *cur = EVENTS; cur; cur = cur->next) {
+		// Skip events that are on the wrong day
+		if ((target->year  != cur->start.year) ||
+		    (target->month != cur->start.month) ||
+		    (target->day   != cur->start.day))
+		    	continue;
+
+		// We don't want time change or leap seconds here
+		int diff = (target->hour - cur->start.hour) * 60 * 24 +
+			   (target->min  - cur->start.min)  * 60 +
+			   (target->sec  - cur->start.sec);
+
+		if (event == NULL || ABS(diff) < min) {
+			min   = ABS(diff);
+			event = cur;
+		}
+	}
+
+	return event;
+}

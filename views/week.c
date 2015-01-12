@@ -24,6 +24,10 @@
 #include "cal.h"
 #include "view.h"
 
+/* From day.c */
+int get_col(event_t **list, int n, event_t *event, int *ncols);
+void move_event(int events, int days, int *line);
+
 /* Static data */
 static int     line;
 static WINDOW *win;
@@ -53,7 +57,8 @@ void week_draw(void)
 	int x = 6;
 	int y = 3 - COMPACT;
 	const float hstep = (float)(COLS-x)/7.0;
-	event_t *event;
+	int ex, ey, ew, eh;
+	event_t *event, *ee;
 
 	/* Get start of week */
 	year_t  year  = SEL.year;
@@ -99,7 +104,7 @@ void week_draw(void)
 			    get_mins(&event->start, &event->end) > 23*60) {
 				int s = ROUND(d*hstep);
 				int w = ROUND((d+1)*hstep) - 1 - s;
-				event_line(win, event, y+n++, x+s, w, 0);
+				event_line(win, event, y+n++, x+s, w, SHOW_ACTIVE);
 			}
 			event = event->next;
 			if (n > allday)
@@ -120,8 +125,13 @@ void week_draw(void)
 		mvwprintw(times, !COMPACT+h*4-line, 0, "%02d:%02d", (h-1)%12+1, 0);
 
 	/* Print events */
+	if (!EVENT)
+		EVENT = find_event(&SEL);
+	ee = NULL;
 	event = EVENTS;
 	add_days(&year, &month, &day, -7);
+	event_t *active[5] = {};
+	int ncols = 0;
 	for (int d = 0; d <  7; d++, add_days(&year,&month,&day,1))
 	for (int h = 0; h < 24; h++)
 	for (int m = 0; m < 60; m+=15)
@@ -129,14 +139,22 @@ void week_draw(void)
 			year, month, day, h+(m+15)/60, (m+15)%60)) {
 		if (!before(&event->start, year, month, day, h, m) &&
 		    get_mins(&event->start, &event->end) <= 23*60) {
+			int col = get_col(active, N_ELEMENTS(active), event, &ncols);
 			int y = h*4 + m/15 - line + !COMPACT;
-			int x = ROUND(d*hstep) + 1;
+			int x = ROUND(d*hstep) + 1 + (col*3);
 			int h = (get_mins(&event->start, &event->end)-1)/15+1;
-			int w = ROUND((d+1)*hstep) - x;
-			event_box(body, event, y, x, h, w);
+			int w = ROUND((d+1)*hstep) - x - ((ncols-1)-col)*3;
+			if (event == EVENT) {
+				ee = event; ex = x; ey = y; ew = w; eh = h;
+			} else
+				event_box(body, event, y, x, h, w);
 		}
 		event = event->next;
 	}
+
+	/* Draw current event on top of other events */
+	if (ee)
+		event_box(body, ee, ey, ex, eh, ew);
 
 	/* Print header lines */
 	if (!COMPACT)
@@ -160,23 +178,27 @@ void week_draw(void)
 /* Week run */
 int week_run(int key, mmask_t btn, int row, int col)
 {
-	int days = 0, ref = 0;
-	switch (key)
-	{
-		case 'h': ref = 1; days = -1; break;
-		case 'l': ref = 1; days =  1; break;
-		case 'i': ref = 1; days = -7; break;
-		case 'o': ref = 1; days =  7; break;
-		case 'k': ref = 1; line--;    break;
-		case 'j': ref = 1; line++;    break;
+	int days = 0, events = 0, lines = 0;
+	switch (key) {
+		case 'h':    days   = -1; break;
+		case 'l':    days   =  1; break;
+		case 'i':    days   = -7; break;
+		case 'o':    days   =  7; break;
+		case 'k':    events = -1; break;
+		case 'j':    events =  1; break;
+		case '\031': lines  = -1; break; // ctrl-y
+		case '\005': lines  =  1; break; // ctrl-e
+		case '\012': view_edit(EDIT_EVENT); return 1; // enter
+		default:     return 0; // not found
 	}
-	line = CLAMP(line, 0, 24*4);
-	if (days)
-		add_days(&SEL.year, &SEL.month, &SEL.day, days);
-	if (ref) {
-		werase(win);
-		week_draw();
-		wrefresh(win);
-	}
-	return ref;
+
+	if (lines)
+		line = CLAMP(line+lines, 0, 24*4);
+	if (days || events)
+		move_event(events, days, &line);
+
+	werase(win);
+	week_draw();
+	wrefresh(win);
+	return 1;
 }

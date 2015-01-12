@@ -143,6 +143,13 @@ int compare(date_t *a, date_t *b)
 	return rval;
 }
 
+int same_day(date_t *a, date_t *b)
+{
+	return a->year  == b->year  &&
+	       a->month == b->month &&
+	       a->day   == b->day;
+}
+
 int before(date_t *start, int year, int month, int day, int hour, int min)
 {
 	return compare(start, &(date_t){year, month, day, hour, min}) < 0;
