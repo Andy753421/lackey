@@ -22,6 +22,7 @@
 
 void date_test(void);
 void conf_test(void);
+void form_test(void);
 void ical_test(void *path);
 
 int main(int argc, char **argv)
@@ -29,6 +30,7 @@ int main(int argc, char **argv)
 	for (int i = 1; i < argc; i++) {
 		if (match(argv[i], "date")) date_test();
 		if (match(argv[i], "conf")) conf_test();
+		if (match(argv[i], "form")) form_test();
 		if (match(argv[i], "ical")) ical_test(argv[++i]);
 	}
 	return 0;

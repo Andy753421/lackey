@@ -16,9 +16,9 @@ LDFLAGS   ?= -lncursesw -lical
 
 # Sources
 PROG      ?= lackey
-PROG_SRC  ?= main view date cal conf util
+PROG_SRC  ?= main view form date cal conf util
 TEST      ?= test
-TEST_SRC  ?= test date cal conf util
+TEST_SRC  ?= test form date cal conf util
 VIEWS     ?= day week month year events todo settings help edit
 CALS      ?= dummy ical
 
