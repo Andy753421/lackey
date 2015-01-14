@@ -350,10 +350,10 @@ void ical_printr(icalcomponent *comp, int depth)
 	}
 }
 
-void ical_test(void)
+void ical_test(char *path)
 {
 	/* Load ical */
-	FILE *file = fopen("data/all.ics", "r");
+	FILE *file = fopen(path, "r");
 	icalparser *parser = icalparser_new();
 	icalparser_set_gen_data(parser, file);
 	icalcomponent *comp = icalparser_parse(parser, (void*)fgets);

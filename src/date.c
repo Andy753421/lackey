@@ -208,7 +208,7 @@ const char *day_to_string(wday_t day)
 void date_test(void)
 {
 	printf("Info\n");
-	printf("  Year Month     Start Weeks Days\n");
+	printf("  Year   Month       Start   Weeks   Days\n");
 	for (int y = 2012; y <= 2012; y++)
 	for (int m = JAN;  m <= DEC;  m++) {
 		printf("  %-5d",  y);
