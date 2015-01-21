@@ -84,6 +84,28 @@ int field_width(form_field_t *field)
 	return width;
 }
 
+void field_sizes(form_t *form, int *col_size)
+{
+	// Do this by column, and right to left so that we can add
+	// in the extra space available for blank spaces.
+	for (int c = form->cols-1; c >= 0; c--) {
+		col_size[c] = 0;
+		for (int r = 0; r < form->rows; r++) {
+			form_field_t *field = form->fields[r][c];
+			if (form->fields[r][c]) {
+				int width = field_width(field);
+				for (int i = c+1; i < form->cols; i++) {
+					if (form->fields[r][i])
+						break;
+					width -= col_size[i];
+				}
+				if (width > col_size[c])
+					col_size[c] = width;
+			}
+		}
+	}
+}
+
 void field_draw(WINDOW *win, form_field_t *field, int width, int hover)
 {
 	char **map   = field->list.map;
@@ -225,27 +247,10 @@ void form_resize(void)
 /* Run */
 int form_draw(form_t *form)
 {
-	// Calculate column width
-	//    do this by column, and right to left so that
-	//    we can add in the extra space available for
-	//    blank spaces.
 	int col_size[form->cols];
-	for (int c = form->cols-1; c >= 0; c--) {
-		col_size[c] = 0;
-		for (int r = 0; r < form->rows; r++) {
-			form_field_t *field = form->fields[r][c];
-			if (form->fields[r][c]) {
-				int width = field_width(field);
-				for (int i = c+1; i < form->cols; i++) {
-					if (form->fields[r][i])
-						break;
-					width -= col_size[i];
-				}
-				if (width > col_size[c])
-					col_size[c] = width;
-			}
-		}
-	}
+
+	// Calculate column width
+	field_sizes(form, col_size);
 
 	// Make sure we have an active field
 	if (!can_active(form, form_row, form_col))
@@ -282,6 +287,22 @@ int form_run(form_t *form, int key, mmask_t btn, int row, int col)
 		case 'j': set_active(form,  1,  0); goto redraw;
 		case 'k': set_active(form, -1,  0); goto redraw;
 		case 'l': set_active(form,  0,  1); goto redraw;
+	}
+
+	// Handle mouse movement
+	if (key == KEY_MOUSE && row < form->rows) {
+		int pos=0, col_size[form->cols];
+		field_sizes(form, col_size);
+		for (int c = 0; c < form->cols; c++) {
+			if (pos < col && col < pos+col_size[c]) {
+				if (can_active(form, row, c)) {
+					form_row = row;
+					form_col = c;
+					goto redraw;
+				}
+			}
+			pos += col_size[c];
+		}
 	}
 
 	// Search for hotkeys
