@@ -393,8 +393,6 @@ int view_run(int key, mmask_t btn, int row, int col)
 			return set_view(active, NULL);
 		case '?':    // help
 			return set_view(active, &help_view);
-		case 'e':    // edit
-			return set_view(active, &edit_view);
 	}
 
 	/* Pass key to active view */

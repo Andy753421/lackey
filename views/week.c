@@ -188,6 +188,7 @@ int week_run(int key, mmask_t btn, int row, int col)
 		case 'j':    events =  1; break;
 		case '\031': lines  = -1; break; // ctrl-y
 		case '\005': lines  =  1; break; // ctrl-e
+		case 'e':    view_edit(EDIT_EVENT); return 1;
 		case '\012': view_edit(EDIT_EVENT); return 1; // enter
 		default:     return 0; // not found
 	}

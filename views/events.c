@@ -117,9 +117,8 @@ int events_run(int key, mmask_t btn, int row, int col)
 		case 'U':    scroll = -LINES;   break;
 		case 'j':    move   =  1;       break;
 		case 'k':    move   = -1;       break;
-		case '\012': // enter
-			view_edit(EDIT_EVENT);
-			return 1;
+		case 'e':    view_edit(EDIT_EVENT); return 1;
+		case '\012': view_edit(EDIT_EVENT); return 1; // enter
 	}
 	line   = CLAMP(line+scroll, 0, rows-1);
 	for (int i=0; i<move && EVENT && EVENT->next; i++)

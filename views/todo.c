@@ -128,9 +128,8 @@ int todo_run(int key, mmask_t btn, int row, int col)
 		case 'n':    ref = 1; show_new      ^= 1; break;
 		case 's':    ref = 1; show_started  ^= 1; break;
 		case 'f':    ref = 1; show_finished ^= 1; break;
-		case '\012': // enter
-			view_edit(EDIT_TODO);
-			return 1;
+		case 'e':    view_edit(EDIT_TODO); return 1;
+		case '\012': view_edit(EDIT_TODO); return 1; // enter
 	}
 
 	/* Move more if we're on the edge of a group */
