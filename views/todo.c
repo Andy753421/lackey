@@ -65,8 +65,10 @@ static int print_group(WINDOW *win, int row, todo_t *todos,
 	int n = 1;
 
 	/* Label */
-	wattron(win, A_BOLD);
-	mvwprintw(win, row, 0, "%s", label);
+	wattron(win, A_BOLD | A_UNDERLINE);
+	mvwprintw(win, row, 0, "%c",  label[0]);
+	wattroff(win, A_UNDERLINE);
+	mvwprintw(win, row, 1, "%s", &label[1]);
 	wattroff(win, A_BOLD);
 
 	/* Todos */
