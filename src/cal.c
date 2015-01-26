@@ -26,7 +26,9 @@
 	void     name##_config(const char *group, const char *name, const char *key, const char *value); \
 	cal_t   *name##_cals(void); \
 	event_t *name##_events(date_t start, date_t end); \
-	todo_t  *name##_todos(date_t start, date_t end)
+	todo_t  *name##_todos(date_t start, date_t end); \
+	void     name##_edit(edit_t mode); \
+	void     name##_save(edit_t mode)
 
 /* Prototypes */
 CAL(dummy);
@@ -199,6 +201,26 @@ void cal_config(const char *group, const char *name, const char *key, const char
 		dummy_config(group, name, key, value);
 	else if (match(group, "ical"))
 		ical_config(group, name, key, value);
+}
+
+/* Edit functions */
+void cal_edit(edit_t mode)
+{
+	const cal_t *cal =
+		mode == EDIT_EVENT ? EVENT->cal :
+		mode == EDIT_TODO  ? TODO->cal  : CAL;
+	debug("cal_edit");
+	if (match(cal->type, "dummy")) dummy_edit(mode);
+	if (match(cal->type, "ical"))  ical_edit(mode);
+}
+
+void cal_save(edit_t mode)
+{
+	const cal_t *cal =
+		mode == EDIT_EVENT ? EVENT->cal :
+		mode == EDIT_TODO  ? TODO->cal  : CAL;
+	if (match(cal->type, "dummy")) dummy_save(mode);
+	if (match(cal->type, "ical"))  ical_save(mode);
 }
 
 /* Find event for matching target date */

@@ -15,6 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* Edit modes */
+typedef enum {
+	EDIT_NONE,
+	EDIT_CAL,
+	EDIT_EVENT,
+	EDIT_TODO,
+} edit_t;
+
 /* Cal status types */
 typedef enum {
 	NEW  = 0,
@@ -63,6 +71,10 @@ extern todo_t  *TODO,  *TODOS;
 void cal_init(void);
 void cal_load(year_t year, month_t month, day_t day, int days);
 void cal_config(const char *group, const char *name, const char *key, const char *value);
+
+/* Edit functions */
+void cal_edit(edit_t edit);
+void cal_save(edit_t edit);
 
 /* Event functions */
 event_t *find_event(date_t *target);

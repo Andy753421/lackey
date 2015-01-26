@@ -405,5 +405,6 @@ int view_run(int key, mmask_t btn, int row, int col)
 void view_edit(edit_t mode)
 {
 	EDIT = mode;
+	cal_edit(mode);
 	set_view(active, &edit_view);
 }

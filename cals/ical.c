@@ -329,6 +329,15 @@ todo_t *ical_todos(date_t _start, date_t _end)
 	return todos;
 }
 
+/* Edit functions */
+void ical_edit(edit_t mode)
+{
+}
+
+void ical_save(edit_t mode)
+{
+}
+
 /* Test functions */
 void ical_printr(icalcomponent *comp, int depth)
 {

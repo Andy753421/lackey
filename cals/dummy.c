@@ -99,3 +99,12 @@ todo_t *dummy_todos(date_t start, date_t end)
 	}
 	return enable ? todo.next : 0;
 }
+
+/* Edit functions */
+void dummy_edit(edit_t mode)
+{
+}
+
+void dummy_save(edit_t mode)
+{
+}

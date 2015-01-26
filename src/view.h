@@ -32,14 +32,6 @@
 #define SHOW_DETAILS 0x1
 #define SHOW_ACTIVE  0x2
 
-/* Edit modes */
-typedef enum {
-	EDIT_NONE,
-	EDIT_CAL,
-	EDIT_EVENT,
-	EDIT_TODO,
-} edit_t;
-
 /* Config data */
 extern int COMPACT; // reduce layout spacing
 extern int MORNING; // first line to display
