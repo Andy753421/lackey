@@ -16,19 +16,19 @@
  */
 
 /* Widget Macros */
-#define TEXT(k,...)    {.type=FORM_TEXT,   .hotkey=k, __VA_ARGS__}
-#define NUMBER(k,...)  {.type=FORM_NUMBER, .hotkey=k, __VA_ARGS__}
-#define DATE(k,...)    {.type=FORM_DATE,   .hotkey=k, __VA_ARGS__}
-#define BUTTON(k,...)  {.type=FORM_BUTTON, .hotkey=k, __VA_ARGS__}
-#define LIST(k,...)    {.type=FORM_LIST,   .hotkey=k, __VA_ARGS__}
+#define TEXT(k,...)    {.f.type=FORM_TEXT,   .f.hotkey=k, __VA_ARGS__}
+#define NUMBER(k,...)  {.f.type=FORM_NUMBER, .f.hotkey=k, __VA_ARGS__}
+#define DATE(k,...)    {.f.type=FORM_DATE,   .f.hotkey=k, __VA_ARGS__}
+#define BUTTON(k,...)  {.f.type=FORM_BUTTON, .f.hotkey=k, __VA_ARGS__}
+#define LIST(k,...)    {.f.type=FORM_LIST,   .f.hotkey=k, __VA_ARGS__}
 
 #define HEAD(t,...)    &(form_field_t){.type=FORM_LABEL, .label=t, .attr.bold=1}
 #define LABEL(t,...)   &(form_field_t){.type=FORM_LABEL, .label=t}
 
-#define CHECK(t,...)     {.type=FORM_BUTTON, .label=t}
-#define TOGGLE(t,...)    {.type=FORM_BUTTON, .label=t}
-#define RADIO(t,...)     {.type=FORM_BUTTON, .label=t}
-#define BUTTONS(t,...)   {.type=FORM_BUTTON, .label=t} // LIST[buttons]
+#define CHECK(t,...)   {.f.type=FORM_BUTTON, .f.label=t}
+#define TOGGLE(t,...)  {.f.type=FORM_BUTTON, .f.label=t}
+#define RADIO(t,...)   {.f.type=FORM_BUTTON, .f.label=t}
+#define BUTTONS(t,...) {.f.type=FORM_BUTTON, .f.label=t} // LIST[buttons]
 
 /* Widget types */
 typedef enum {
@@ -45,7 +45,7 @@ typedef struct {
 	int bold : 1;
 } form_attr_t;
 
-/* Form data type */
+/* Form header */
 typedef struct {
 	form_type_t type;
 	form_attr_t attr;
@@ -53,19 +53,37 @@ typedef struct {
 	char       *before;
 	char       *label;
 	char       *after;
-	union {
-		char    text[256];
-		date_t  date;
-		int     number;
-		int     button;
-		struct {
-			char **map;
-			int    num;
-			int    idx;
-		} list;
-	};
 } form_field_t;
 
+/* Form types */
+typedef struct {
+	form_field_t f;
+	char   *text;
+} form_text_t;
+
+typedef struct {
+	form_field_t f;
+	date_t  date;
+} form_date_t;
+
+typedef struct {
+	form_field_t f;
+	int     number;
+} form_number_t;
+
+typedef struct {
+	form_field_t f;
+	int     button;
+} form_button_t;
+
+typedef struct {
+	form_field_t f;
+	char **map;
+	int    num;
+	int    idx;
+} form_list_t;
+
+/* Form structure */
 typedef struct {
 	int rows;
 	int cols;

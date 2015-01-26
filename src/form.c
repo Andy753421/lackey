@@ -29,6 +29,13 @@
 #define NUMBER_WIDTH (10)
 #define DATE_WIDTH   (4+1+2+1+2 +1+ 2+1+2)
 
+/* Widget accessors */
+#define FF_TEXT(f)   (((form_text_t  *)f)->text)
+#define FF_DATE(f)   (((form_date_t  *)f)->date)
+#define FF_NUMBER(f) (((form_number_t*)f)->number)
+#define FF_BUTTON(f) (((form_button_t*)f)->button)
+#define FF_LIST(f)   (((form_list_t  *)f))
+
 /* Local variables */
 static WINDOW *form_win;
 static int     form_row;
@@ -60,8 +67,8 @@ int field_width(form_field_t *field)
 	// Calculate list width
 	int list_size = 0;
 	if (field->type == FORM_LIST) {
-		for (int i = 0; i < field->list.num; i++) {
-			int width = strlen(field->list.map[i]);
+		for (int i = 0; i < FF_LIST(field)->num; i++) {
+			int width = strlen(FF_LIST(field)->map[i]);
 			if (width > list_size)
 				list_size = width;
 		}
@@ -108,8 +115,8 @@ void field_sizes(form_t *form, int *col_size)
 
 void field_draw(WINDOW *win, form_field_t *field, int width, int hover)
 {
-	char **map   = field->list.map;
-	int    idx   = field->list.idx;
+	char **map   = FF_LIST(field)->map;
+	int    idx   = FF_LIST(field)->idx;
 
 	char *before = field->before ?: "";
 	char *after  = field->after  ?: "";
@@ -133,19 +140,19 @@ void field_draw(WINDOW *win, form_field_t *field, int width, int hover)
 			break;
 		case FORM_TEXT:
 			wprintw(win, "%-.*s",
-				maxstr, field->text);
+				maxstr, FF_TEXT(field));
 			break;
 		case FORM_DATE:
-			if (no_date(&field->date))
+			if (no_date(&FF_DATE(field)))
 				wprintw(win, "%s", "undefined");
 			else
 				wprintw(win, "%04d-%02d-%02d %02d:%02d",
-					field->date.year,  field->date.month+1,
-					field->date.day+1, field->date.hour,
-					field->date.min);
+					FF_DATE(field).year,  FF_DATE(field).month+1,
+					FF_DATE(field).day+1, FF_DATE(field).hour,
+					FF_DATE(field).min);
 			break;
 		case FORM_NUMBER:
-			wprintw(win, "%d", field->number);
+			wprintw(win, "%d", FF_NUMBER(field));
 			break;
 		case FORM_BUTTON:
 			wprintw(win, "%s", field->label);
@@ -324,32 +331,32 @@ redraw:
 }
 
 /* Test functions */
-static form_field_t title     = TEXT('t');
-static form_field_t location  = TEXT('o');
-static form_field_t start     = DATE('s');
-static form_field_t end       = DATE('e');
-static form_field_t due_date  = DATE('u');
-static form_field_t completed = NUMBER('p', .after="%");
-static form_field_t calendar  = LIST('c');
-static form_field_t category  = LIST('g');
-static form_field_t repeat    = LIST('r');
-static form_field_t frequency = NUMBER(0);
-static form_field_t weekdays  = BUTTONS("Su Mo Tu We Th Fr Sa");
-static form_field_t details   = TEXT('d');
+static form_text_t   title     = TEXT('t');
+static form_text_t   location  = TEXT('o');
+static form_date_t   start     = DATE('s');
+static form_date_t   end       = DATE('e');
+static form_date_t   due_date  = DATE('u');
+static form_number_t completed = NUMBER('p', .f.after="%");
+static form_list_t   calendar  = LIST('c');
+static form_list_t   category  = LIST('g');
+static form_list_t   repeat    = LIST('r');
+static form_number_t frequency = NUMBER(0);
+static form_button_t weekdays  = BUTTONS("Su Mo Tu We Th Fr Sa");
+static form_text_t   details   = TEXT('d');
 
 static form_t edit = { 12, 4, {
-	{ LABEL("_Title: "),    &title                                         },
-	{ LABEL("L_ocation: "), &location                                      },
-	{                                                                      },
-	{ LABEL("_Start: "),    &start,    LABEL("  _End: "),       &end       },
-	{ LABEL("D_ue Date: "), &due_date, LABEL("  Com_pleted: "), &completed },
-	{ LABEL("_Calendar: "), &calendar, LABEL("  Cate_gory: "),  &category  },
-	{                                                                      },
-	{ LABEL("_Repeat: "),   &repeat,   LABEL("  Every: "),      &frequency },
-	{                                                                      },
-	{ NULL,                 &weekdays                                      },
-	{                                                                      },
-	{ LABEL("_Details: "),  &details                                       },
+	{ LABEL("_Title: "),    &title.f                                           },
+	{ LABEL("L_ocation: "), &location.f                                        },
+	{                                                                          },
+	{ LABEL("_Start: "),    &start.f,    LABEL("  _End: "),       &end.f       },
+	{ LABEL("D_ue Date: "), &due_date.f, LABEL("  Com_pleted: "), &completed.f },
+	{ LABEL("_Calendar: "), &calendar.f, LABEL("  Cate_gory: "),  &category.f  },
+	{                                                                          },
+	{ LABEL("_Repeat: "),   &repeat.f,   LABEL("  Every: "),      &frequency.f },
+	{                                                                          },
+	{ NULL,                 &weekdays.f                                        },
+	{                                                                          },
+	{ LABEL("_Details: "),  &details.f                                         },
 } };
 
 void form_test(void)
