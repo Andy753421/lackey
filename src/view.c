@@ -402,6 +402,16 @@ int view_run(int key, mmask_t btn, int row, int col)
 /* View event */
 void view_edit(edit_t mode)
 {
+	if ((mode == EDIT_CAL   && !CAL)   ||
+	    (mode == EDIT_EVENT && !EVENT) ||
+	    (mode == EDIT_TODO  && !TODO)) {
+		debug("No %s selected for editing",
+			mode == EDIT_CAL   ? "calendar" :
+			mode == EDIT_EVENT ? "event" :
+			mode == EDIT_TODO  ? "todo" : "item");
+		return;
+	}
+
 	EDIT = mode;
 	cal_edit(mode);
 	set_view(active, &edit_view);
