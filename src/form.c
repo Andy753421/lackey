@@ -140,12 +140,13 @@ static void field_draw(form_field_t *field, int width, int hover)
 			label_print(field->label);
 			break;
 		case FORM_TEXT:
-			wprintw(win, "%-.*s",
-				maxstr, FF_TEXT(field));
+			if (FF_TEXT(field))
+				wprintw(win, "%-.*s",
+						maxstr, FF_TEXT(field));
 			break;
 		case FORM_DATE:
 			if (no_date(&FF_DATE(field)))
-				wprintw(win, "%s", "undefined");
+				wprintw(win, "%s", "{undefined}");
 			else
 				wprintw(win, "%04d-%02d-%02d %02d:%02d",
 					FF_DATE(field).year,  FF_DATE(field).month+1,
@@ -162,7 +163,7 @@ static void field_draw(form_field_t *field, int width, int hover)
 			if (map)
 				wprintw(win, "%s", map[idx]);
 			else
-				wprintw(win, "%s", "undefined");
+				wprintw(win, "%s", "{undefined}");
 			break;
 	}
 	int pad = width-(getcurx(win)-begin)-boxed;
