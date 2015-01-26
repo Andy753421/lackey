@@ -90,6 +90,7 @@ typedef struct {
 	form_field_t *fields[][10];
 } form_t;
 
-void form_init(void);
-
-int form_run(form_t *form, int key, mmask_t btn, int row, int col);
+/* Form functions */
+void form_show(form_t *form);
+void form_draw(WINDOW *win);
+int  form_run(int key, mmask_t btn, int row, int col);
