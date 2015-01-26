@@ -45,6 +45,7 @@ static void message(FILE *output_fd, const char *prefix, const char *fmt, va_lis
 		fprintf(output_fd, "%s: ", prefix);
 		vfprintf(output_fd, fmt, tmp);
 		fprintf(output_fd, "\n");
+		fflush(output_fd);
 	}
 
 	/* Log to debug file */
@@ -53,6 +54,7 @@ static void message(FILE *output_fd, const char *prefix, const char *fmt, va_lis
 		fprintf(debug_fd, "%s: ", prefix);
 		vfprintf(debug_fd, fmt, tmp);
 		fprintf(debug_fd, "\n");
+		fflush(debug_fd);
 	}
 
 	/* Log to status bar */

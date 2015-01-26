@@ -116,7 +116,7 @@ void cal_init(void)
 	cal_load(SEL.year, SEL.month, SEL.day, 1);
 
 	/* Debug */
-#ifdef DEBUG_CALS
+#ifdef CAL_DEBUG
 	for (event_t *e = EVENTS; e; e = e->next)
 		debug("event: %04d-%02d-%02d %02d:%02d: %s - %s",
 				e->start.year, e->start.month, e->start.day,
@@ -176,7 +176,7 @@ void cal_load(year_t year, month_t month, day_t day, int days)
 		 ical_todos(start, end));
 
 	/* Verify events and todos*/
-#ifdef DEBUG_CALS
+#ifdef CAL_ERROR
 	for (event_t *cur = EVENTS; cur; cur = cur->next) {
 		if (!cur->cal)
 			error("Missing cal in event '%s'", cur->name);
