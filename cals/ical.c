@@ -20,12 +20,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <wordexp.h>
+#include <ncurses.h>
 #include <libical/ical.h>
 
 #include "util.h"
 #include "conf.h"
 #include "date.h"
 #include "cal.h"
+#include "form.h"
 
 /* Local types */
 typedef struct {
@@ -46,6 +48,55 @@ typedef struct ical_t {
 
 /* Static data */
 static ical_t *calendars;
+
+/* Form fields */
+static form_text_t   ff_name   = TEXT('t');
+static form_text_t   ff_desc   = TEXT('d');
+static form_text_t   ff_loc    = TEXT('o');
+static form_list_t   ff_cat    = LIST('g');
+static form_date_t   ff_start  = DATE('s');
+static form_date_t   ff_end    = DATE('e');
+static form_number_t ff_status = NUMBER('p', .f.after="%");
+static form_date_t   ff_due    = DATE('u');
+static form_list_t   ff_cal    = LIST('c');
+static form_list_t   ff_recur  = LIST('r');
+static form_number_t ff_freq   = NUMBER(0);
+static form_button_t ff_wdays  = BUTTONS("Su Mo Tu We Th Fr Sa");
+
+/* Edit event form */
+static form_t form_cal = { 1, 2, {
+	{ LABEL("_Title: "),     &ff_name.f                                    },
+} };
+
+/* Edit event form */
+static form_t form_event = { 11, 4, {
+	{ LABEL("_Title: "),     &ff_name.f                                      },
+	{ LABEL("L_ocation: "),  &ff_loc.f                                       },
+	{                                                                        },
+	{ LABEL("_Start: "),     &ff_start.f, LABEL("  _End: "),      &ff_end.f  },
+	{ LABEL("_Calendar: "),  &ff_cal.f,   LABEL("  Cate_gory: "), &ff_cat.f  },
+	{                                                                        },
+	{ LABEL("_Repeat: "),    &ff_recur.f, LABEL("  Every: "),     &ff_freq.f },
+	{                                                                        },
+	{ NULL,                  &ff_wdays.f                                     },
+	{                                                                        },
+	{ LABEL("_Details: "),   &ff_desc.f                                      },
+} };
+
+/* Edit todo form */
+static form_t form_todo = { 11, 4, {
+	{ LABEL("_Title: "),     &ff_name.f                                      },
+	{ LABEL("Com_pleted: "), &ff_status.f                                    },
+	{                                                                        },
+	{ LABEL("_Start:    "),  &ff_start.f, LABEL("  D_ue Date: "), &ff_due.f  },
+	{ LABEL("_Calendar: "),  &ff_cal.f,   LABEL("  Cate_gory: "), &ff_cat.f  },
+	{                                                                        },
+	{ LABEL("_Repeat: "),    &ff_recur.f, LABEL("  Every: "),     &ff_freq.f },
+	{                                                                        },
+	{ NULL,                  &ff_wdays.f                                     },
+	{                                                                        },
+	{ LABEL("_Details: "),   &ff_desc.f                                      },
+} };
 
 /* Helper functions */
 static int ical_compare(const void *_a, const void *_b)
@@ -332,10 +383,59 @@ todo_t *ical_todos(date_t _start, date_t _end)
 /* Edit functions */
 void ical_edit(edit_t mode)
 {
+	switch (mode) {
+		case EDIT_NONE:
+			break;
+		case EDIT_CAL:
+			//load_username();
+			//load_password();
+			form_show(&form_cal);
+			break;
+		case EDIT_EVENT:
+			ff_name.text   = strcopy(EVENT->name);
+			ff_desc.text   = strcopy(EVENT->desc);
+			ff_loc.text    = strcopy(EVENT->loc);
+			//ff_cat.text    = strcopy(EVENT->cat);
+			ff_start.date  = EVENT->start;
+			ff_end.date    = EVENT->end;
+			//ff_recur.text = strcopy(EVENT->recur);
+			debug("ical_edit - event");
+			form_show(&form_event);
+			break;
+		case EDIT_TODO:
+			ff_name.text   = strcopy(TODO->name);
+			ff_desc.text   = strcopy(TODO->desc);
+			ff_status.number = TODO->status;
+			//ff_cat.text    = strcopy(TODO->cat);
+			ff_start.date  = TODO->start;
+			ff_due.date    = TODO->due;
+			//ff_recur.text = strcopy(TODO->recur);
+			debug("ical_edit - todo");
+			form_show(&form_todo);
+			break;
+	}
 }
 
 void ical_save(edit_t mode)
 {
+	//if (isevent || istodo) {
+	//	//save_title();
+	//	//save_location();
+	//	//save_recur();
+	//	//save_details();
+	//}
+	//if (isevent) {
+	//	//save_start();
+	//	//save_end();
+	//}
+	//if (istodo) {
+	//	//save_due();
+	//	//save_completed();
+	//}
+	//if (iscal) {
+	//	//save_username();
+	//	//save_password();
+	//}
 }
 
 /* Test functions */

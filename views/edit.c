@@ -23,60 +23,10 @@
 #include "date.h"
 #include "cal.h"
 #include "view.h"
+#include "form.h"
 
 /* Static data */
 static WINDOW *win;
-
-/* Helper functions */
-static const char *timestr(date_t date)
-{
-	static char buf[64];
-	if (date.year)
-		sprintf(buf, "%04d-%02d-%02d %02d:%02d",
-			date.year, date.month+1, date.day+1,
-			date.hour, date.min);
-	else
-		sprintf(buf, "[none]");
-	return buf;
-}
-
-/* Event editing */
-static void draw_event(event_t *event)
-{
-	wmove(win, 0, 0);
-	wprintw(win, "Edit Event\n");
-	wprintw(win, "    Name:        %s\n",  event->name      ?: "[none]");
-	wprintw(win, "    Description: %s\n",  event->desc      ?: "[none]");
-	wprintw(win, "    Location:    %s\n",  event->loc       ?: "[none]");
-	wprintw(win, "    Category:    %s\n",  event->cat       ?: "[none]");
-	wprintw(win, "    Start Time:  %s\n",  timestr(event->start));
-	wprintw(win, "    End Time:    %s\n",  timestr(event->end));
-	wprintw(win, "    Calendar:    %s\n",  event->cal->name ?: "[none]");
-}
-
-static int edit_event(event_t *event, int key, mmask_t btn, int row, int col)
-{
-	return 0;
-}
-
-/* Todo editing */
-static void draw_todo(todo_t *todo)
-{
-	wmove(win, 0, 0);
-	wprintw(win, "Edit Todo\n");
-	wprintw(win, "    Name:        %s\n",   todo->name      ?: "[none]");
-	wprintw(win, "    Description: %s\n",   todo->desc      ?: "[none]");
-	wprintw(win, "    Category:    %s\n",   todo->cat       ?: "[none]");
-	wprintw(win, "    Completed:   %d%%\n", todo->status);
-	wprintw(win, "    Start Time:  %s\n",   timestr(todo->start));
-	wprintw(win, "    Due Date:    %s\n",   timestr(todo->due));
-	wprintw(win, "    Calendar:    %s\n",   todo->cal->name ?: "[none]");
-}
-
-static int edit_todo(todo_t *todo, int key, mmask_t btn, int row, int col)
-{
-	return 0;
-}
 
 /* Edit init */
 void edit_init(WINDOW *_win)
@@ -92,21 +42,11 @@ void edit_size(int rows, int cols)
 /* Edit draw */
 void edit_draw(void)
 {
-	switch (EDIT) {
-		case EDIT_CAL:   break;
-		case EDIT_EVENT: draw_event(EVENT); break;
-		case EDIT_TODO:  draw_todo(TODO);   break;
-		default:         break;
-	}
+	form_draw(win);
 }
 
 /* Edit run */
 int edit_run(int key, mmask_t btn, int row, int col)
 {
-	switch (EDIT) {
-		case EDIT_CAL:   return 1;
-		case EDIT_EVENT: return edit_event(EVENT, key, btn, row, col);
-		case EDIT_TODO:  return edit_todo(TODO, key, btn, row, col);
-		default:         return 0;
-	}
+	return form_run(key, btn, row, col);
 }
