@@ -383,12 +383,6 @@ int view_run(int key, mmask_t btn, int row, int col)
 
 	/* Handle other keys */
 	switch (key) {
-		case 'c':
-			COMPACT ^= 1;
-			set_bool("view", 0, "compact", COMPACT);
-			view_resize();
-			view_draw();
-			return 1;
 		case '\033': // escape
 			return set_view(active, NULL);
 		case '?':    // help
