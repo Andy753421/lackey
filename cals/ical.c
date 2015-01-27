@@ -53,49 +53,58 @@ static ical_t *calendars;
 static form_text_t   ff_name   = TEXT('t');
 static form_text_t   ff_desc   = TEXT('d');
 static form_text_t   ff_loc    = TEXT('o');
-static form_list_t   ff_cat    = LIST('g');
+static form_text_t   ff_cat    = TEXT('g');
 static form_date_t   ff_start  = DATE('s');
 static form_date_t   ff_end    = DATE('e');
 static form_number_t ff_status = NUMBER('p', .f.after="%");
 static form_date_t   ff_due    = DATE('u');
 static form_list_t   ff_cal    = LIST('c');
 static form_list_t   ff_recur  = LIST('r');
-static form_number_t ff_freq   = NUMBER(0);
+static form_number_t ff_freq   = NUMBER('v');
 static form_button_t ff_wdays  = BUTTONS("Su Mo Tu We Th Fr Sa");
 
 /* Edit event form */
 static form_t form_cal = { 1, 2, {
-	{ LABEL("_Title: "),     &ff_name.f                                    },
+	{ HEAD("Basics")                         },
+	{ TAB, LABEL("_Title"),     &ff_name.f   },
 } };
 
 /* Edit event form */
-static form_t form_event = { 11, 4, {
-	{ LABEL("_Title: "),     &ff_name.f                                      },
-	{ LABEL("L_ocation: "),  &ff_loc.f                                       },
-	{                                                                        },
-	{ LABEL("_Start: "),     &ff_start.f, LABEL("  _End: "),      &ff_end.f  },
-	{ LABEL("_Calendar: "),  &ff_cal.f,   LABEL("  Cate_gory: "), &ff_cat.f  },
-	{                                                                        },
-	{ LABEL("_Repeat: "),    &ff_recur.f, LABEL("  Every: "),     &ff_freq.f },
-	{                                                                        },
-	{ NULL,                  &ff_wdays.f                                     },
-	{                                                                        },
-	{ LABEL("_Details: "),   &ff_desc.f                                      },
+static form_t form_event = { 12, 6, {
+	{ HEAD("Basics")                         },
+	{ TAB, LABEL("_Title"),     &ff_name.f   },
+	{ TAB, LABEL("L_ocation"),  &ff_loc.f    },
+	{ TAB, LABEL("_Start"),     &ff_start.f,
+	  TAB, LABEL("_End"),       &ff_end.f    },
+	{ TAB, LABEL("_Calendar"),  &ff_cal.f,
+	  TAB, LABEL("Cate_gory"),  &ff_cat.f    },
+	{                                        },
+	{ HEAD("Recurrence")                     },
+	{ TAB, LABEL("_Repeat"),    &ff_recur.f,
+	  TAB, LABEL("E_very"),     &ff_freq.f   },
+	{ TAB, TAB,                 &ff_wdays.f  },
+	{                                        },
+	{ HEAD("_Details")                       },
+	{ TAB, &ff_desc.f                        },
 } };
 
 /* Edit todo form */
-static form_t form_todo = { 11, 4, {
-	{ LABEL("_Title: "),     &ff_name.f                                      },
-	{ LABEL("Com_pleted: "), &ff_status.f                                    },
-	{                                                                        },
-	{ LABEL("_Start:    "),  &ff_start.f, LABEL("  D_ue Date: "), &ff_due.f  },
-	{ LABEL("_Calendar: "),  &ff_cal.f,   LABEL("  Cate_gory: "), &ff_cat.f  },
-	{                                                                        },
-	{ LABEL("_Repeat: "),    &ff_recur.f, LABEL("  Every: "),     &ff_freq.f },
-	{                                                                        },
-	{ NULL,                  &ff_wdays.f                                     },
-	{                                                                        },
-	{ LABEL("_Details: "),   &ff_desc.f                                      },
+static form_t form_todo = { 12, 6, {
+	{ HEAD("Basics")                         },
+	{ TAB, LABEL("_Title"),     &ff_name.f   },
+	{ TAB, LABEL("Com_pleted"), &ff_status.f },
+	{ TAB, LABEL("_Start"),     &ff_start.f,
+	  TAB, LABEL("D_ue Date"),  &ff_due.f    },
+	{ TAB, LABEL("_Calendar"),  &ff_cal.f,
+	  TAB, LABEL("Cate_gory"),  &ff_cat.f    },
+	{                                        },
+	{ HEAD("Recurrence")                     },
+	{ TAB, LABEL("_Repeat"),    &ff_recur.f,
+	  TAB, LABEL("E_very"),     &ff_freq.f   },
+	{ TAB, TAB,                 &ff_wdays.f  },
+	{                                        },
+	{ HEAD("_Details")                       },
+	{ TAB, &ff_desc.f                        },
 } };
 
 /* Helper functions */
@@ -392,25 +401,23 @@ void ical_edit(edit_t mode)
 			form_show(&form_cal);
 			break;
 		case EDIT_EVENT:
-			ff_name.text   = strcopy(EVENT->name);
-			ff_desc.text   = strcopy(EVENT->desc);
-			ff_loc.text    = strcopy(EVENT->loc);
-			//ff_cat.text    = strcopy(EVENT->cat);
-			ff_start.date  = EVENT->start;
-			ff_end.date    = EVENT->end;
-			//ff_recur.text = strcopy(EVENT->recur);
-			debug("ical_edit - event");
+			ff_name.text     = strcopy(EVENT->name);
+			ff_desc.text     = strcopy(EVENT->desc);
+			ff_loc.text      = strcopy(EVENT->loc);
+			ff_cat.text      = strcopy(EVENT->cat);
+			ff_start.date    = EVENT->start;
+			ff_end.date      = EVENT->end;
+			//ff_recur.text   = strcopy(EVENT->recur);
 			form_show(&form_event);
 			break;
 		case EDIT_TODO:
-			ff_name.text   = strcopy(TODO->name);
-			ff_desc.text   = strcopy(TODO->desc);
+			ff_name.text     = strcopy(TODO->name);
+			ff_desc.text     = strcopy(TODO->desc);
 			ff_status.number = TODO->status;
-			//ff_cat.text    = strcopy(TODO->cat);
-			ff_start.date  = TODO->start;
-			ff_due.date    = TODO->due;
-			//ff_recur.text = strcopy(TODO->recur);
-			debug("ical_edit - todo");
+			ff_cat.text      = strcopy(TODO->cat);
+			ff_start.date    = TODO->start;
+			ff_due.date      = TODO->due;
+			//ff_recur.text   = strcopy(TODO->recur);
 			form_show(&form_todo);
 			break;
 	}

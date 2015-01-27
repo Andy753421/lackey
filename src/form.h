@@ -23,7 +23,8 @@
 #define LIST(k,...)    {.f.type=FORM_LIST,   .f.hotkey=k, __VA_ARGS__}
 
 #define HEAD(t,...)    &(form_field_t){.type=FORM_LABEL, .label=t, .attr.bold=1}
-#define LABEL(t,...)   &(form_field_t){.type=FORM_LABEL, .label=t}
+#define LABEL(t,...)   &(form_field_t){.type=FORM_LABEL, .label=t, .after="  "}
+#define TAB            &(form_field_t){.type=FORM_LABEL, .label="    "}
 
 #define CHECK(t,...)   {.f.type=FORM_BUTTON, .f.label=t}
 #define TOGGLE(t,...)  {.f.type=FORM_BUTTON, .f.label=t}

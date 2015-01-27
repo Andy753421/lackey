@@ -22,12 +22,14 @@
 #include <ncurses.h>
 
 #include "date.h"
+#include "cal.h"
+#include "view.h"
 #include "form.h"
 
 /* Constants */
-#define TEXT_WIDTH   (20)
-#define NUMBER_WIDTH (10)
 #define DATE_WIDTH   (4+1+2+1+2 +1+ 2+1+2)
+#define TEXT_WIDTH   (DATE_WIDTH)
+#define NUMBER_WIDTH (10)
 
 /* Widget accessors */
 #define FF_TEXT(f)   (((form_text_t  *)f)->text)
@@ -124,11 +126,13 @@ static void field_draw(form_field_t *field, int width, int hover)
 
 	int boxed    = field->type == FORM_TEXT ||
 	               field->type == FORM_NUMBER;
+	int bold     = field->attr.bold;
 	int under    = 0;
 
 	int begin    = getcurx(win);
 	int maxstr   = width - strlen(before) - strlen(after);
 
+	if (bold)   wattron(win, A_BOLD);
 	if (hover)  wattron(win, A_REVERSE);
 	if (under)  wattron(win, A_UNDERLINE);
 	if (boxed)  waddch(win, '[');
@@ -172,6 +176,7 @@ static void field_draw(form_field_t *field, int width, int hover)
 	if (boxed)  waddch(win, ']');
 	if (under)  wattroff(win, A_UNDERLINE);
 	if (hover)  wattroff(win, A_REVERSE);
+	if (bold)   wattroff(win, A_BOLD);
 }
 
 static int is_active(form_t *form, int r, int c)
