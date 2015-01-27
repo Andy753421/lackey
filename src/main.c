@@ -96,29 +96,15 @@ int main(int argc, char **argv)
 		conf_sync();
 		int chr = getch();
 		date_sync();
-		if (chr == 'q')
-			break;
 		if (chr == KEY_MOUSE)
 			if (getmouse(&btn) != OK)
 				continue;
-		switch (chr) {
-			case KEY_RESIZE:
-				endwin();
-				refresh();
-				view_resize();
-				view_draw();
-				continue;
-			case '\14': // Ctrl-L
-				clear();
-			case '\7':  // Ctrl-G
-				view_resize();
-				view_draw();
-				continue;
-		}
 		if (view_run(chr, btn.bstate, btn.y, btn.x))
 			continue;
 		if (chr == ERR) // timeout
 			continue;
+		if (chr == 'q')
+			break;
 		debug("main: Unhandled key - Dec %3d,  Hex %02x,  Oct %03o,  Chr <%c>",
 				chr, chr, chr, chr);
 	}

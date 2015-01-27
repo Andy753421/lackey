@@ -18,9 +18,11 @@
 #define _XOPEN_SOURCE
 #define _XOPEN_SOURCE_EXTENDED
 
+#include <ctype.h>
 #include <string.h>
 #include <ncurses.h>
 
+#include "util.h"
 #include "date.h"
 #include "cal.h"
 #include "view.h"
@@ -254,6 +256,100 @@ static void move_active(form_t *form, int ro, int co)
 	}
 }
 
+static void form_edit(void)
+{
+	int cur=0, len=0;
+	char buf[512] = {};
+	int col_size[form->cols];
+
+	field_sizes(form, col_size);
+
+	int rrow = arow;
+	int rcol = 0;
+	int rlen = 0;
+	for (int c = 0; c < form->cols; c++) {
+		if (is_active(form, arow, c))
+			rlen += col_size[c];
+		else if (rlen == 0)
+			rcol += col_size[c];
+		else
+			break;
+	}
+
+	int done = 0;
+	curs_set(true);
+	while (!done) {
+		// Draw
+		int idx = MAX(0, len-(rlen-2));
+		wmove(win, rrow, rcol);
+		wprintw(win, "[%-*.*s]", rlen-2, rlen-2, &buf[idx]);
+		wmove(win, rrow, rcol+1+cur-idx);
+		wrefresh(win);
+
+		// Read next character
+		MEVENT btn;
+		int chr = getch();
+		date_sync();
+		if (chr == KEY_MOUSE)
+			if (getmouse(&btn) != OK)
+				continue;
+
+		// Line editing
+		switch (chr) {
+			case ERR:
+			case KEY_RESIZE:
+			case '\14':
+			case '\7':
+				//view_run(chr, btn.bstate, btn.y, btn.x);
+				continue;
+			case '\012': // Enter
+				done = 1;
+				break;
+			case '\033': // Escape
+				done = 2;
+				break;
+			case KEY_LEFT:
+				if (cur > 0)
+					cur--;
+				break;
+			case KEY_RIGHT:
+				if (cur < len)
+					cur++;
+				break;
+			case KEY_BACKSPACE:
+				if (cur > 0) {
+					memmove(&buf[cur-1], &buf[cur], (len-cur)+1);
+					cur--;
+					len--;
+				}
+				break;
+			case KEY_DC:
+				if (cur < len) {
+					memmove(&buf[cur], &buf[cur+1], (len-cur)+1);
+					len--;
+				}
+				break;
+		}
+
+		// Text input
+		if (isprint(chr)) {
+			if (len+1 < sizeof(buf)) {
+				memmove(&buf[cur+1], &buf[cur], (len-cur)+1);
+				buf[cur] = chr;
+				cur++;
+				len++;
+				//debug("form: cur=%d, len=%d", cur, len);
+			} else {
+				debug("form: out of space");
+			}
+		} else {
+			debug("form: Unhandled key - Dec %3d,  Hex %02x,  Oct %03o,  Chr <%c>",
+					chr, chr, chr, chr);
+		}
+	}
+	curs_set(false);
+}
+
 /* Form functions */
 void form_show(form_t *_form)
 {
@@ -338,6 +434,13 @@ int form_run(int key, mmask_t btn, int row, int col)
 			acol = c;
 			goto redraw;
 		}
+
+	// Check editing (enter)
+	if (key == '\012') {
+		form_edit();
+		goto redraw;
+	}
+
 	return 0;
 
 redraw:

@@ -383,6 +383,18 @@ int view_run(int key, mmask_t btn, int row, int col)
 
 	/* Handle other keys */
 	switch (key) {
+		case KEY_RESIZE:
+			endwin();
+			refresh();
+			view_resize();
+			view_draw();
+			return 1;
+		case '\14': // Ctrl-L
+			clear();
+		case '\7':  // Ctrl-G
+			view_resize();
+			view_draw();
+			return 1;
 		case '\033': // escape
 			return set_view(active, NULL);
 		case '?':    // help
